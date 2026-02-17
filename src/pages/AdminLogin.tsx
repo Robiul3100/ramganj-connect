@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Mail, Lock, LogIn } from "lucide-react";
+import { Shield, Mail, Lock, LogIn, Home } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const AdminLogin = () => {
@@ -65,6 +65,14 @@ const AdminLogin = () => {
           <h1 className="text-2xl font-bold text-foreground">এডমিন লগইন</h1>
           <p className="text-sm text-muted-foreground mt-1">রামগঞ্জ সেবা ম্যানেজমেন্ট</p>
         </div>
+
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl border border-border bg-card text-sm font-semibold text-foreground hover:bg-muted transition-colors mb-4"
+        >
+          <Home className="w-4 h-4" /> হোমপেজে যান
+        </button>
 
         <form onSubmit={isSetup ? handleSetup : handleLogin} className="glass-card p-6 space-y-4">
           <div>
