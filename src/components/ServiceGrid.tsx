@@ -5,14 +5,14 @@ import {
   Stethoscope, Building2, Pill, GraduationCap, Store, Tag, Briefcase, MapPin,
   Calendar, Globe, Ambulance, Shield, Flame, Bus, Zap, Scale, Landmark, Users,
   Umbrella, Package, Sprout, Home, BookOpenCheck, UtensilsCrossed, Wrench, PenTool, Heart,
-  Newspaper
+  Newspaper, Activity, Car, Building, TrendingUp, BedDouble, Coffee, Video, TreePine
 } from "lucide-react";
 
 const iconMap: Record<string, any> = {
   Stethoscope, Building2, Pill, GraduationCap, Store, Tag, Briefcase, MapPin,
   Calendar, Globe, Ambulance, Shield, Flame, Bus, Zap, Scale, Landmark, Users,
   Umbrella, Package, Sprout, Home, BookOpenCheck, UtensilsCrossed, Wrench, PenTool, Heart,
-  Newspaper,
+  Newspaper, Activity, Car, Building, TrendingUp, BedDouble, Coffee, Video, TreePine,
 };
 
 const colorMap: Record<string, { iconColor: string; iconBg: string }> = {
@@ -44,6 +44,14 @@ const colorMap: Record<string, { iconColor: string; iconBg: string }> = {
   PenTool: { iconColor: "hsl(250,40%,50%)", iconBg: "hsl(250,40%,92%)" },
   Heart: { iconColor: "hsl(340,70%,55%)", iconBg: "hsl(340,70%,92%)" },
   Newspaper: { iconColor: "hsl(0,75%,50%)", iconBg: "hsl(0,75%,92%)" },
+  Activity: { iconColor: "hsl(190,60%,45%)", iconBg: "hsl(190,60%,92%)" },
+  Car: { iconColor: "hsl(160,55%,40%)", iconBg: "hsl(160,55%,92%)" },
+  Building: { iconColor: "hsl(210,40%,50%)", iconBg: "hsl(210,40%,92%)" },
+  TrendingUp: { iconColor: "hsl(140,50%,42%)", iconBg: "hsl(140,50%,92%)" },
+  BedDouble: { iconColor: "hsl(35,70%,50%)", iconBg: "hsl(35,70%,92%)" },
+  Coffee: { iconColor: "hsl(15,70%,50%)", iconBg: "hsl(15,70%,92%)" },
+  Video: { iconColor: "hsl(240,50%,55%)", iconBg: "hsl(240,50%,92%)" },
+  TreePine: { iconColor: "hsl(130,50%,40%)", iconBg: "hsl(130,50%,92%)" },
 };
 
 interface Category {
