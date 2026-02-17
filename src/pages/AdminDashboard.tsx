@@ -578,7 +578,8 @@ const AdminDashboard = () => {
           <Newspaper className="w-4 h-4 text-primary" /> {newsEditId ? "নিউজ এডিট" : "নতুন নিউজ যোগ করুন"}
         </h2>
         <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:ring-2 focus:ring-primary/20" placeholder="নিউজ শিরোনাম" value={newsForm.title} onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })} />
-        <textarea className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none min-h-[120px] focus:ring-2 focus:ring-primary/20" placeholder="নিউজ বিস্তারিত..." value={newsForm.body} onChange={(e) => setNewsForm({ ...newsForm, body: e.target.value })} />
+        <textarea className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none min-h-[200px] focus:ring-2 focus:ring-primary/20 font-mono" placeholder="বিস্তারিত নিউজ (HTML সাপোর্টেড)... &#10;উদাহরণ: <h2>শিরোনাম</h2> <p>প্যারাগ্রাফ</p> <ul><li>পয়েন্ট</li></ul>" value={newsForm.body} onChange={(e) => setNewsForm({ ...newsForm, body: e.target.value })} />
+        <p className="text-[10px] text-muted-foreground">HTML কোড পেস্ট করতে পারবেন — হেডিং, কালার, বুলেট পয়েন্ট, এলাইনমেন্ট ইত্যাদি সাপোর্টেড</p>
         <div>
           <label className="text-xs font-medium text-muted-foreground mb-1 block">প্রকাশের তারিখ ও সময়</label>
           <input

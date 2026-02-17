@@ -105,9 +105,7 @@ const NewsDetail = () => {
 
         <hr className="border-border" />
 
-        <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-          {news.body}
-        </div>
+        <div className="news-html-content text-sm text-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: news.body }} />
       </div>
 
       <BottomNav />
