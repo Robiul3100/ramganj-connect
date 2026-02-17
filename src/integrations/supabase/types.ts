@@ -14,16 +14,522 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      about_content: {
+        Row: {
+          article_body: string
+          article_title: string
+          id: string
+          meta_description: string | null
+          updated_at: string
+        }
+        Insert: {
+          article_body?: string
+          article_title?: string
+          id?: string
+          meta_description?: string | null
+          updated_at?: string
+        }
+        Update: {
+          article_body?: string
+          article_title?: string
+          id?: string
+          meta_description?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      about_gallery: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          image_url: string
+          is_active: boolean
+          sort_order: number
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_url: string
+          is_active?: boolean
+          sort_order?: number
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      announcements: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          text: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          text: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          text?: string
+        }
+        Relationships: []
+      }
+      blood_donors: {
+        Row: {
+          address: string | null
+          blood_group: string
+          created_at: string
+          id: string
+          is_approved: boolean
+          is_available: boolean
+          last_donation_date: string | null
+          name: string
+          phone: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          blood_group: string
+          created_at?: string
+          id?: string
+          is_approved?: boolean
+          is_available?: boolean
+          last_donation_date?: string | null
+          name: string
+          phone: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          blood_group?: string
+          created_at?: string
+          id?: string
+          is_approved?: boolean
+          is_available?: boolean
+          last_donation_date?: string | null
+          name?: string
+          phone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      complaints: {
+        Row: {
+          category: string
+          complaint_date: string
+          created_at: string
+          description: string | null
+          id: string
+          is_approved: boolean
+          location: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          complaint_date?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_approved?: boolean
+          location?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          complaint_date?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_approved?: boolean
+          location?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      donation_methods: {
+        Row: {
+          account_number: string
+          account_type: string
+          created_at: string
+          gradient_colors: string | null
+          id: string
+          is_active: boolean
+          method_name: string
+          sort_order: number
+        }
+        Insert: {
+          account_number: string
+          account_type: string
+          created_at?: string
+          gradient_colors?: string | null
+          id?: string
+          is_active?: boolean
+          method_name: string
+          sort_order?: number
+        }
+        Update: {
+          account_number?: string
+          account_type?: string
+          created_at?: string
+          gradient_colors?: string | null
+          id?: string
+          is_active?: boolean
+          method_name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      donations: {
+        Row: {
+          amount: number
+          created_at: string
+          donor_name: string
+          id: string
+          message: string | null
+          payment_method: string
+          phone: string
+          trx_id: string | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          donor_name: string
+          id?: string
+          message?: string | null
+          payment_method: string
+          phone: string
+          trx_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          donor_name?: string
+          id?: string
+          message?: string | null
+          payment_method?: string
+          phone?: string
+          trx_id?: string | null
+        }
+        Relationships: []
+      }
+      emergency_calls: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon_name: string | null
+          id: string
+          is_active: boolean
+          name: string
+          phone: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          phone: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          phone?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          event_date: string | null
+          icon_name: string | null
+          id: string
+          is_approved: boolean
+          location: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          icon_name?: string | null
+          id?: string
+          is_approved?: boolean
+          location?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          icon_name?: string | null
+          id?: string
+          is_approved?: boolean
+          location?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      expatriate_forums: {
+        Row: {
+          category: string
+          country: string
+          created_at: string
+          description: string | null
+          id: string
+          is_approved: boolean
+          location: string | null
+          name: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          country: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_approved?: boolean
+          location?: string | null
+          name: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          country?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_approved?: boolean
+          location?: string | null
+          name?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      jobs: {
+        Row: {
+          category: string
+          company: string
+          created_at: string
+          deadline: string | null
+          description: string | null
+          id: string
+          is_approved: boolean
+          phone: string | null
+          salary_range: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          company: string
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          is_approved?: boolean
+          phone?: string | null
+          salary_range?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          company?: string
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          is_approved?: boolean
+          phone?: string | null
+          salary_range?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          id: string
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          id?: string
+          key: string
+          updated_at?: string
+          value?: string
+        }
+        Update: {
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      slider_items: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          is_active: boolean
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          is_active?: boolean
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      timeline_events: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          sort_order: number
+          title: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +656,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
