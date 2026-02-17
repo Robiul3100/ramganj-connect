@@ -40,7 +40,7 @@ const Complaints = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background max-w-4xl mx-auto">
+    <div className="min-h-screen bg-background max-w-4xl mx-auto pb-6">
       <PageHeader title="অভিযোগ বক্স" color="linear-gradient(135deg, hsl(0,70%,50%), hsl(15,80%,55%))" onAdd={() => setShowForm(true)} />
       
       <div className="px-4 -mt-2 space-y-3">

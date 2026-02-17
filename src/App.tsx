@@ -23,6 +23,7 @@ import Marketplace from "./pages/Marketplace";
 import Doctors from "./pages/Doctors";
 import Education from "./pages/Education";
 import Shops from "./pages/Shops";
+import Services from "./pages/Services";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/services" element={<Services />} />
           <Route path="/emergency-calls" element={<EmergencyCalls />} />
           <Route path="/blood-bank" element={<BloodBank />} />
           <Route path="/jobs" element={<Jobs />} />
