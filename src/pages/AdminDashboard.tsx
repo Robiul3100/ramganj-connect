@@ -7,7 +7,8 @@ import {
   Eye, Clock, AlertTriangle, Star, StarOff, Filter, Newspaper, Plus,
   Image as ImageIcon, ChevronRight, Bell, Settings, Zap, BarChart3,
   Menu, XIcon, Globe, FileText, Phone, Droplets, Heart, Megaphone,
-  SlidersHorizontal, Info, History
+  SlidersHorizontal, Info, History, ChevronDown, ArrowUpRight, Sparkles,
+  RefreshCw, MoreHorizontal, CalendarDays, Hash, Layers
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -26,7 +27,7 @@ const tabGroups = [
     label: "সেবা ম্যানেজমেন্ট",
     items: [
       { id: "services" as Tab, label: "সেবাসমূহ", icon: Globe },
-      { id: "categories" as Tab, label: "ক্যাটাগরি", icon: Filter },
+      { id: "categories" as Tab, label: "ক্যাটাগরি", icon: Layers },
     ],
   },
   {
@@ -50,7 +51,7 @@ const tabGroups = [
     label: "সিস্টেম",
     items: [
       { id: "users" as Tab, label: "ইউজার", icon: Users },
-      { id: "activity" as Tab, label: "অ্যাক্টিভিটি লগ", icon: Activity },
+      { id: "activity" as Tab, label: "অ্যাক্টিভিটি", icon: Activity },
     ],
   },
 ];
@@ -286,80 +287,71 @@ const AdminDashboard = () => {
 
   // ===================== RENDER SECTIONS =====================
 
-  const renderHero = () => (
-    <div className="relative overflow-hidden rounded-2xl mx-4 mt-4">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-accent opacity-90" />
-      <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
-      <div className="relative px-5 py-8 text-primary-foreground">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-2xl bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center">
-            <Shield className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold">রামগঞ্জ সেবা</h1>
-            <p className="text-sm opacity-80">অ্যাডমিন কন্ট্রোল প্যানেল</p>
-          </div>
-        </div>
-        <p className="text-sm opacity-90 mb-5">সকল সেবা, কমিউনিটি ও কন্টেন্ট ম্যানেজ করুন একটি জায়গা থেকে।</p>
-
-        {/* Quick Stats Row */}
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { label: "মোট সেবা", value: counts.total, icon: Globe },
-            { label: "অনুমোদিত", value: counts.approved, icon: CheckCircle },
-            { label: "অপেক্ষমান", value: counts.pending, icon: Clock },
-          ].map(s => (
-            <div key={s.label} className="bg-primary-foreground/15 backdrop-blur-sm rounded-xl p-3 text-center">
-              <s.icon className="w-4 h-4 mx-auto mb-1 opacity-80" />
-              <p className="text-2xl font-bold">{s.value}</p>
-              <p className="text-[10px] opacity-70">{s.label}</p>
+  const renderDashboard = () => (
+    <div className="space-y-6">
+      {/* Welcome Banner */}
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/3" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full translate-y-1/2 -translate-x-1/4" />
+        <div className="relative p-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <span className="text-xs font-semibold text-primary uppercase tracking-wider">অ্যাডমিন প্যানেল</span>
+              </div>
+              <h1 className="text-2xl font-bold text-foreground">স্বাগতম! 👋</h1>
+              <p className="text-sm text-muted-foreground mt-1">সকল সেবা ও কন্টেন্ট ম্যানেজ করুন এখান থেকে</p>
             </div>
-          ))}
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Shield className="w-6 h-6 text-primary" />
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  );
 
-  const renderDashboard = () => (
-    <div className="space-y-5">
       {/* Pending Alert */}
       {counts.pending > 0 && (
-        <button onClick={() => setActiveTab("pending")} className="w-full bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 text-left flex items-center justify-between group">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
+        <button onClick={() => setActiveTab("pending")} className="w-full group">
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40 hover:border-amber-300 dark:hover:border-amber-700 transition-all">
+            <div className="w-11 h-11 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
               <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             </div>
-            <div>
-              <span className="font-bold text-amber-800 dark:text-amber-200 text-sm">{counts.pending}টি অনুমোদন অপেক্ষমান</span>
-              <p className="text-xs text-amber-600 dark:text-amber-400">এখনই রিভিউ করুন</p>
+            <div className="flex-1 text-left">
+              <p className="font-bold text-amber-800 dark:text-amber-200 text-sm">{counts.pending}টি অনুমোদন অপেক্ষমান</p>
+              <p className="text-xs text-amber-600/80 dark:text-amber-400/80">ট্যাপ করে রিভিউ করুন</p>
             </div>
+            <ChevronRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform" />
           </div>
-          <ChevronRight className="w-5 h-5 text-amber-500 group-hover:translate-x-1 transition-transform" />
         </button>
       )}
 
-      {/* Stats Grid */}
+      {/* Stats */}
       <div>
-        <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-          <BarChart3 className="w-4 h-4 text-primary" /> পরিসংখ্যান
-        </h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 text-primary" /> পরিসংখ্যান
+          </h3>
+          <button onClick={() => fetchCounts()} className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors">
+            <RefreshCw className="w-3 h-3" /> রিফ্রেশ
+          </button>
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {[
-            { label: "মোট সেবা", count: counts.total, icon: Globe, color: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
-            { label: "অনুমোদিত", count: counts.approved, icon: CheckCircle, color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
-            { label: "অপেক্ষমান", count: counts.pending, icon: Clock, color: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
-            { label: "প্রত্যাখ্যাত", count: counts.rejected, icon: XCircle, color: "bg-red-500/10 text-red-600 dark:text-red-400" },
-            { label: "ফিচার্ড", count: counts.featured, icon: Star, color: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400" },
-            { label: "ক্যাটাগরি", count: counts.categories, icon: Filter, color: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
+            { label: "মোট সেবা", count: counts.total, icon: Globe, gradient: "from-blue-500 to-cyan-500" },
+            { label: "অনুমোদিত", count: counts.approved, icon: CheckCircle, gradient: "from-emerald-500 to-teal-500" },
+            { label: "অপেক্ষমান", count: counts.pending, icon: Clock, gradient: "from-amber-500 to-orange-500" },
+            { label: "প্রত্যাখ্যাত", count: counts.rejected, icon: XCircle, gradient: "from-rose-500 to-red-500" },
+            { label: "ফিচার্ড", count: counts.featured, icon: Star, gradient: "from-yellow-500 to-amber-500" },
+            { label: "ক্যাটাগরি", count: counts.categories, icon: Layers, gradient: "from-violet-500 to-purple-500" },
           ].map((s) => (
-            <div key={s.label} className="glass-card p-4 flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.color}`}>
-                <s.icon className="w-5 h-5" />
+            <div key={s.label} className="relative overflow-hidden rounded-2xl bg-card border border-border p-4 group hover:shadow-md transition-all">
+              <div className={`absolute top-0 right-0 w-20 h-20 rounded-full bg-gradient-to-br ${s.gradient} opacity-[0.07] -translate-y-1/3 translate-x-1/3 group-hover:opacity-[0.12] transition-opacity`} />
+              <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center mb-3`}>
+                <s.icon className="w-4 h-4 text-white" />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{s.count}</p>
-                <p className="text-xs text-muted-foreground">{s.label}</p>
-              </div>
+              <p className="text-2xl font-bold text-foreground">{s.count}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
@@ -370,18 +362,20 @@ const AdminDashboard = () => {
         <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
           <Zap className="w-4 h-4 text-accent" /> দ্রুত অ্যাকশন
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {[
-            { label: "অপেক্ষমান", tab: "pending" as Tab, icon: Clock, desc: "রিভিউ করুন" },
-            { label: "সকল সেবা", tab: "services" as Tab, icon: Globe, desc: "সেবা দেখুন" },
-            { label: "নিউজ", tab: "news" as Tab, icon: Newspaper, desc: "প্রকাশ করুন" },
-            { label: "ক্যাটাগরি", tab: "categories" as Tab, icon: Filter, desc: "ম্যানেজ করুন" },
-            { label: "ইউজার", tab: "users" as Tab, icon: Users, desc: "ব্যবস্থাপনা" },
-            { label: "অ্যাক্টিভিটি", tab: "activity" as Tab, icon: Activity, desc: "লগ দেখুন" },
+            { label: "অপেক্ষমান", tab: "pending" as Tab, icon: Clock, desc: "রিভিউ করুন", gradient: "from-amber-500 to-orange-500" },
+            { label: "সকল সেবা", tab: "services" as Tab, icon: Globe, desc: "সেবা দেখুন", gradient: "from-blue-500 to-cyan-500" },
+            { label: "নিউজ", tab: "news" as Tab, icon: Newspaper, desc: "প্রকাশ করুন", gradient: "from-emerald-500 to-teal-500" },
+            { label: "ক্যাটাগরি", tab: "categories" as Tab, icon: Layers, desc: "ম্যানেজ করুন", gradient: "from-violet-500 to-purple-500" },
+            { label: "ইউজার", tab: "users" as Tab, icon: Users, desc: "ব্যবস্থাপনা", gradient: "from-pink-500 to-rose-500" },
+            { label: "অ্যাক্টিভিটি", tab: "activity" as Tab, icon: Activity, desc: "লগ দেখুন", gradient: "from-slate-500 to-zinc-500" },
           ].map((a) => (
             <button key={a.label} onClick={() => { setActiveTab(a.tab); setSidebarOpen(false); }}
-              className="glass-card p-4 text-left hover:shadow-md transition-all group">
-              <a.icon className="w-5 h-5 text-primary mb-2" />
+              className="bg-card border border-border rounded-2xl p-4 text-left hover:shadow-md hover:border-primary/20 transition-all group">
+              <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${a.gradient} flex items-center justify-center mb-3 group-hover:scale-105 transition-transform`}>
+                <a.icon className="w-4 h-4 text-white" />
+              </div>
               <p className="text-sm font-bold text-foreground">{a.label}</p>
               <p className="text-xs text-muted-foreground">{a.desc}</p>
             </button>
@@ -392,129 +386,151 @@ const AdminDashboard = () => {
   );
 
   const renderServicesList = () => (
-    <div className="space-y-3">
-      <div className="flex flex-col gap-2">
+    <div className="space-y-4">
+      {/* Search & Filters */}
+      <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input type="text" placeholder="নাম, ফোন, ঠিকানা দিয়ে খুঁজুন..." className="w-full bg-card rounded-xl pl-9 pr-4 py-2.5 text-sm outline-none border border-border focus:ring-2 focus:ring-primary/20 transition-all" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input type="text" placeholder="নাম, ফোন বা ঠিকানা দিয়ে খুঁজুন..." className="w-full bg-muted/50 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none border border-border focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex gap-2 flex-wrap">
           {activeTab !== "pending" && (
-            <select className="bg-card rounded-xl px-3 py-2 text-xs border border-border" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+            <select className="bg-muted/50 rounded-xl px-3 py-2 text-xs border border-border focus:border-primary/40 outline-none" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
               <option value="all">সকল স্ট্যাটাস</option>
               <option value="approved">অনুমোদিত</option>
               <option value="pending">অপেক্ষমান</option>
               <option value="rejected">প্রত্যাখ্যাত</option>
             </select>
           )}
-          <select className="bg-card rounded-xl px-3 py-2 text-xs border border-border" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+          <select className="bg-muted/50 rounded-xl px-3 py-2 text-xs border border-border focus:border-primary/40 outline-none" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
             <option value="all">সকল ক্যাটাগরি</option>
             {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
+          <div className="flex-1" />
+          <span className="text-xs text-muted-foreground flex items-center gap-1 bg-muted/50 px-3 py-2 rounded-xl">
+            <Hash className="w-3 h-3" /> {filteredServices.length}টি
+          </span>
         </div>
-        <p className="text-xs text-muted-foreground">মোট: {filteredServices.length}টি</p>
       </div>
 
       {loading ? <LoadingState /> : filteredServices.length === 0 ? <EmptyState /> : (
-        filteredServices.map((item: any) => (
-          <div key={item.id} className="glass-card p-4 border border-border/50">
-            {editingId === item.id ? (
-              <div className="space-y-2">
-                <input className="w-full bg-muted/50 rounded-xl px-3 py-2 text-sm border border-border focus:ring-2 focus:ring-primary/20" value={editData.title} onChange={(e) => setEditData({ ...editData, title: e.target.value })} placeholder="শিরোনাম" />
-                <textarea className="w-full bg-muted/50 rounded-xl px-3 py-2 text-sm border border-border min-h-[60px] focus:ring-2 focus:ring-primary/20" value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} placeholder="বিবরণ" />
-                <div className="grid grid-cols-2 gap-2">
-                  <input className="bg-muted/50 rounded-xl px-3 py-2 text-sm border border-border" value={editData.phone} onChange={(e) => setEditData({ ...editData, phone: e.target.value })} placeholder="ফোন" />
-                  <input className="bg-muted/50 rounded-xl px-3 py-2 text-sm border border-border" value={editData.whatsapp} onChange={(e) => setEditData({ ...editData, whatsapp: e.target.value })} placeholder="WhatsApp" />
-                </div>
-                <input className="w-full bg-muted/50 rounded-xl px-3 py-2 text-sm border border-border" value={editData.address} onChange={(e) => setEditData({ ...editData, address: e.target.value })} placeholder="ঠিকানা" />
-                <select className="w-full bg-muted/50 rounded-xl px-3 py-2 text-sm border border-border" value={editData.category_id} onChange={(e) => setEditData({ ...editData, category_id: e.target.value })}>
-                  <option value="">ক্যাটাগরি নির্বাচন</option>
-                  {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1 block">ছবি (URL অথবা আপলোড)</label>
-                  <input className="w-full bg-muted/50 rounded-xl px-3 py-2 text-sm border border-border" value={editData.image_url} onChange={(e) => setEditData({ ...editData, image_url: e.target.value })} placeholder="ছবির লিংক (URL)" />
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <label className="flex items-center gap-1.5 text-xs text-primary font-medium cursor-pointer bg-primary/10 px-3 py-1.5 rounded-lg hover:bg-primary/15 transition-colors">
-                      <ImageIcon className="w-3.5 h-3.5" /> আপলোড
-                      <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        const ext = file.name.split(".").pop();
-                        const path = `services/${Date.now()}.${ext}`;
-                        const { error } = await supabase.storage.from("media").upload(path, file);
-                        if (error) { toast({ title: "আপলোড ব্যর্থ", variant: "destructive" }); return; }
-                        const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
-                        setEditData({ ...editData, image_url: urlData.publicUrl });
-                      }} />
-                    </label>
-                    {editData.image_url && <img src={editData.image_url} alt="" className="w-10 h-10 rounded-lg object-cover border border-border" />}
+        <div className="space-y-3">
+          {filteredServices.map((item: any) => (
+            <div key={item.id} className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-md transition-all">
+              {editingId === item.id ? (
+                <div className="p-4 space-y-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Edit3 className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-bold text-foreground">এডিট মোড</span>
                   </div>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={() => saveEdit(item.id)} className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center gap-1">
-                    <Save className="w-3.5 h-3.5" /> সেভ
-                  </button>
-                  <button onClick={() => setEditingId(null)} className="px-4 py-2.5 rounded-xl bg-muted text-foreground text-xs font-medium">
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-bold text-foreground text-sm">{item.title}</h3>
-                      {item.is_featured && <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />}
+                  <input className="w-full bg-muted/50 rounded-xl px-4 py-2.5 text-sm border border-border focus:border-primary/40 focus:ring-2 focus:ring-primary/10 outline-none transition-all" value={editData.title} onChange={(e) => setEditData({ ...editData, title: e.target.value })} placeholder="শিরোনাম" />
+                  <textarea className="w-full bg-muted/50 rounded-xl px-4 py-2.5 text-sm border border-border min-h-[70px] focus:border-primary/40 focus:ring-2 focus:ring-primary/10 outline-none transition-all resize-none" value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} placeholder="বিবরণ" />
+                  <div className="grid grid-cols-2 gap-2">
+                    <input className="bg-muted/50 rounded-xl px-4 py-2.5 text-sm border border-border focus:border-primary/40 outline-none" value={editData.phone} onChange={(e) => setEditData({ ...editData, phone: e.target.value })} placeholder="📞 ফোন" />
+                    <input className="bg-muted/50 rounded-xl px-4 py-2.5 text-sm border border-border focus:border-primary/40 outline-none" value={editData.whatsapp} onChange={(e) => setEditData({ ...editData, whatsapp: e.target.value })} placeholder="💬 WhatsApp" />
+                  </div>
+                  <input className="w-full bg-muted/50 rounded-xl px-4 py-2.5 text-sm border border-border focus:border-primary/40 outline-none" value={editData.address} onChange={(e) => setEditData({ ...editData, address: e.target.value })} placeholder="📍 ঠিকানা" />
+                  <select className="w-full bg-muted/50 rounded-xl px-4 py-2.5 text-sm border border-border focus:border-primary/40 outline-none" value={editData.category_id} onChange={(e) => setEditData({ ...editData, category_id: e.target.value })}>
+                    <option value="">ক্যাটাগরি নির্বাচন</option>
+                    {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">ছবি</label>
+                    <input className="w-full bg-muted/50 rounded-xl px-4 py-2.5 text-sm border border-border focus:border-primary/40 outline-none" value={editData.image_url} onChange={(e) => setEditData({ ...editData, image_url: e.target.value })} placeholder="ছবির লিংক (URL)" />
+                    <div className="flex items-center gap-3 mt-2">
+                      <label className="inline-flex items-center gap-1.5 text-xs text-primary font-semibold cursor-pointer bg-primary/10 px-4 py-2 rounded-xl hover:bg-primary/15 transition-colors">
+                        <ImageIcon className="w-3.5 h-3.5" /> আপলোড
+                        <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const ext = file.name.split(".").pop();
+                          const path = `services/${Date.now()}.${ext}`;
+                          const { error } = await supabase.storage.from("media").upload(path, file);
+                          if (error) { toast({ title: "আপলোড ব্যর্থ", variant: "destructive" }); return; }
+                          const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+                          setEditData({ ...editData, image_url: urlData.publicUrl });
+                        }} />
+                      </label>
+                      {editData.image_url && <img src={editData.image_url} alt="" className="w-10 h-10 rounded-xl object-cover border border-border" />}
                     </div>
-                    <p className="text-xs text-muted-foreground">{item.service_categories?.name || "—"}</p>
-                    {item.phone && <p className="text-xs text-muted-foreground mt-1">📞 {item.phone}</p>}
-                    {item.address && <p className="text-xs text-muted-foreground">📍 {item.address}</p>}
-                    {item.image_url && <img src={item.image_url} alt="" className="w-16 h-12 rounded-lg object-cover mt-1 border border-border" />}
-                    {item.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{item.description}</p>}
-                    <p className="text-xs text-muted-foreground mt-1">📅 {new Date(item.created_at).toLocaleDateString("bn-BD")}</p>
                   </div>
-                  <StatusBadge status={item.status} />
+                  <div className="flex gap-2 pt-1">
+                    <button onClick={() => saveEdit(item.id)} className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+                      <Save className="w-4 h-4" /> সেভ করুন
+                    </button>
+                    <button onClick={() => setEditingId(null)} className="px-5 py-2.5 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
+                      বাতিল
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-1.5 mt-3 flex-wrap">
-                  {item.status !== "approved" && (
-                    <ActionBtn color="emerald" onClick={() => updateServiceStatus(item.id, "approved", item.title)} icon={<CheckCircle className="w-3.5 h-3.5" />} label="অনুমোদন" />
-                  )}
-                  {item.status !== "rejected" && (
-                    <ActionBtn color="red" onClick={() => updateServiceStatus(item.id, "rejected", item.title)} icon={<XCircle className="w-3.5 h-3.5" />} label="প্রত্যাখ্যান" />
-                  )}
-                  <ActionBtn color="amber" onClick={() => toggleFeatured(item.id, item.is_featured, item.title)} icon={item.is_featured ? <StarOff className="w-3.5 h-3.5" /> : <Star className="w-3.5 h-3.5" />} label={item.is_featured ? "আনফিচার" : "ফিচার"} />
-                  <ActionBtn color="blue" onClick={() => startEdit(item)} icon={<Edit3 className="w-3.5 h-3.5" />} label="এডিট" />
-                  <ActionBtn color="red" onClick={() => deleteService(item.id, item.title)} icon={<Trash2 className="w-3.5 h-3.5" />} label="মুছুন" />
+              ) : (
+                <div className="p-4">
+                  <div className="flex gap-3">
+                    {/* Thumbnail */}
+                    {item.image_url && (
+                      <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-muted">
+                        <img src={item.image_url} alt="" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <h3 className="font-bold text-foreground text-sm truncate">{item.title}</h3>
+                            {item.is_featured && <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5">{item.service_categories?.name || "—"}</p>
+                        </div>
+                        <StatusBadge status={item.status} />
+                      </div>
+                      {item.phone && <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1"><Phone className="w-3 h-3" /> {item.phone}</p>}
+                      {item.address && <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">📍 {item.address}</p>}
+                      {item.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{item.description}</p>}
+                      <p className="text-[10px] text-muted-foreground/60 mt-1.5 flex items-center gap-1">
+                        <CalendarDays className="w-3 h-3" /> {new Date(item.created_at).toLocaleDateString("bn-BD")}
+                      </p>
+                    </div>
+                  </div>
+                  {/* Actions */}
+                  <div className="flex gap-1.5 mt-3 pt-3 border-t border-border/50 flex-wrap">
+                    {item.status !== "approved" && (
+                      <ActionBtn variant="success" onClick={() => updateServiceStatus(item.id, "approved", item.title)} icon={<CheckCircle className="w-3.5 h-3.5" />} label="অনুমোদন" />
+                    )}
+                    {item.status !== "rejected" && (
+                      <ActionBtn variant="danger" onClick={() => updateServiceStatus(item.id, "rejected", item.title)} icon={<XCircle className="w-3.5 h-3.5" />} label="প্রত্যাখ্যান" />
+                    )}
+                    <ActionBtn variant="warning" onClick={() => toggleFeatured(item.id, item.is_featured, item.title)} icon={item.is_featured ? <StarOff className="w-3.5 h-3.5" /> : <Star className="w-3.5 h-3.5" />} label={item.is_featured ? "আনফিচার" : "ফিচার"} />
+                    <ActionBtn variant="info" onClick={() => startEdit(item)} icon={<Edit3 className="w-3.5 h-3.5" />} label="এডিট" />
+                    <ActionBtn variant="danger" onClick={() => deleteService(item.id, item.title)} icon={<Trash2 className="w-3.5 h-3.5" />} label="মুছুন" />
+                  </div>
                 </div>
-              </>
-            )}
-          </div>
-        ))
+              )}
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
 
   const renderCategories = () => (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-bold text-foreground">ক্যাটাগরি ম্যানেজমেন্ট</h2>
-        <span className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full font-medium">{categories.length}টি</span>
+      <div className="flex items-center justify-between mb-1">
+        <h2 className="text-sm font-bold text-foreground">ক্যাটাগরি তালিকা</h2>
+        <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-semibold">{categories.length}টি</span>
       </div>
-      {categories.map((c: any) => (
-        <div key={c.id} className="glass-card p-4 flex items-center justify-between border border-border/50">
+      {categories.map((c: any, i: number) => (
+        <div key={c.id} className="bg-card border border-border rounded-2xl p-4 flex items-center justify-between hover:shadow-sm transition-all">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Filter className="w-5 h-5 text-primary" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center text-sm font-bold text-primary">
+              {i + 1}
             </div>
             <div>
               <h3 className="font-bold text-sm text-foreground">{c.name}</h3>
-              <p className="text-xs text-muted-foreground">/{c.slug} • আইকন: {c.icon}</p>
+              <p className="text-xs text-muted-foreground">/{c.slug} • {c.icon}</p>
             </div>
           </div>
-          <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${c.is_active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-muted text-muted-foreground"}`}>
-            {c.is_active ? "সক্রিয়" : "নিষ্ক্রিয়"}
+          <span className={`text-xs px-3 py-1 rounded-full font-semibold ${c.is_active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-muted text-muted-foreground"}`}>
+            {c.is_active ? "✅ সক্রিয়" : "⏸ নিষ্ক্রিয়"}
           </span>
         </div>
       ))}
@@ -525,16 +541,24 @@ const AdminDashboard = () => {
     <div className="space-y-3">
       {loading ? <LoadingState /> : activityLog.length === 0 ? <EmptyState /> : (
         activityLog.map((log: any) => (
-          <div key={log.id} className="glass-card p-4 flex items-start gap-3 border border-border/50">
+          <div key={log.id} className="bg-card border border-border rounded-2xl p-4 flex items-start gap-3 hover:shadow-sm transition-all">
             <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-              log.action === "approved" ? "bg-emerald-500/10 text-emerald-600" : log.action === "deleted" ? "bg-red-500/10 text-red-600" : "bg-blue-500/10 text-blue-600"
+              log.action === "approved" ? "bg-emerald-500/10 text-emerald-600" : 
+              log.action === "deleted" ? "bg-red-500/10 text-red-600" : 
+              log.action === "edited" ? "bg-blue-500/10 text-blue-600" :
+              log.action === "rejected" ? "bg-orange-500/10 text-orange-600" :
+              "bg-muted text-muted-foreground"
             }`}>
-              {log.action === "approved" ? <CheckCircle className="w-4 h-4" /> : log.action === "deleted" ? <Trash2 className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {log.action === "approved" ? <CheckCircle className="w-4 h-4" /> : 
+               log.action === "deleted" ? <Trash2 className="w-4 h-4" /> : 
+               log.action === "edited" ? <Edit3 className="w-4 h-4" /> :
+               log.action === "rejected" ? <XCircle className="w-4 h-4" /> :
+               <Activity className="w-4 h-4" />}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground capitalize">{log.action}</p>
-              {log.table_name && <p className="text-xs text-muted-foreground">{log.table_name}{log.details ? ` — ${log.details}` : ""}</p>}
-              <p className="text-xs text-muted-foreground">{new Date(log.created_at).toLocaleString("bn-BD")}</p>
+              <p className="text-sm font-semibold text-foreground capitalize">{log.action}</p>
+              {log.table_name && <p className="text-xs text-muted-foreground mt-0.5">{log.table_name}{log.details ? ` — ${log.details}` : ""}</p>}
+              <p className="text-[10px] text-muted-foreground/60 mt-1">{new Date(log.created_at).toLocaleString("bn-BD")}</p>
             </div>
           </div>
         ))
@@ -544,24 +568,26 @@ const AdminDashboard = () => {
 
   const renderUsers = () => (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-bold text-foreground">ইউজার ম্যানেজমেন্ট</h2>
-        <span className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full font-medium">{usersList.length}জন</span>
+      <div className="flex items-center justify-between mb-1">
+        <h2 className="text-sm font-bold text-foreground">ইউজার তালিকা</h2>
+        <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-semibold">{usersList.length}জন</span>
       </div>
       {loading ? <LoadingState /> : (
         usersList.map((user: any) => (
-          <div key={user.id} className="glass-card p-4 flex items-center gap-3 border border-border/50">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Users className="w-5 h-5 text-primary" />
+          <div key={user.id} className="bg-card border border-border rounded-2xl p-4 flex items-center gap-3 hover:shadow-sm transition-all">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+              <span className="text-base font-bold text-primary">{(user.display_name || "U").charAt(0)}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-sm text-foreground">{user.display_name || "No Name"}</h3>
+              <h3 className="font-bold text-sm text-foreground truncate">{user.display_name || "No Name"}</h3>
               <p className="text-xs text-muted-foreground">{user.phone || "—"}</p>
             </div>
-            <div className="flex gap-1">
+            <div className="flex gap-1.5">
               {user.roles.map((r: string) => (
-                <span key={r} className={`text-xs px-2.5 py-1 rounded-full font-medium ${r === "admin" ? "bg-red-500/10 text-red-600 dark:text-red-400" : "bg-muted text-muted-foreground"}`}>
-                  {r === "admin" ? "🛡️" : "👤"} {r}
+                <span key={r} className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wide ${
+                  r === "admin" ? "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20" : "bg-muted text-muted-foreground"
+                }`}>
+                  {r === "admin" ? "🛡️ " : "👤 "}{r}
                 </span>
               ))}
             </div>
@@ -576,15 +602,19 @@ const AdminDashboard = () => {
     if (legacyData.length === 0) return <EmptyState />;
     return (
       <div className="space-y-3">
-        <p className="text-xs text-muted-foreground">মোট: {legacyData.length}টি</p>
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> মোট: {legacyData.length}টি</span>
+        </div>
         {legacyData.map((item: any) => {
           const name = item.title || item.name || item.text || item.method_name || item.article_title || item.donor_name || item.item_name || `${item.year || ""}`;
           return (
-            <div key={item.id} className="glass-card p-4 border border-border/50">
+            <div key={item.id} className="bg-card border border-border rounded-2xl p-4 hover:shadow-sm transition-all">
               <h3 className="font-bold text-sm text-foreground">{name}</h3>
-              {item.phone && <p className="text-xs text-muted-foreground mt-1">📞 {item.phone}</p>}
+              {item.phone && <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Phone className="w-3 h-3" /> {item.phone}</p>}
               {item.description && <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{item.description}</p>}
-              <p className="text-xs text-muted-foreground mt-1">📅 {new Date(item.created_at).toLocaleDateString("bn-BD")}</p>
+              <p className="text-[10px] text-muted-foreground/60 mt-1.5 flex items-center gap-1">
+                <CalendarDays className="w-3 h-3" /> {new Date(item.created_at).toLocaleDateString("bn-BD")}
+              </p>
             </div>
           );
         })}
@@ -594,66 +624,67 @@ const AdminDashboard = () => {
 
   const renderNews = () => (
     <div className="space-y-4">
-      <div className="glass-card p-5 space-y-3 border border-border/50">
-        <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-          <Newspaper className="w-4 h-4 text-primary" /> {newsEditId ? "নিউজ এডিট" : "নতুন নিউজ যোগ করুন"}
-        </h2>
-        <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:ring-2 focus:ring-primary/20" placeholder="নিউজ শিরোনাম" value={newsForm.title} onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })} />
-        <textarea className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none min-h-[200px] focus:ring-2 focus:ring-primary/20 font-mono" placeholder="বিস্তারিত নিউজ (HTML সাপোর্টেড)... &#10;উদাহরণ: <h2>শিরোনাম</h2> <p>প্যারাগ্রাফ</p> <ul><li>পয়েন্ট</li></ul>" value={newsForm.body} onChange={(e) => setNewsForm({ ...newsForm, body: e.target.value })} />
+      {/* News Form */}
+      <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Newspaper className="w-4 h-4 text-primary" />
+          </div>
+          <h2 className="text-sm font-bold text-foreground">{newsEditId ? "নিউজ এডিট" : "নতুন নিউজ যোগ করুন"}</h2>
+        </div>
+        <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" placeholder="নিউজ শিরোনাম" value={newsForm.title} onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })} />
+        <textarea className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none min-h-[180px] focus:border-primary/40 focus:ring-2 focus:ring-primary/10 font-mono transition-all resize-none" placeholder="বিস্তারিত নিউজ (HTML সাপোর্টেড)..." value={newsForm.body} onChange={(e) => setNewsForm({ ...newsForm, body: e.target.value })} />
         <p className="text-[10px] text-muted-foreground">HTML কোড পেস্ট করতে পারবেন — হেডিং, কালার, বুলেট পয়েন্ট, এলাইনমেন্ট ইত্যাদি সাপোর্টেড</p>
         <div>
-          <label className="text-xs font-medium text-muted-foreground mb-1 block">প্রকাশের তারিখ ও সময়</label>
-          <input
-            type="datetime-local"
-            className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:ring-2 focus:ring-primary/20"
-            value={newsForm.published_at}
-            onChange={(e) => setNewsForm({ ...newsForm, published_at: e.target.value })}
-          />
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">প্রকাশের তারিখ ও সময়</label>
+          <input type="datetime-local" className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" value={newsForm.published_at} onChange={(e) => setNewsForm({ ...newsForm, published_at: e.target.value })} />
           <p className="text-[10px] text-muted-foreground mt-1">খালি রাখলে বর্তমান সময় ব্যবহার হবে</p>
         </div>
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-xs text-primary font-medium cursor-pointer bg-primary/10 px-4 py-2.5 rounded-xl hover:bg-primary/15 transition-colors">
+          <label className="inline-flex items-center gap-2 text-xs text-primary font-semibold cursor-pointer bg-primary/10 px-4 py-2.5 rounded-xl hover:bg-primary/15 transition-colors">
             <ImageIcon className="w-4 h-4" /> {newsUploading ? "আপলোড হচ্ছে..." : "থাম্বনেইল"}
             <input type="file" accept="image/*" className="hidden" onChange={handleNewsUpload} disabled={newsUploading} />
           </label>
           {newsForm.thumbnail_url && <img src={newsForm.thumbnail_url} alt="thumb" className="w-14 h-14 rounded-xl object-cover border border-border" />}
         </div>
         <div className="flex gap-2">
-          <button onClick={saveNews} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors">
+          <button onClick={saveNews} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
             <Save className="w-4 h-4" /> {newsEditId ? "আপডেট" : "প্রকাশ করুন"}
           </button>
           {newsEditId && (
-            <button onClick={() => { setNewsEditId(null); setNewsForm({ title: "", body: "", thumbnail_url: "", published_at: "" }); }} className="px-5 py-3 rounded-xl bg-muted text-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
+            <button onClick={() => { setNewsEditId(null); setNewsForm({ title: "", body: "", thumbnail_url: "", published_at: "" }); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
               বাতিল
             </button>
           )}
         </div>
       </div>
 
+      {/* News List */}
       <div className="flex items-center justify-between">
-        <p className="text-xs text-muted-foreground">মোট: {newsItems.length}টি নিউজ</p>
+        <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> {newsItems.length}টি নিউজ</span>
       </div>
       {loading ? <LoadingState /> : newsItems.map((item: any) => (
-        <div key={item.id} className="glass-card p-4 flex gap-3 border border-border/50">
+        <div key={item.id} className="bg-card border border-border rounded-2xl p-4 flex gap-3 hover:shadow-sm transition-all">
           <div className="w-20 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
             {item.thumbnail_url ? (
               <img src={item.thumbnail_url} alt="" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center"><Newspaper className="w-5 h-5 text-muted-foreground/40" /></div>
+              <div className="w-full h-full flex items-center justify-center"><Newspaper className="w-5 h-5 text-muted-foreground/30" /></div>
             )}
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-bold text-foreground text-sm line-clamp-1">{item.title}</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
+              <CalendarDays className="w-3 h-3" />
               {new Date(item.published_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
             </p>
             <div className="flex gap-1.5 mt-2 flex-wrap">
-              <ActionBtn color="blue" onClick={() => { setNewsEditId(item.id); setNewsForm({ title: item.title, body: item.body || "", thumbnail_url: item.thumbnail_url || "", published_at: item.published_at ? new Date(item.published_at).toISOString().slice(0, 16) : "" }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
+              <ActionBtn variant="info" onClick={() => { setNewsEditId(item.id); setNewsForm({ title: item.title, body: item.body || "", thumbnail_url: item.thumbnail_url || "", published_at: item.published_at ? new Date(item.published_at).toISOString().slice(0, 16) : "" }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
               <button onClick={() => toggleNewsActive(item.id, item.is_active)}
-                className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${item.is_active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-muted text-muted-foreground"}`}>
+                className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-colors ${item.is_active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
                 {item.is_active ? "✅ সক্রিয়" : "⏸ নিষ্ক্রিয়"}
               </button>
-              <ActionBtn color="red" onClick={() => deleteNews(item.id, item.title)} icon={<Trash2 className="w-3 h-3" />} label="মুছুন" />
+              <ActionBtn variant="danger" onClick={() => deleteNews(item.id, item.title)} icon={<Trash2 className="w-3 h-3" />} label="মুছুন" />
             </div>
           </div>
         </div>
@@ -675,100 +706,123 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Mobile Header */}
-      <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
-        <div className="flex items-center justify-between px-4 py-3 max-w-5xl mx-auto">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border">
+        <div className="flex items-center justify-between px-4 py-3 max-w-6xl mx-auto">
           <div className="flex items-center gap-3">
-            <button onClick={() => setSidebarOpen(true)} className="lg:hidden w-9 h-9 rounded-xl bg-muted flex items-center justify-center">
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden w-9 h-9 rounded-xl bg-muted/80 hover:bg-muted flex items-center justify-center transition-colors">
               <Menu className="w-5 h-5 text-foreground" />
             </button>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
-                <Shield className="w-4 h-4 text-white" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm">
+                <Shield className="w-4 h-4 text-primary-foreground" />
               </div>
-              <span className="text-sm font-bold text-foreground hidden sm:inline">এডমিন প্যানেল</span>
+              <div className="hidden sm:block">
+                <span className="text-sm font-bold text-foreground">রামগঞ্জ সেবা</span>
+                <span className="text-[10px] text-muted-foreground block -mt-0.5">অ্যাডমিন</span>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {counts.pending > 0 && (
-              <button onClick={() => setActiveTab("pending")} className="relative w-9 h-9 rounded-xl bg-muted flex items-center justify-center">
+              <button onClick={() => setActiveTab("pending")} className="relative w-9 h-9 rounded-xl bg-muted/80 hover:bg-muted flex items-center justify-center transition-colors">
                 <Bell className="w-4 h-4 text-foreground" />
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center">{counts.pending}</span>
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">{counts.pending}</span>
               </button>
             )}
-            <button onClick={handleLogout} className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center hover:bg-destructive/10 transition-colors">
-              <LogOut className="w-4 h-4 text-foreground" />
+            <button onClick={handleLogout} className="w-9 h-9 rounded-xl bg-muted/80 hover:bg-destructive/10 flex items-center justify-center transition-colors group" title="লগআউট">
+              <LogOut className="w-4 h-4 text-foreground group-hover:text-destructive transition-colors" />
             </button>
           </div>
         </div>
       </header>
 
-      <div className="flex max-w-5xl mx-auto">
+      <div className="flex max-w-6xl mx-auto">
         {/* Desktop Sidebar */}
-        <aside className="hidden lg:block w-60 shrink-0 sticky top-[57px] h-[calc(100vh-57px)] overflow-y-auto border-r border-border p-3 space-y-4">
-          {tabGroups.map(group => (
-            <div key={group.label}>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold px-3 mb-1.5">{group.label}</p>
-              {group.items.map(tab => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
-                return (
-                  <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-all mb-0.5 ${
-                      isActive ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}>
-                    <Icon className="w-4 h-4" />
-                    <span>{tab.label}</span>
-                    {tab.id === "pending" && counts.pending > 0 && (
-                      <span className={`ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isActive ? "bg-primary-foreground/20" : "bg-destructive text-destructive-foreground"}`}>{counts.pending}</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          ))}
-        </aside>
-
-        {/* Mobile Sidebar Overlay */}
-        {sidebarOpen && (
-          <div className="fixed inset-0 z-50 lg:hidden">
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-            <aside className="absolute left-0 top-0 bottom-0 w-72 bg-card border-r border-border p-4 overflow-y-auto animate-slide-up" style={{ animation: "none", transform: "translateX(0)" }}>
-              <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
-                    <Shield className="w-4 h-4 text-white" />
-                  </div>
-                  <span className="text-sm font-bold text-foreground">এডমিন প্যানেল</span>
-                </div>
-                <button onClick={() => setSidebarOpen(false)} className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center">
-                  <XIcon className="w-4 h-4 text-foreground" />
-                </button>
-              </div>
-              {tabGroups.map(group => (
-                <div key={group.label} className="mb-4">
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold px-3 mb-1.5">{group.label}</p>
+        <aside className="hidden lg:flex flex-col w-[240px] shrink-0 sticky top-[57px] h-[calc(100vh-57px)] border-r border-border bg-card/40">
+          <nav className="flex-1 overflow-y-auto p-3 space-y-5">
+            {tabGroups.map(group => (
+              <div key={group.label}>
+                <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground/70 font-bold px-3 mb-2">{group.label}</p>
+                <div className="space-y-0.5">
                   {group.items.map(tab => {
                     const Icon = tab.icon;
                     const isActive = activeTab === tab.id;
                     return (
-                      <button key={tab.id} onClick={() => { setActiveTab(tab.id); setSidebarOpen(false); }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all mb-0.5 ${
-                          isActive ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${
+                          isActive 
+                            ? "bg-primary text-primary-foreground shadow-sm" 
+                            : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
                         }`}>
-                        <Icon className="w-4 h-4" />
-                        <span>{tab.label}</span>
+                        <Icon className="w-4 h-4 shrink-0" />
+                        <span className="truncate">{tab.label}</span>
                         {tab.id === "pending" && counts.pending > 0 && (
-                          <span className={`ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isActive ? "bg-primary-foreground/20" : "bg-destructive text-destructive-foreground"}`}>{counts.pending}</span>
+                          <span className={`ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${isActive ? "bg-primary-foreground/20" : "bg-destructive text-destructive-foreground"}`}>{counts.pending}</span>
                         )}
                       </button>
                     );
                   })}
                 </div>
-              ))}
+              </div>
+            ))}
+          </nav>
+          {/* Sidebar Footer */}
+          <div className="p-3 border-t border-border">
+            <div className="px-3 py-2">
+              <p className="text-[10px] text-muted-foreground/70 truncate">{currentUser?.email}</p>
+              <p className="text-[10px] text-emerald-500 font-medium flex items-center gap-1 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> অনলাইন
+              </p>
+            </div>
+          </div>
+        </aside>
 
-              <div className="mt-4 pt-4 border-t border-border">
-                <p className="text-xs text-muted-foreground px-3">{currentUser?.email}</p>
+        {/* Mobile Sidebar Overlay */}
+        {sidebarOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+            <aside className="absolute left-0 top-0 bottom-0 w-[280px] bg-card border-r border-border flex flex-col" style={{ animation: "slideInLeft 0.2s ease-out" }}>
+              <div className="flex items-center justify-between p-4 border-b border-border">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+                    <Shield className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                  <span className="text-sm font-bold text-foreground">এডমিন প্যানেল</span>
+                </div>
+                <button onClick={() => setSidebarOpen(false)} className="w-8 h-8 rounded-xl bg-muted/80 hover:bg-muted flex items-center justify-center transition-colors">
+                  <XIcon className="w-4 h-4 text-foreground" />
+                </button>
+              </div>
+              <nav className="flex-1 overflow-y-auto p-3 space-y-5">
+                {tabGroups.map(group => (
+                  <div key={group.label}>
+                    <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground/70 font-bold px-3 mb-2">{group.label}</p>
+                    <div className="space-y-0.5">
+                      {group.items.map(tab => {
+                        const Icon = tab.icon;
+                        const isActive = activeTab === tab.id;
+                        return (
+                          <button key={tab.id} onClick={() => { setActiveTab(tab.id); setSidebarOpen(false); }}
+                            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${
+                              isActive 
+                                ? "bg-primary text-primary-foreground shadow-sm" 
+                                : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                            }`}>
+                            <Icon className="w-4 h-4 shrink-0" />
+                            <span>{tab.label}</span>
+                            {tab.id === "pending" && counts.pending > 0 && (
+                              <span className={`ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isActive ? "bg-primary-foreground/20" : "bg-destructive text-destructive-foreground"}`}>{counts.pending}</span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </nav>
+              <div className="p-4 border-t border-border">
+                <p className="text-xs text-muted-foreground truncate px-1">{currentUser?.email}</p>
                 <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors mt-2">
                   <LogOut className="w-4 h-4" /> লগআউট
                 </button>
@@ -779,40 +833,46 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <main className="flex-1 min-w-0">
-          {activeTab === "dashboard" && renderHero()}
+          {/* Mobile Tab Scroller */}
+          <div className="lg:hidden sticky top-[57px] z-40 bg-background/95 backdrop-blur-md border-b border-border">
+            <div className="px-3 py-2.5 overflow-x-auto">
+              <div className="flex gap-1.5 min-w-max">
+                {allTabs.map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
+                        activeTab === tab.id 
+                          ? "bg-primary text-primary-foreground shadow-sm" 
+                          : "bg-card text-muted-foreground border border-border"
+                      }`}>
+                      <Icon className="w-3.5 h-3.5" />
+                      {tab.label}
+                      {tab.id === "pending" && counts.pending > 0 && (
+                        <span className={`text-[10px] font-bold px-1 rounded-full ${activeTab === tab.id ? "bg-primary-foreground/20" : "bg-destructive text-destructive-foreground"}`}>{counts.pending}</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
 
-          {/* Tab header for non-dashboard */}
+          {/* Page Header */}
           {activeTab !== "dashboard" && activeTabData && (
-            <div className="px-4 pt-4 pb-2">
-              <div className="flex items-center gap-2">
-                <activeTabData.icon className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-bold text-foreground">{activeTabData.label}</h2>
+            <div className="px-5 pt-5 pb-1">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <activeTabData.icon className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-foreground leading-tight">{activeTabData.label}</h2>
+                </div>
               </div>
             </div>
           )}
 
-          {/* Mobile Tab Scroller */}
-          <div className="lg:hidden px-2 py-2 overflow-x-auto">
-            <div className="flex gap-1.5 min-w-max">
-              {allTabs.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
-                      activeTab === tab.id ? "bg-primary text-primary-foreground shadow-md" : "bg-muted text-muted-foreground"
-                    }`}>
-                    <Icon className="w-3.5 h-3.5" />
-                    {tab.label}
-                    {tab.id === "pending" && counts.pending > 0 && (
-                      <span className={`text-[10px] font-bold px-1 rounded-full ${activeTab === tab.id ? "bg-primary-foreground/20" : "bg-destructive text-destructive-foreground"}`}>{counts.pending}</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="px-4 pb-8">
+          <div className="p-5">
             {renderContent()}
           </div>
         </main>
@@ -824,40 +884,47 @@ const AdminDashboard = () => {
 // ===================== UTILITY COMPONENTS =====================
 
 const LoadingState = () => (
-  <div className="flex flex-col items-center justify-center py-12">
-    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3" />
-    <p className="text-sm text-muted-foreground">লোড হচ্ছে...</p>
+  <div className="flex flex-col items-center justify-center py-16">
+    <div className="w-10 h-10 border-[3px] border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
+    <p className="text-sm text-muted-foreground font-medium">লোড হচ্ছে...</p>
   </div>
 );
 
 const EmptyState = () => (
-  <div className="flex flex-col items-center justify-center py-12">
-    <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center mb-3">
-      <FileText className="w-6 h-6 text-muted-foreground" />
+  <div className="flex flex-col items-center justify-center py-16">
+    <div className="w-14 h-14 rounded-2xl bg-muted/80 flex items-center justify-center mb-4">
+      <FileText className="w-7 h-7 text-muted-foreground/40" />
     </div>
-    <p className="text-sm text-muted-foreground">কোন ডাটা নেই</p>
+    <p className="text-sm text-muted-foreground font-medium">কোন ডাটা নেই</p>
+    <p className="text-xs text-muted-foreground/60 mt-1">নতুন কন্টেন্ট যোগ করুন</p>
   </div>
 );
 
-const StatusBadge = ({ status }: { status: string }) => (
-  <span className={`text-xs px-2.5 py-1 rounded-full font-medium shrink-0 ${
-    status === "approved" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" :
-    status === "rejected" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
-    "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-  }`}>
-    {status === "approved" ? "✅" : status === "rejected" ? "❌" : "🕐"} {status}
-  </span>
-);
+const StatusBadge = ({ status }: { status: string }) => {
+  const config: Record<string, { bg: string; icon: string }> = {
+    approved: { bg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20", icon: "✅" },
+    rejected: { bg: "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20", icon: "❌" },
+    pending: { bg: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20", icon: "🕐" },
+  };
+  const c = config[status] || config.pending;
+  return (
+    <span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold shrink-0 ${c.bg}`}>
+      {c.icon} {status === "approved" ? "অনুমোদিত" : status === "rejected" ? "প্রত্যাখ্যাত" : "অপেক্ষমান"}
+    </span>
+  );
+};
 
-const ActionBtn = ({ color, onClick, icon, label }: { color: string; onClick: () => void; icon: React.ReactNode; label: string }) => {
-  const colorMap: Record<string, string> = {
-    emerald: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20",
-    red: "bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20",
-    amber: "bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20",
-    blue: "bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20",
+type ActionVariant = "success" | "danger" | "warning" | "info";
+
+const ActionBtn = ({ variant, onClick, icon, label }: { variant: ActionVariant; onClick: () => void; icon: React.ReactNode; label: string }) => {
+  const variantMap: Record<ActionVariant, string> = {
+    success: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20",
+    danger: "bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 border border-red-500/20",
+    warning: "bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 border border-amber-500/20",
+    info: "bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 border border-blue-500/20",
   };
   return (
-    <button onClick={onClick} className={`text-xs px-2.5 py-1.5 rounded-lg font-medium flex items-center gap-1 transition-colors ${colorMap[color] || colorMap.blue}`}>
+    <button onClick={onClick} className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all ${variantMap[variant]}`}>
       {icon}{label}
     </button>
   );
