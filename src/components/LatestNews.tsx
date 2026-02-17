@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Newspaper, ChevronRight, Calendar, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,7 +42,6 @@ const LatestNews = () => {
     };
   };
 
-  // Duplicate items for seamless infinite loop
   const items = [...news, ...news];
 
   return (
@@ -60,19 +59,17 @@ const LatestNews = () => {
       </div>
 
       <div className="overflow-hidden -mx-4 px-4">
-        <div
-          className="flex gap-3 marquee-left"
-          style={{ width: "max-content" }}
-        >
+        <div className="flex gap-3 marquee-left" style={{ width: "max-content" }}>
           {items.map((item, i) => {
             const { date, time } = formatDate(item.published_at);
             return (
               <Link
                 to={`/news/${item.id}`}
                 key={`${item.id}-${i}`}
-                className="glass-card overflow-hidden w-[220px] shrink-0 block"
+                className="glass-card overflow-hidden w-[220px] h-[220px] shrink-0 flex flex-col transition-transform duration-200 hover:scale-[1.03]"
               >
-                <div className="w-full aspect-video bg-muted overflow-hidden">
+                {/* Strict 16:9 thumbnail */}
+                <div className="w-[220px] h-[124px] bg-muted overflow-hidden shrink-0">
                   {item.thumbnail_url ? (
                     <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
                   ) : (
@@ -81,9 +78,9 @@ const LatestNews = () => {
                     </div>
                   )}
                 </div>
-                <div className="p-2.5">
-                  <h3 className="font-bold text-foreground text-xs leading-snug line-clamp-2 mb-1.5">{item.title}</h3>
-                  <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                <div className="p-2.5 flex flex-col flex-1 min-h-0">
+                  <h3 className="font-bold text-foreground text-xs leading-snug line-clamp-2 mb-auto">{item.title}</h3>
+                  <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-1.5">
                     <span className="flex items-center gap-0.5">
                       <Calendar className="w-2.5 h-2.5" /> {date}
                     </span>
