@@ -161,8 +161,28 @@ const CategoryServices = () => {
         </div>
 
         {loading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map(i => <div key={i} className="glass-card p-4 h-24 animate-pulse bg-muted/30" />)}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="glass-card p-4 border-l-4 border-border">
+                <div className="flex items-start gap-3">
+                  <div className="w-14 h-14 rounded-2xl skeleton-shimmer shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-3/4 skeleton-shimmer" />
+                    <div className="h-3 w-1/2 skeleton-shimmer" />
+                    <div className="flex gap-1.5 mt-1.5">
+                      <div className="h-5 w-16 rounded-full skeleton-shimmer" />
+                      <div className="h-5 w-20 rounded-full skeleton-shimmer" />
+                    </div>
+                  </div>
+                </div>
+                <div className="h-3 w-full skeleton-shimmer mt-3" />
+                <div className="flex gap-2 mt-3">
+                  <div className="flex-1 h-9 rounded-xl skeleton-shimmer" />
+                  <div className="flex-1 h-9 rounded-xl skeleton-shimmer" />
+                  <div className="w-10 h-9 rounded-xl skeleton-shimmer" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : filtered.length === 0 ? (
           <p className="text-center text-muted-foreground py-12">কোন তথ্য পাওয়া যায়নি</p>
