@@ -17,6 +17,7 @@ import Contact from "./pages/Contact";
 import Notifications from "./pages/Notifications";
 import Services from "./pages/Services";
 import CategoryServices from "./pages/CategoryServices";
+import TuitionMedia from "./pages/TuitionMedia";
 import News from "./pages/News";
 import NewsDetail from "./pages/NewsDetail";
 
@@ -32,6 +33,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/service/tuition" element={<TuitionMedia />} />
           <Route path="/service/:slug" element={<CategoryServices />} />
           <Route path="/emergency-calls" element={<EmergencyCalls />} />
           <Route path="/blood-bank" element={<BloodBank />} />
