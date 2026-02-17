@@ -56,7 +56,7 @@ const LostFound = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background max-w-lg mx-auto pb-20">
+    <div className="min-h-screen bg-background max-w-4xl mx-auto pb-20">
       <PageHeader
         title="হারানো বিজ্ঞপ্তি"
         color="linear-gradient(135deg, hsl(220,60%,40%), hsl(240,50%,50%))"

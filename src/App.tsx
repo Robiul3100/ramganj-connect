@@ -19,6 +19,10 @@ import LostFound from "./pages/LostFound";
 import Profile from "./pages/Profile";
 import Contact from "./pages/Contact";
 import Notifications from "./pages/Notifications";
+import Marketplace from "./pages/Marketplace";
+import Doctors from "./pages/Doctors";
+import Education from "./pages/Education";
+import Shops from "./pages/Shops";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +43,10 @@ const App = () => (
           <Route path="/donation" element={<Donation />} />
           <Route path="/about-ramganj" element={<AboutRamganj />} />
           <Route path="/lost-found" element={<LostFound />} />
+          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/doctors" element={<Doctors />} />
+          <Route path="/education" element={<Education />} />
+          <Route path="/shops" element={<Shops />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/notifications" element={<Notifications />} />

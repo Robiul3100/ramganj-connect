@@ -11,7 +11,7 @@ const contactItems = [
 
 const Contact = () => {
   return (
-    <div className="min-h-screen bg-background max-w-lg mx-auto pb-20">
+    <div className="min-h-screen bg-background max-w-4xl mx-auto pb-20">
       <PageHeader title="যোগাযোগ" color="var(--gradient-primary)" />
 
       <div className="px-4 -mt-2 space-y-3">

@@ -36,7 +36,7 @@ const EmergencyCalls = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background max-w-lg mx-auto">
+    <div className="min-h-screen bg-background max-w-4xl mx-auto">
       <PageHeader title="জরুরি কল" color="linear-gradient(135deg, hsl(0,70%,50%), hsl(0,80%,60%))" />
       
       <div className="px-4 -mt-2 space-y-4">

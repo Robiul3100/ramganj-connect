@@ -45,7 +45,7 @@ const Jobs = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background max-w-lg mx-auto">
+    <div className="min-h-screen bg-background max-w-4xl mx-auto">
       <PageHeader title="চাকরি" color="linear-gradient(135deg, hsl(210,85%,50%), hsl(230,70%,55%))" onAdd={() => setShowForm(true)} />
       
       <div className="px-4 -mt-2 space-y-3">

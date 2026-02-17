@@ -35,7 +35,7 @@ const Profile = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background max-w-lg mx-auto pb-20">
+    <div className="min-h-screen bg-background max-w-4xl mx-auto pb-20">
       {/* Profile Header */}
       <div className="px-4 pt-6 pb-4">
         <div className="glass-card p-5 flex items-center gap-4">
