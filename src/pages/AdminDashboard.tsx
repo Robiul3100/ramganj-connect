@@ -8,7 +8,13 @@ import {
   Image as ImageIcon, ChevronRight, Bell, Settings, Zap, BarChart3,
   Menu, XIcon, Globe, FileText, Phone, Droplets, Heart, Megaphone,
   SlidersHorizontal, Info, History, ChevronDown, ArrowUpRight, Sparkles,
-  RefreshCw, MoreHorizontal, CalendarDays, Hash, Layers
+  RefreshCw, MoreHorizontal, CalendarDays, Hash, Layers,
+  Stethoscope, Building2, Pill, GraduationCap, Store, ShoppingBag,
+  Briefcase, SearchX, CalendarHeart, Plane, Ambulance, ShieldAlert,
+  Flame, Bus, Lightbulb, Scale, Landmark, UsersRound, MapPin,
+  Package, Tractor, Home, BookOpen, UtensilsCrossed, Wrench,
+  ScrollText, HeartHandshake, Microscope, Car, Building, Rocket,
+  Hotel, Coffee, Video, Flower2, type LucideIcon
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -390,18 +396,51 @@ const AdminDashboard = () => {
         </h3>
         <div className="grid grid-cols-3 gap-2.5">
           {categories.filter((c: any) => c.is_active).map((cat: any) => {
-            const iconGradients = [
-              "from-blue-500 to-indigo-500", "from-emerald-500 to-green-500", "from-purple-500 to-violet-500",
-              "from-rose-500 to-pink-500", "from-amber-500 to-yellow-500", "from-cyan-500 to-teal-500",
-              "from-orange-500 to-red-500", "from-lime-500 to-emerald-500", "from-fuchsia-500 to-purple-500",
-            ];
-            const gradient = iconGradients[(cat.sort_order || 0) % iconGradients.length];
+            const slugIconMap: Record<string, { icon: LucideIcon; gradient: string }> = {
+              "doctors": { icon: Stethoscope, gradient: "from-blue-500 to-indigo-500" },
+              "hospitals": { icon: Building2, gradient: "from-sky-500 to-blue-500" },
+              "pharmacy": { icon: Pill, gradient: "from-emerald-500 to-green-500" },
+              "education": { icon: GraduationCap, gradient: "from-violet-500 to-purple-500" },
+              "shops": { icon: Store, gradient: "from-amber-500 to-orange-500" },
+              "marketplace": { icon: ShoppingBag, gradient: "from-pink-500 to-rose-500" },
+              "jobs": { icon: Briefcase, gradient: "from-cyan-500 to-teal-500" },
+              "lost-found": { icon: SearchX, gradient: "from-orange-500 to-red-500" },
+              "events": { icon: CalendarHeart, gradient: "from-fuchsia-500 to-pink-500" },
+              "expatriate": { icon: Plane, gradient: "from-indigo-500 to-blue-500" },
+              "ambulance": { icon: Ambulance, gradient: "from-red-500 to-rose-500" },
+              "police": { icon: ShieldAlert, gradient: "from-slate-600 to-blue-600" },
+              "fire": { icon: Flame, gradient: "from-orange-600 to-red-600" },
+              "transport": { icon: Bus, gradient: "from-teal-500 to-cyan-500" },
+              "electricity": { icon: Lightbulb, gradient: "from-yellow-500 to-amber-500" },
+              "legal": { icon: Scale, gradient: "from-gray-500 to-slate-600" },
+              "bank": { icon: Landmark, gradient: "from-emerald-600 to-teal-600" },
+              "organizations": { icon: UsersRound, gradient: "from-purple-500 to-indigo-500" },
+              "tourism": { icon: MapPin, gradient: "from-green-500 to-emerald-500" },
+              "courier": { icon: Package, gradient: "from-amber-600 to-orange-500" },
+              "agriculture": { icon: Tractor, gradient: "from-lime-600 to-green-600" },
+              "rent": { icon: Home, gradient: "from-blue-600 to-indigo-600" },
+              "tuition": { icon: BookOpen, gradient: "from-violet-600 to-purple-600" },
+              "food": { icon: UtensilsCrossed, gradient: "from-red-500 to-orange-500" },
+              "repair": { icon: Wrench, gradient: "from-zinc-500 to-slate-600" },
+              "deed-writer": { icon: ScrollText, gradient: "from-amber-700 to-yellow-600" },
+              "marriage": { icon: HeartHandshake, gradient: "from-rose-500 to-pink-500" },
+              "diagnostic": { icon: Microscope, gradient: "from-cyan-600 to-blue-600" },
+              "car-rental": { icon: Car, gradient: "from-blue-500 to-sky-500" },
+              "municipal": { icon: Building, gradient: "from-slate-500 to-zinc-600" },
+              "entrepreneur": { icon: Rocket, gradient: "from-orange-500 to-amber-500" },
+              "hotel": { icon: Hotel, gradient: "from-indigo-500 to-violet-500" },
+              "restaurant": { icon: Coffee, gradient: "from-amber-600 to-brown-500" },
+              "video": { icon: Video, gradient: "from-red-600 to-rose-600" },
+              "nursery": { icon: Flower2, gradient: "from-green-500 to-lime-500" },
+            };
+            const match = slugIconMap[cat.slug] || { icon: Globe, gradient: "from-gray-500 to-slate-500" };
+            const IconComp = match.icon;
             return (
               <button key={cat.id} onClick={() => { setActiveTab("services"); setFilterCategory(cat.id); setSidebarOpen(false); }}
                 className="bg-card border border-border rounded-2xl p-3 text-left hover:shadow-md hover:border-primary/20 transition-all group relative overflow-hidden">
-                <div className={`absolute top-0 right-0 w-12 h-12 rounded-full bg-gradient-to-br ${gradient} opacity-[0.06] -translate-y-1/3 translate-x-1/3 group-hover:opacity-[0.12] transition-opacity`} />
-                <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center mb-2 group-hover:scale-105 transition-transform`}>
-                  <span className="text-white text-xs font-bold">{cat.name.charAt(0)}</span>
+                <div className={`absolute top-0 right-0 w-12 h-12 rounded-full bg-gradient-to-br ${match.gradient} opacity-[0.06] -translate-y-1/3 translate-x-1/3 group-hover:opacity-[0.12] transition-opacity`} />
+                <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${match.gradient} flex items-center justify-center mb-2 group-hover:scale-105 transition-transform`}>
+                  <IconComp className="w-3.5 h-3.5 text-white" />
                 </div>
                 <p className="text-xs font-bold text-foreground leading-tight truncate">{cat.name}</p>
                 <p className="text-[10px] text-muted-foreground flex items-center gap-0.5 mt-0.5">
