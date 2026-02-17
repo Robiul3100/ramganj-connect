@@ -215,7 +215,7 @@ const AdminDashboard = () => {
 
   const startEdit = (item: any) => {
     setEditingId(item.id);
-    setEditData({ title: item.title, description: item.description || "", phone: item.phone || "", whatsapp: item.whatsapp || "", address: item.address || "", area: item.area || "", category_id: item.category_id || "" });
+    setEditData({ title: item.title, description: item.description || "", phone: item.phone || "", whatsapp: item.whatsapp || "", address: item.address || "", area: item.area || "", category_id: item.category_id || "", image_url: item.image_url || "" });
   };
 
   const saveEdit = async (id: string) => {
@@ -431,6 +431,26 @@ const AdminDashboard = () => {
                   <option value="">ক্যাটাগরি নির্বাচন</option>
                   {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">ছবি (URL অথবা আপলোড)</label>
+                  <input className="w-full bg-muted/50 rounded-xl px-3 py-2 text-sm border border-border" value={editData.image_url} onChange={(e) => setEditData({ ...editData, image_url: e.target.value })} placeholder="ছবির লিংক (URL)" />
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <label className="flex items-center gap-1.5 text-xs text-primary font-medium cursor-pointer bg-primary/10 px-3 py-1.5 rounded-lg hover:bg-primary/15 transition-colors">
+                      <ImageIcon className="w-3.5 h-3.5" /> আপলোড
+                      <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const ext = file.name.split(".").pop();
+                        const path = `services/${Date.now()}.${ext}`;
+                        const { error } = await supabase.storage.from("media").upload(path, file);
+                        if (error) { toast({ title: "আপলোড ব্যর্থ", variant: "destructive" }); return; }
+                        const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+                        setEditData({ ...editData, image_url: urlData.publicUrl });
+                      }} />
+                    </label>
+                    {editData.image_url && <img src={editData.image_url} alt="" className="w-10 h-10 rounded-lg object-cover border border-border" />}
+                  </div>
+                </div>
                 <div className="flex gap-2">
                   <button onClick={() => saveEdit(item.id)} className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center gap-1">
                     <Save className="w-3.5 h-3.5" /> সেভ
@@ -451,6 +471,7 @@ const AdminDashboard = () => {
                     <p className="text-xs text-muted-foreground">{item.service_categories?.name || "—"}</p>
                     {item.phone && <p className="text-xs text-muted-foreground mt-1">📞 {item.phone}</p>}
                     {item.address && <p className="text-xs text-muted-foreground">📍 {item.address}</p>}
+                    {item.image_url && <img src={item.image_url} alt="" className="w-16 h-12 rounded-lg object-cover mt-1 border border-border" />}
                     {item.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{item.description}</p>}
                     <p className="text-xs text-muted-foreground mt-1">📅 {new Date(item.created_at).toLocaleDateString("bn-BD")}</p>
                   </div>

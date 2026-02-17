@@ -123,6 +123,7 @@ const CategoryServices = () => {
       whatsapp: data.whatsapp || null,
       address: data.address || null,
       area: data.area || null,
+      image_url: data.image_url || null,
       category_id: category.id,
       metadata: {},
     });
@@ -178,9 +179,13 @@ const CategoryServices = () => {
                     </div>
                   )}
                   <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 text-lg font-bold" style={{ background: colors.bg, color: colors.accent }}>
-                      {s.title.charAt(0)}
-                    </div>
+                    {s.image_url ? (
+                      <img src={s.image_url} alt={s.title} className="w-14 h-14 rounded-2xl object-cover shrink-0 border border-border" />
+                    ) : (
+                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 text-lg font-bold" style={{ background: colors.bg, color: colors.accent }}>
+                        {s.title.charAt(0)}
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-foreground text-sm">{s.title}</h3>
                       {s.address && (
@@ -235,6 +240,7 @@ const CategoryServices = () => {
           { name: "whatsapp", label: "WhatsApp নাম্বার", type: "tel" },
           { name: "address", label: "ঠিকানা" },
           { name: "area", label: "এলাকা" },
+          { name: "image_url", label: "ছবির লিংক (URL)", placeholder: "https://example.com/image.jpg" },
         ]}
         onSubmit={handleSubmit}
       />
