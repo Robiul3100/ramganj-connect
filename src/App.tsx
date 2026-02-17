@@ -7,23 +7,15 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import EmergencyCalls from "./pages/EmergencyCalls";
 import BloodBank from "./pages/BloodBank";
-import Jobs from "./pages/Jobs";
-import Events from "./pages/Events";
-import Complaints from "./pages/Complaints";
-import ExpatriateCorner from "./pages/ExpatriateCorner";
 import Donation from "./pages/Donation";
 import AboutRamganj from "./pages/AboutRamganj";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
-import LostFound from "./pages/LostFound";
 import Profile from "./pages/Profile";
 import Contact from "./pages/Contact";
 import Notifications from "./pages/Notifications";
-import Marketplace from "./pages/Marketplace";
-import Doctors from "./pages/Doctors";
-import Education from "./pages/Education";
-import Shops from "./pages/Shops";
 import Services from "./pages/Services";
+import CategoryServices from "./pages/CategoryServices";
 
 const queryClient = new QueryClient();
 
@@ -36,19 +28,11 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/service/:slug" element={<CategoryServices />} />
           <Route path="/emergency-calls" element={<EmergencyCalls />} />
           <Route path="/blood-bank" element={<BloodBank />} />
-          <Route path="/jobs" element={<Jobs />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/complaints" element={<Complaints />} />
-          <Route path="/expatriate-corner" element={<ExpatriateCorner />} />
           <Route path="/donation" element={<Donation />} />
           <Route path="/about-ramganj" element={<AboutRamganj />} />
-          <Route path="/lost-found" element={<LostFound />} />
-          <Route path="/marketplace" element={<Marketplace />} />
-          <Route path="/doctors" element={<Doctors />} />
-          <Route path="/education" element={<Education />} />
-          <Route path="/shops" element={<Shops />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/notifications" element={<Notifications />} />

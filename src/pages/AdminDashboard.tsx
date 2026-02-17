@@ -1,53 +1,53 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  LogOut, LayoutDashboard, Image, Megaphone, Phone, Droplets, Briefcase, Calendar, 
-  AlertTriangle, Globe, Heart, FileText, Clock, Users, Activity, Shield, 
-  TrendingUp, Eye, CheckCircle, XCircle, Trash2, RefreshCw, Tag, Stethoscope, GraduationCap, Store, MapPin
+import {
+  LogOut, LayoutDashboard, Shield, Activity, Users, TrendingUp,
+  CheckCircle, XCircle, Trash2, RefreshCw, Search, Edit3, Save, X,
+  Eye, Clock, AlertTriangle, Star, StarOff, Filter
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
-type Tab = "dashboard" | "slider" | "announcements" | "emergency" | "blood" | "jobs" | "events" | "complaints" | "expatriate" | "donation" | "about" | "timeline" | "users" | "activity" | "marketplace" | "doctors" | "education" | "shops" | "lost_found";
+type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline";
 
 const tabs: { id: Tab; label: string; icon: any }[] = [
   { id: "dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard },
-  { id: "activity", label: "অ্যাক্টিভিটি", icon: Activity },
+  { id: "pending", label: "অপেক্ষমান", icon: Clock },
+  { id: "services", label: "সেবাসমূহ", icon: Eye },
+  { id: "categories", label: "ক্যাটাগরি", icon: Filter },
   { id: "users", label: "ইউজার", icon: Users },
-  { id: "slider", label: "স্লাইডার", icon: Image },
-  { id: "announcements", label: "ঘোষণা", icon: Megaphone },
-  { id: "emergency", label: "জরুরি কল", icon: Phone },
-  { id: "blood", label: "রক্তদাতা", icon: Droplets },
-  { id: "jobs", label: "চাকরি", icon: Briefcase },
-  { id: "events", label: "ইভেন্ট", icon: Calendar },
-  { id: "complaints", label: "অভিযোগ", icon: AlertTriangle },
-  { id: "expatriate", label: "প্রবাসী", icon: Globe },
-  { id: "donation", label: "অনুদান", icon: Heart },
-  { id: "marketplace", label: "মার্কেটপ্লেস", icon: Tag },
-  { id: "doctors", label: "ডক্টর", icon: Stethoscope },
-  { id: "education", label: "শিক্ষা", icon: GraduationCap },
-  { id: "shops", label: "দোকান", icon: Store },
-  { id: "lost_found", label: "হারানো", icon: MapPin },
-  { id: "about", label: "রামগঞ্জ", icon: FileText },
-  { id: "timeline", label: "টাইমলাইন", icon: Clock },
+  { id: "activity", label: "লগ", icon: Activity },
+  { id: "emergency", label: "জরুরি", icon: AlertTriangle },
+  { id: "blood", label: "রক্ত", icon: TrendingUp },
+  { id: "donations", label: "অনুদান", icon: TrendingUp },
+  { id: "announcements", label: "ঘোষণা", icon: TrendingUp },
+  { id: "slider", label: "স্লাইডার", icon: TrendingUp },
+  { id: "about", label: "সম্পর্কে", icon: TrendingUp },
+  { id: "timeline", label: "টাইমলাইন", icon: TrendingUp },
 ];
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
-  const [counts, setCounts] = useState<Record<string, number>>({});
-  const [tableData, setTableData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [services, setServices] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editData, setEditData] = useState<any>({});
+  const [counts, setCounts] = useState({ total: 0, pending: 0, approved: 0, rejected: 0, featured: 0, categories: 0 });
   const [activityLog, setActivityLog] = useState<any[]>([]);
   const [usersList, setUsersList] = useState<any[]>([]);
-  const [pendingCounts, setPendingCounts] = useState<Record<string, number>>({});
+  const [legacyData, setLegacyData] = useState<any[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate("/admin-login"); return; }
-      const { data: roles } = await (supabase.from as any)("user_roles").select("role").eq("user_id", user.id);
+      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
       if (!roles || !roles.some((r: any) => r.role === "admin")) { navigate("/admin-login"); return; }
       setCurrentUser(user);
     };
@@ -55,107 +55,129 @@ const AdminDashboard = () => {
   }, [navigate]);
 
   const fetchCounts = useCallback(async () => {
-    const tableNames = ["emergency_calls", "blood_donors", "jobs", "events", "complaints", "expatriate_forums", "donations", "slider_items", "announcements", "timeline_events", "marketplace", "doctors", "education_institutes", "shops", "lost_found"];
-    const results: Record<string, number> = {};
-    const pending: Record<string, number> = {};
-    
-    await Promise.all(tableNames.map(async (t) => {
-      const { count } = await (supabase.from as any)(t).select("*", { count: "exact", head: true });
-      results[t] = count || 0;
-    }));
-
-    const approvalTables = ["blood_donors", "jobs", "events", "complaints", "expatriate_forums", "marketplace", "doctors", "education_institutes", "shops", "lost_found"];
-    await Promise.all(approvalTables.map(async (t) => {
-      const { count } = await (supabase.from as any)(t).select("*", { count: "exact", head: true }).eq("is_approved", false);
-      pending[t] = count || 0;
-    }));
-
-    setCounts(results);
-    setPendingCounts(pending);
+    const [total, pending, approved, rejected, featured, cats] = await Promise.all([
+      supabase.from("services").select("*", { count: "exact", head: true }),
+      supabase.from("services").select("*", { count: "exact", head: true }).eq("status", "pending"),
+      supabase.from("services").select("*", { count: "exact", head: true }).eq("status", "approved"),
+      supabase.from("services").select("*", { count: "exact", head: true }).eq("status", "rejected"),
+      supabase.from("services").select("*", { count: "exact", head: true }).eq("is_featured", true),
+      supabase.from("service_categories").select("*", { count: "exact", head: true }),
+    ]);
+    setCounts({
+      total: total.count || 0, pending: pending.count || 0, approved: approved.count || 0,
+      rejected: rejected.count || 0, featured: featured.count || 0, categories: cats.count || 0,
+    });
   }, []);
 
-  useEffect(() => { fetchCounts(); }, [fetchCounts]);
+  const fetchCategories = useCallback(async () => {
+    const { data } = await supabase.from("service_categories").select("*").order("sort_order");
+    setCategories(data || []);
+  }, []);
+
+  const fetchServices = useCallback(async () => {
+    setLoading(true);
+    let query = supabase.from("services").select("*, service_categories(name, slug)").order("created_at", { ascending: false });
+    if (filterStatus !== "all") query = query.eq("status", filterStatus);
+    if (filterCategory !== "all") query = query.eq("category_id", filterCategory);
+    const { data } = await query;
+    setServices(data || []);
+    setLoading(false);
+  }, [filterStatus, filterCategory]);
+
+  useEffect(() => { fetchCounts(); fetchCategories(); }, [fetchCounts, fetchCategories]);
+
+  useEffect(() => {
+    if (activeTab === "services" || activeTab === "pending") fetchServices();
+  }, [activeTab, fetchServices]);
+
+  useEffect(() => {
+    if (activeTab === "pending") setFilterStatus("pending");
+    else if (activeTab === "services") setFilterStatus("all");
+  }, [activeTab]);
+
+  useEffect(() => {
+    const ch = supabase.channel("admin_services_rt").on("postgres_changes", { event: "*", schema: "public", table: "services" }, () => {
+      fetchServices(); fetchCounts();
+    }).subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [fetchServices, fetchCounts]);
+
+  useEffect(() => {
+    if (activeTab === "activity") {
+      const fetch = async () => {
+        setLoading(true);
+        const { data } = await supabase.from("admin_activity_log").select("*").order("created_at", { ascending: false }).limit(50);
+        setActivityLog(data || []);
+        setLoading(false);
+      };
+      fetch();
+    }
+    if (activeTab === "users") {
+      const fetch = async () => {
+        setLoading(true);
+        const { data: profiles } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
+        const { data: roles } = await supabase.from("user_roles").select("*");
+        setUsersList((profiles || []).map((p: any) => ({
+          ...p, roles: (roles || []).filter((r: any) => r.user_id === p.user_id).map((r: any) => r.role),
+        })));
+        setLoading(false);
+      };
+      fetch();
+    }
+    // Legacy tables
+    const legacyTabs: Record<string, string> = {
+      emergency: "emergency_calls", blood: "blood_donors", donations: "donations",
+      announcements: "announcements", slider: "slider_items", about: "about_content", timeline: "timeline_events",
+    };
+    if (legacyTabs[activeTab]) {
+      const fetch = async () => {
+        setLoading(true);
+        const { data } = await (supabase.from as any)(legacyTabs[activeTab]).select("*").order("created_at", { ascending: false });
+        setLegacyData(data || []);
+        setLoading(false);
+      };
+      fetch();
+    }
+  }, [activeTab]);
 
   const logActivity = useCallback(async (action: string, tableName?: string, recordId?: string, details?: string) => {
     if (!currentUser) return;
-    await (supabase.from as any)("admin_activity_log").insert({
+    await supabase.from("admin_activity_log").insert({
       user_id: currentUser.id, action, table_name: tableName || null, record_id: recordId || null, details: details || null,
     });
   }, [currentUser]);
 
-  const tableMap: Record<string, string> = {
-    slider: "slider_items", announcements: "announcements", emergency: "emergency_calls",
-    blood: "blood_donors", jobs: "jobs", events: "events", complaints: "complaints",
-    expatriate: "expatriate_forums", donation: "donations", about: "about_content", timeline: "timeline_events",
-    marketplace: "marketplace", doctors: "doctors", education: "education_institutes", shops: "shops", lost_found: "lost_found",
-  };
-
-  useEffect(() => {
-    if (activeTab === "dashboard") return;
-
-    if (activeTab === "activity") {
-      const fetchActivity = async () => {
-        setLoading(true);
-        const { data } = await (supabase.from as any)("admin_activity_log").select("*").order("created_at", { ascending: false }).limit(50);
-        setActivityLog(data || []);
-        setLoading(false);
-      };
-      fetchActivity();
-      const ch = supabase.channel("admin_activity_rt").on("postgres_changes", { event: "INSERT", schema: "public", table: "admin_activity_log" }, () => fetchActivity()).subscribe();
-      return () => { supabase.removeChannel(ch); };
-    }
-
-    if (activeTab === "users") {
-      const fetchUsers = async () => {
-        setLoading(true);
-        const { data: profiles } = await (supabase.from as any)("profiles").select("*").order("created_at", { ascending: false });
-        const { data: roles } = await (supabase.from as any)("user_roles").select("*");
-        const merged = (profiles || []).map((p: any) => ({
-          ...p, roles: (roles || []).filter((r: any) => r.user_id === p.user_id).map((r: any) => r.role),
-        }));
-        setUsersList(merged);
-        setLoading(false);
-      };
-      fetchUsers();
-      return;
-    }
-
-    const fetchData = async () => {
-      setLoading(true);
-      const table = tableMap[activeTab];
-      if (!table) return;
-      const { data } = await (supabase.from as any)(table).select("*").order("created_at", { ascending: false });
-      setTableData(data || []);
-      setLoading(false);
-    };
-    fetchData();
-
-    const table = tableMap[activeTab];
-    if (table) {
-      const ch = supabase.channel(`admin_${table}`).on("postgres_changes", { event: "*", schema: "public", table }, () => fetchData()).subscribe();
-      return () => { supabase.removeChannel(ch); };
-    }
-  }, [activeTab]);
-
-  const toggleApproval = async (table: string, id: string, currentVal: boolean, name: string) => {
-    await (supabase.from as any)(table).update({ is_approved: !currentVal }).eq("id", id);
-    await logActivity(!currentVal ? "approved" : "unapproved", table, id, name);
-    toast({ title: !currentVal ? "অনুমোদিত ✅" : "অননুমোদিত ❌" });
+  const updateServiceStatus = async (id: string, status: string, title: string) => {
+    await supabase.from("services").update({ status }).eq("id", id);
+    await logActivity(status, "services", id, title);
+    toast({ title: status === "approved" ? "অনুমোদিত ✅" : status === "rejected" ? "প্রত্যাখ্যাত ❌" : "পেন্ডিং 🕐" });
     fetchCounts();
   };
 
-  const toggleActive = async (table: string, id: string, currentVal: boolean, name: string) => {
-    await (supabase.from as any)(table).update({ is_active: !currentVal }).eq("id", id);
-    await logActivity(!currentVal ? "activated" : "deactivated", table, id, name);
-    toast({ title: !currentVal ? "সক্রিয় ✅" : "নিষ্ক্রিয় ❌" });
+  const toggleFeatured = async (id: string, current: boolean, title: string) => {
+    await supabase.from("services").update({ is_featured: !current }).eq("id", id);
+    await logActivity(!current ? "featured" : "unfeatured", "services", id, title);
+    toast({ title: !current ? "ফিচার্ড ✨" : "আনফিচার্ড" });
   };
 
-  const deleteItem = async (table: string, id: string, name: string) => {
+  const deleteService = async (id: string, title: string) => {
     if (!confirm("মুছে ফেলতে চান?")) return;
-    await (supabase.from as any)(table).delete().eq("id", id);
-    await logActivity("deleted", table, id, name);
+    await supabase.from("services").delete().eq("id", id);
+    await logActivity("deleted", "services", id, title);
     toast({ title: "মুছে ফেলা হয়েছে" });
     fetchCounts();
+  };
+
+  const startEdit = (item: any) => {
+    setEditingId(item.id);
+    setEditData({ title: item.title, description: item.description || "", phone: item.phone || "", whatsapp: item.whatsapp || "", address: item.address || "", area: item.area || "", category_id: item.category_id || "" });
+  };
+
+  const saveEdit = async (id: string) => {
+    await supabase.from("services").update(editData).eq("id", id);
+    await logActivity("edited", "services", id, editData.title);
+    setEditingId(null);
+    toast({ title: "আপডেট হয়েছে ✅" });
   };
 
   const handleLogout = async () => {
@@ -164,10 +186,14 @@ const AdminDashboard = () => {
     navigate("/admin-login");
   };
 
-  const totalPending = Object.values(pendingCounts).reduce((a, b) => a + b, 0);
+  const filteredServices = services.filter(s =>
+    s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (s.phone || "").includes(searchTerm) ||
+    (s.address || "").toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const renderDashboard = () => (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <div className="glass-card p-4 border-l-4 border-l-primary">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center">
@@ -180,119 +206,183 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {totalPending > 0 && (
-        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="w-4 h-4 text-amber-600" />
-            <h3 className="font-bold text-sm text-amber-800 dark:text-amber-200">অনুমোদন অপেক্ষমান ({totalPending})</h3>
+      {counts.pending > 0 && (
+        <button onClick={() => setActiveTab("pending")} className="w-full bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 text-left">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-amber-600" />
+            <span className="font-bold text-amber-800 dark:text-amber-200">{counts.pending}টি অনুমোদন অপেক্ষমান</span>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(pendingCounts).filter(([, v]) => v > 0).map(([key, val]) => {
-              const labelMap: Record<string, { label: string; tab: Tab }> = {
-                blood_donors: { label: "রক্তদাতা", tab: "blood" },
-                jobs: { label: "চাকরি", tab: "jobs" },
-                events: { label: "ইভেন্ট", tab: "events" },
-                complaints: { label: "অভিযোগ", tab: "complaints" },
-                expatriate_forums: { label: "প্রবাসী", tab: "expatriate" },
-                marketplace: { label: "মার্কেটপ্লেস", tab: "marketplace" },
-                doctors: { label: "ডক্টর", tab: "doctors" },
-                education_institutes: { label: "শিক্ষা", tab: "education" },
-                shops: { label: "দোকান", tab: "shops" },
-                lost_found: { label: "হারানো", tab: "lost_found" },
-              };
-              const info = labelMap[key];
-              if (!info) return null;
-              return (
-                <button key={key} onClick={() => setActiveTab(info.tab)} className="text-xs bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 px-2.5 py-1 rounded-lg">
-                  {info.label} ({val})
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        </button>
       )}
 
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <TrendingUp className="w-4 h-4 text-primary" />
-          <h2 className="text-sm font-bold text-foreground">পরিসংখ্যান</h2>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {[
-            { label: "জরুরি কল", count: counts.emergency_calls, icon: Phone, color: "hsl(0 70% 50%)" },
-            { label: "রক্তদাতা", count: counts.blood_donors, icon: Droplets, color: "hsl(0 80% 55%)" },
-            { label: "চাকরি", count: counts.jobs, icon: Briefcase, color: "hsl(210 85% 55%)" },
-            { label: "ইভেন্ট", count: counts.events, icon: Calendar, color: "hsl(270 60% 55%)" },
-            { label: "অভিযোগ", count: counts.complaints, icon: AlertTriangle, color: "hsl(15 80% 55%)" },
-            { label: "প্রবাসী", count: counts.expatriate_forums, icon: Globe, color: "hsl(195 70% 50%)" },
-            { label: "অনুদান", count: counts.donations, icon: Heart, color: "hsl(340 75% 60%)" },
-            { label: "মার্কেটপ্লেস", count: counts.marketplace, icon: Tag, color: "hsl(160 50% 40%)" },
-            { label: "ডক্টর", count: counts.doctors, icon: Stethoscope, color: "hsl(185 60% 42%)" },
-            { label: "শিক্ষা", count: counts.education_institutes, icon: GraduationCap, color: "hsl(150 50% 38%)" },
-            { label: "দোকান", count: counts.shops, icon: Store, color: "hsl(330 55% 55%)" },
-            { label: "হারানো", count: counts.lost_found, icon: MapPin, color: "hsl(0 60% 50%)" },
-          ].map((s) => {
-            const Icon = s.icon;
-            return (
-              <div key={s.label} className="glass-card p-3.5 border-l-4 hover:scale-[1.02] transition-transform" style={{ borderColor: s.color }}>
-                <div className="flex items-center justify-between mb-1">
-                  <Icon className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-xl font-bold text-foreground">{s.count ?? "..."}</span>
-                </div>
-                <p className="text-xs text-muted-foreground">{s.label}</p>
-              </div>
-            );
-          })}
-        </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[
+          { label: "মোট সেবা", count: counts.total, color: "hsl(210,85%,55%)" },
+          { label: "অনুমোদিত", count: counts.approved, color: "hsl(140,60%,45%)" },
+          { label: "অপেক্ষমান", count: counts.pending, color: "hsl(40,85%,55%)" },
+          { label: "প্রত্যাখ্যাত", count: counts.rejected, color: "hsl(0,70%,55%)" },
+          { label: "ফিচার্ড", count: counts.featured, color: "hsl(45,90%,50%)" },
+          { label: "ক্যাটাগরি", count: counts.categories, color: "hsl(270,50%,55%)" },
+        ].map((s) => (
+          <div key={s.label} className="glass-card p-3 border-l-4" style={{ borderColor: s.color }}>
+            <span className="text-xl font-bold text-foreground">{s.count}</span>
+            <p className="text-xs text-muted-foreground">{s.label}</p>
+          </div>
+        ))}
       </div>
 
-      <div>
-        <h2 className="text-sm font-bold text-foreground mb-3">⚡ দ্রুত অ্যাকশন</h2>
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-          {[
-            { label: "স্লাইডার", tab: "slider" as Tab, icon: Image },
-            { label: "ঘোষণা", tab: "announcements" as Tab, icon: Megaphone },
-            { label: "জরুরি কল", tab: "emergency" as Tab, icon: Phone },
-            { label: "অ্যাক্টিভিটি", tab: "activity" as Tab, icon: Activity },
-            { label: "ইউজার", tab: "users" as Tab, icon: Users },
-            { label: "সেটিংস", tab: "about" as Tab, icon: FileText },
-          ].map((a) => {
-            const Icon = a.icon;
-            return (
-              <button key={a.label} onClick={() => setActiveTab(a.tab)}
-                className="glass-card p-3 flex flex-col items-center gap-1.5 hover:bg-primary/5 transition-colors">
-                <Icon className="w-5 h-5 text-primary" />
-                <span className="text-xs font-medium text-foreground">{a.label}</span>
-              </button>
-            );
-          })}
-        </div>
+      <div className="grid grid-cols-3 gap-2">
+        {[
+          { label: "অপেক্ষমান", tab: "pending" as Tab },
+          { label: "সকল সেবা", tab: "services" as Tab },
+          { label: "ক্যাটাগরি", tab: "categories" as Tab },
+          { label: "ইউজার", tab: "users" as Tab },
+          { label: "অ্যাক্টিভিটি", tab: "activity" as Tab },
+          { label: "জরুরি কল", tab: "emergency" as Tab },
+        ].map((a) => (
+          <button key={a.label} onClick={() => setActiveTab(a.tab)} className="glass-card p-3 text-center text-xs font-medium text-foreground hover:bg-primary/5 transition-colors">
+            {a.label}
+          </button>
+        ))}
       </div>
+    </div>
+  );
+
+  const renderServicesList = () => (
+    <div className="space-y-3">
+      <div className="flex flex-col gap-2">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input type="text" placeholder="নাম, ফোন, ঠিকানা দিয়ে খুঁজুন..." className="w-full bg-muted/50 rounded-xl pl-9 pr-4 py-2.5 text-sm outline-none border border-border" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {activeTab !== "pending" && (
+            <select className="bg-muted/50 rounded-lg px-3 py-1.5 text-xs border border-border" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+              <option value="all">সকল স্ট্যাটাস</option>
+              <option value="approved">অনুমোদিত</option>
+              <option value="pending">অপেক্ষমান</option>
+              <option value="rejected">প্রত্যাখ্যাত</option>
+            </select>
+          )}
+          <select className="bg-muted/50 rounded-lg px-3 py-1.5 text-xs border border-border" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+            <option value="all">সকল ক্যাটাগরি</option>
+            {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        </div>
+        <p className="text-xs text-muted-foreground">মোট: {filteredServices.length}টি</p>
+      </div>
+
+      {loading ? <p className="text-center text-muted-foreground py-8">লোড হচ্ছে...</p> : filteredServices.length === 0 ? <p className="text-center text-muted-foreground py-8">কোন ডাটা নেই</p> : (
+        filteredServices.map((item: any) => (
+          <div key={item.id} className="glass-card p-4">
+            {editingId === item.id ? (
+              <div className="space-y-2">
+                <input className="w-full bg-muted/50 rounded-lg px-3 py-2 text-sm border border-border" value={editData.title} onChange={(e) => setEditData({ ...editData, title: e.target.value })} placeholder="শিরোনাম" />
+                <textarea className="w-full bg-muted/50 rounded-lg px-3 py-2 text-sm border border-border min-h-[60px]" value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} placeholder="বিবরণ" />
+                <div className="grid grid-cols-2 gap-2">
+                  <input className="bg-muted/50 rounded-lg px-3 py-2 text-sm border border-border" value={editData.phone} onChange={(e) => setEditData({ ...editData, phone: e.target.value })} placeholder="ফোন" />
+                  <input className="bg-muted/50 rounded-lg px-3 py-2 text-sm border border-border" value={editData.whatsapp} onChange={(e) => setEditData({ ...editData, whatsapp: e.target.value })} placeholder="WhatsApp" />
+                </div>
+                <input className="w-full bg-muted/50 rounded-lg px-3 py-2 text-sm border border-border" value={editData.address} onChange={(e) => setEditData({ ...editData, address: e.target.value })} placeholder="ঠিকানা" />
+                <select className="w-full bg-muted/50 rounded-lg px-3 py-2 text-sm border border-border" value={editData.category_id} onChange={(e) => setEditData({ ...editData, category_id: e.target.value })}>
+                  <option value="">ক্যাটাগরি নির্বাচন</option>
+                  {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+                <div className="flex gap-2">
+                  <button onClick={() => saveEdit(item.id)} className="flex-1 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center gap-1">
+                    <Save className="w-3.5 h-3.5" /> সেভ
+                  </button>
+                  <button onClick={() => setEditingId(null)} className="px-4 py-2 rounded-lg bg-muted text-foreground text-xs font-medium">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-bold text-foreground text-sm">{item.title}</h3>
+                      {item.is_featured && <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{item.service_categories?.name || "—"}</p>
+                    {item.phone && <p className="text-xs text-muted-foreground">📞 {item.phone}</p>}
+                    {item.address && <p className="text-xs text-muted-foreground">📍 {item.address}</p>}
+                    {item.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{item.description}</p>}
+                    <p className="text-xs text-muted-foreground mt-1">📅 {new Date(item.created_at).toLocaleDateString("bn-BD")}</p>
+                  </div>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
+                    item.status === "approved" ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" :
+                    item.status === "rejected" ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" :
+                    "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300"
+                  }`}>
+                    {item.status === "approved" ? "✅" : item.status === "rejected" ? "❌" : "🕐"} {item.status}
+                  </span>
+                </div>
+                <div className="flex gap-1.5 mt-3 flex-wrap">
+                  {item.status !== "approved" && (
+                    <button onClick={() => updateServiceStatus(item.id, "approved", item.title)} className="text-xs px-3 py-1.5 rounded-lg bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 font-medium">
+                      <CheckCircle className="w-3.5 h-3.5 inline mr-1" />অনুমোদন
+                    </button>
+                  )}
+                  {item.status !== "rejected" && (
+                    <button onClick={() => updateServiceStatus(item.id, "rejected", item.title)} className="text-xs px-3 py-1.5 rounded-lg bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 font-medium">
+                      <XCircle className="w-3.5 h-3.5 inline mr-1" />প্রত্যাখ্যান
+                    </button>
+                  )}
+                  <button onClick={() => toggleFeatured(item.id, item.is_featured, item.title)} className="text-xs px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300 font-medium">
+                    {item.is_featured ? <StarOff className="w-3.5 h-3.5 inline mr-1" /> : <Star className="w-3.5 h-3.5 inline mr-1" />}
+                    {item.is_featured ? "আনফিচার" : "ফিচার"}
+                  </button>
+                  <button onClick={() => startEdit(item)} className="text-xs px-3 py-1.5 rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 font-medium">
+                    <Edit3 className="w-3.5 h-3.5 inline mr-1" />এডিট
+                  </button>
+                  <button onClick={() => deleteService(item.id, item.title)} className="text-xs px-3 py-1.5 rounded-lg bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 font-medium">
+                    <Trash2 className="w-3.5 h-3.5 inline mr-1" />মুছুন
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        ))
+      )}
+    </div>
+  );
+
+  const renderCategories = () => (
+    <div className="space-y-3">
+      <h2 className="text-sm font-bold text-foreground">ক্যাটাগরি ম্যানেজমেন্ট ({categories.length})</h2>
+      {categories.map((c: any) => (
+        <div key={c.id} className="glass-card p-3 flex items-center justify-between">
+          <div>
+            <h3 className="font-bold text-sm text-foreground">{c.name}</h3>
+            <p className="text-xs text-muted-foreground">/{c.slug} • আইকন: {c.icon}</p>
+          </div>
+          <span className={`text-xs px-2 py-0.5 rounded-full ${c.is_active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}`}>
+            {c.is_active ? "সক্রিয়" : "নিষ্ক্রিয়"}
+          </span>
+        </div>
+      ))}
     </div>
   );
 
   const renderActivity = () => (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-          <Activity className="w-4 h-4 text-primary" /> সাম্প্রতিক কার্যকলাপ
-        </h2>
-        <div className="flex items-center gap-1 text-xs text-green-600">
-          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /> লাইভ
-        </div>
-      </div>
+      <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
+        <Activity className="w-4 h-4 text-primary" /> সাম্প্রতিক কার্যকলাপ
+      </h2>
       {loading ? <p className="text-center text-muted-foreground py-8">লোড হচ্ছে...</p> : activityLog.length === 0 ? <p className="text-center text-muted-foreground py-8">কোন অ্যাক্টিভিটি নেই</p> : (
         activityLog.map((log: any) => (
           <div key={log.id} className="glass-card p-3 flex items-start gap-3">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-              log.action === "approved" ? "bg-green-100 text-green-600" : log.action === "deleted" ? "bg-red-100 text-red-600" : log.action === "logout" ? "bg-gray-100 text-gray-600" : "bg-blue-100 text-blue-600"
+              log.action === "approved" ? "bg-green-100 text-green-600" : log.action === "deleted" ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"
             }`}>
-              {log.action === "approved" ? <CheckCircle className="w-4 h-4" /> : log.action === "deleted" ? <Trash2 className="w-4 h-4" /> : log.action === "logout" ? <LogOut className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {log.action === "approved" ? <CheckCircle className="w-4 h-4" /> : log.action === "deleted" ? <Trash2 className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground capitalize">{log.action}</p>
               {log.table_name && <p className="text-xs text-muted-foreground">{log.table_name}{log.details ? ` — ${log.details}` : ""}</p>}
-              <p className="text-xs text-muted-foreground mt-0.5">{new Date(log.created_at).toLocaleString("bn-BD")}</p>
+              <p className="text-xs text-muted-foreground">{new Date(log.created_at).toLocaleString("bn-BD")}</p>
             </div>
           </div>
         ))
@@ -302,28 +392,23 @@ const AdminDashboard = () => {
 
   const renderUsers = () => (
     <div className="space-y-3">
-      <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-        <Users className="w-4 h-4 text-primary" /> ইউজার ম্যানেজমেন্ট
-      </h2>
-      {loading ? <p className="text-center text-muted-foreground py-8">লোড হচ্ছে...</p> : usersList.length === 0 ? <p className="text-center text-muted-foreground py-8">কোন ইউজার নেই</p> : (
+      <h2 className="text-sm font-bold text-foreground">ইউজার ম্যানেজমেন্ট ({usersList.length})</h2>
+      {loading ? <p className="text-center text-muted-foreground py-8">লোড হচ্ছে...</p> : (
         usersList.map((user: any) => (
-          <div key={user.id} className="glass-card p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Users className="w-5 h-5 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-sm text-foreground truncate">{user.display_name || "No Name"}</h3>
-                <p className="text-xs text-muted-foreground">{user.phone || "ফোন নেই"}</p>
-              </div>
-              <div className="flex flex-col gap-1">
-                {user.roles.map((r: string) => (
-                  <span key={r} className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                    r === "admin" ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" : r === "moderator" ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300" : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                  }`}>{r === "admin" ? "🛡️ এডমিন" : r === "moderator" ? "👮 মডারেটর" : "👤 ইউজার"}</span>
-                ))}
-                {user.roles.length === 0 && <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">👤 সাধারণ</span>}
-              </div>
+          <div key={user.id} className="glass-card p-3 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Users className="w-5 h-5 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-sm text-foreground">{user.display_name || "No Name"}</h3>
+              <p className="text-xs text-muted-foreground">{user.phone || "—"}</p>
+            </div>
+            <div className="flex gap-1">
+              {user.roles.map((r: string) => (
+                <span key={r} className={`text-xs px-2 py-0.5 rounded-full font-medium ${r === "admin" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-700"}`}>
+                  {r === "admin" ? "🛡️" : "👤"} {r}
+                </span>
+              ))}
             </div>
           </div>
         ))
@@ -331,59 +416,36 @@ const AdminDashboard = () => {
     </div>
   );
 
-  const renderTable = () => {
-    const table = tableMap[activeTab];
-    if (!table || loading) return <p className="text-center text-muted-foreground py-8">লোড হচ্ছে...</p>;
-    if (tableData.length === 0) return <p className="text-center text-muted-foreground py-8">কোন ডাটা নেই</p>;
-
+  const renderLegacy = () => {
+    if (loading) return <p className="text-center text-muted-foreground py-8">লোড হচ্ছে...</p>;
+    if (legacyData.length === 0) return <p className="text-center text-muted-foreground py-8">কোন ডাটা নেই</p>;
     return (
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">মোট: {tableData.length}টি</p>
-          <button onClick={() => setActiveTab(activeTab)} className="text-xs text-primary flex items-center gap-1">
-            <RefreshCw className="w-3 h-3" /> রিফ্রেশ
-          </button>
-        </div>
-        {tableData.map((item: any) => {
-          const itemName = item.title || item.name || item.text || item.method_name || item.article_title || item.donor_name || item.item_name || `${item.year || ""}`;
+        <p className="text-xs text-muted-foreground">মোট: {legacyData.length}টি</p>
+        {legacyData.map((item: any) => {
+          const name = item.title || item.name || item.text || item.method_name || item.article_title || item.donor_name || item.item_name || `${item.year || ""}`;
           return (
-            <div key={item.id} className="glass-card p-4">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-foreground text-sm truncate">{itemName}</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {item.category || item.blood_group || item.country || item.account_number || item.specialty || item.type || ""}
-                  </p>
-                  {item.description && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{item.description}</p>}
-                  {item.phone && <p className="text-xs text-muted-foreground">📞 {item.phone}</p>}
-                  {item.price && <p className="text-xs font-semibold text-primary">💰 {item.price}</p>}
-                  {item.location && <p className="text-xs text-muted-foreground">📍 {item.location}</p>}
-                  {item.created_at && <p className="text-xs text-muted-foreground mt-1">📅 {new Date(item.created_at).toLocaleDateString("bn-BD")}</p>}
-                </div>
-                <div className="flex gap-1.5 shrink-0 flex-wrap justify-end">
-                  {"is_approved" in item && (
-                    <button onClick={() => toggleApproval(table, item.id, item.is_approved, itemName)}
-                      className={`text-xs px-2 py-1 rounded-lg transition-colors ${item.is_approved ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"}`}>
-                      {item.is_approved ? <CheckCircle className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
-                    </button>
-                  )}
-                  {"is_active" in item && (
-                    <button onClick={() => toggleActive(table, item.id, item.is_active, itemName)}
-                      className={`text-xs px-2 py-1 rounded-lg transition-colors ${item.is_active ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"}`}>
-                      {item.is_active ? "🟢" : "⚫"}
-                    </button>
-                  )}
-                  <button onClick={() => deleteItem(table, item.id, itemName)}
-                    className="text-xs px-2 py-1 rounded-lg bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 transition-colors">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
+            <div key={item.id} className="glass-card p-3">
+              <h3 className="font-bold text-sm text-foreground">{name}</h3>
+              {item.phone && <p className="text-xs text-muted-foreground">📞 {item.phone}</p>}
+              {item.description && <p className="text-xs text-muted-foreground line-clamp-2">{item.description}</p>}
+              <p className="text-xs text-muted-foreground mt-1">📅 {new Date(item.created_at).toLocaleDateString("bn-BD")}</p>
             </div>
           );
         })}
       </div>
     );
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "dashboard": return renderDashboard();
+      case "services": case "pending": return renderServicesList();
+      case "categories": return renderCategories();
+      case "activity": return renderActivity();
+      case "users": return renderUsers();
+      default: return renderLegacy();
+    }
   };
 
   return (
@@ -393,8 +455,8 @@ const AdminDashboard = () => {
           <Shield className="w-5 h-5" /> এডমিন প্যানেল
         </h1>
         <div className="flex items-center gap-2">
-          {totalPending > 0 && (
-            <span className="bg-amber-400 text-amber-900 text-xs font-bold px-2 py-0.5 rounded-full">{totalPending}</span>
+          {counts.pending > 0 && (
+            <span className="bg-amber-400 text-amber-900 text-xs font-bold px-2 py-0.5 rounded-full">{counts.pending}</span>
           )}
           <button onClick={handleLogout} className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
             <LogOut className="w-4 h-4 text-white" />
@@ -419,10 +481,7 @@ const AdminDashboard = () => {
       </div>
 
       <div className="px-4 pb-8">
-        {activeTab === "dashboard" ? renderDashboard() : 
-         activeTab === "activity" ? renderActivity() :
-         activeTab === "users" ? renderUsers() :
-         renderTable()}
+        {renderContent()}
       </div>
     </div>
   );
