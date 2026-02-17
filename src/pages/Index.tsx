@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
-import SearchBar from "@/components/SearchBar";
 import HeroSlider from "@/components/HeroSlider";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import ServiceGrid from "@/components/ServiceGrid";
@@ -19,12 +18,11 @@ const Index = () => {
       <Navbar onMenuClick={() => setDrawerOpen(true)} />
 
       <div className="space-y-5 pb-6 mt-2">
-        <SearchBar />
         <HeroSlider />
         <AnnouncementBar />
         <LatestNews />
-        <FeaturedServices />
         <ServiceGrid />
+        <FeaturedServices />
         <StatsSection />
         <Footer />
       </div>

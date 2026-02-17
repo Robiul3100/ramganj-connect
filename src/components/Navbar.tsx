@@ -1,30 +1,76 @@
-import { Menu, Users } from "lucide-react";
+import { Menu, Sun, Moon, Monitor } from "lucide-react";
+import { useTheme } from "@/components/ThemeProvider";
+import { useState, useRef, useEffect } from "react";
 
 interface NavbarProps {
   onMenuClick: () => void;
 }
 
+const themeOptions = [
+  { value: "light" as const, icon: Sun, label: "লাইট" },
+  { value: "dark" as const, icon: Moon, label: "ডার্ক" },
+  { value: "system" as const, icon: Monitor, label: "সিস্টেম" },
+];
+
 const Navbar = ({ onMenuClick }: NavbarProps) => {
+  const { theme, setTheme } = useTheme();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const CurrentIcon = themeOptions.find((o) => o.value === theme)?.icon || Sun;
+
   return (
-    <header className="flex items-center justify-between px-4 py-3">
-      <button
-        onClick={onMenuClick}
-        className="w-12 h-12 rounded-full bg-card flex items-center justify-center shadow-sm"
-        aria-label="Menu"
-      >
-        <Menu className="w-5 h-5 text-muted-foreground" />
-      </button>
-
-      <div className="flex-1 ml-3">
-        <h1 className="text-xl font-bold text-foreground leading-tight">রামগঞ্জ সেবা</h1>
-        <p className="text-sm text-muted-foreground">আপনার ডিজিটাল সহযোগী</p>
-      </div>
-
-      <div className="relative">
-        <button className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-          <Users className="w-5 h-5 text-primary" />
+    <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border">
+      <div className="flex items-center justify-between px-4 py-3 max-w-4xl mx-auto">
+        <button
+          onClick={onMenuClick}
+          className="w-10 h-10 rounded-full bg-card flex items-center justify-center shadow-sm"
+          aria-label="Menu"
+        >
+          <Menu className="w-5 h-5 text-muted-foreground" />
         </button>
-        <span className="absolute top-0 right-0 w-3 h-3 rounded-full border-2 border-background" style={{ backgroundColor: "hsl(140, 70%, 45%)" }} />
+
+        <div className="flex-1 ml-3">
+          <h1 className="text-xl font-bold text-foreground leading-tight">রামগঞ্জ সেবা</h1>
+          <p className="text-xs text-muted-foreground">আপনার ডিজিটাল সহযোগী</p>
+        </div>
+
+        <div className="relative" ref={ref}>
+          <button
+            onClick={() => setOpen(!open)}
+            className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center"
+          >
+            <CurrentIcon className="w-5 h-5 text-primary" />
+          </button>
+          {open && (
+            <div className="absolute right-0 top-12 bg-card rounded-2xl shadow-lg border border-border p-1.5 min-w-[140px] animate-fade-in z-50">
+              {themeOptions.map((opt) => {
+                const Icon = opt.icon;
+                const active = theme === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => { setTheme(opt.value); setOpen(false); }}
+                    className={`flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-sm transition-colors ${
+                      active ? "bg-primary/10 text-primary font-semibold" : "text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

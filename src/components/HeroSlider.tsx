@@ -42,7 +42,7 @@ const HeroSlider = () => {
   return (
     <div className="px-4">
       <div className="relative rounded-3xl overflow-hidden" style={{ boxShadow: "var(--shadow-card)" }}>
-        <div className="aspect-[16/10] relative">
+        <div className="aspect-[2.7/1] relative">
           {slides.map((slide, i) => (
             <img
               key={slide.id}
