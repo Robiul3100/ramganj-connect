@@ -3,7 +3,8 @@ import {
   Zap, Flame, Bus, GraduationCap, Umbrella, Briefcase, Scale, Store,
   Lightbulb, Users, ShoppingCart, ShieldCheck, Headphones, Landmark, FileText,
   Image, BookOpen, MapPin, Package,
-  MonitorSmartphone, Home, Sprout, Truck, BookOpenCheck, UtensilsCrossed, Wrench, PenTool, Heart
+  MonitorSmartphone, Home, Sprout, Truck, BookOpenCheck, UtensilsCrossed, Wrench, PenTool, Heart,
+  AlertTriangle, Calendar, Globe
 } from "lucide-react";
 
 export interface Service {
@@ -14,13 +15,14 @@ export interface Service {
   iconBg: string;
   status: "active" | "coming_soon";
   order: number;
+  route?: string;
 }
 
 export const services: Service[] = [
-  { id: "1", name: "রামগঞ্জ সম্পর্কে", icon: Info, iconColor: "hsl(210, 85%, 55%)", iconBg: "hsl(210, 85%, 93%)", status: "active", order: 1 },
-  { id: "2", name: "জরুরি কল", icon: Phone, iconColor: "hsl(0, 70%, 55%)", iconBg: "hsl(0, 70%, 93%)", status: "active", order: 2 },
+  { id: "1", name: "রামগঞ্জ সম্পর্কে", icon: Info, iconColor: "hsl(210, 85%, 55%)", iconBg: "hsl(210, 85%, 93%)", status: "active", order: 1, route: "/about-ramganj" },
+  { id: "2", name: "জরুরি কল", icon: Phone, iconColor: "hsl(0, 70%, 55%)", iconBg: "hsl(0, 70%, 93%)", status: "active", order: 2, route: "/emergency-calls" },
   { id: "3", name: "হাসপাতাল", icon: Building2, iconColor: "hsl(150, 60%, 40%)", iconBg: "hsl(150, 60%, 92%)", status: "active", order: 3 },
-  { id: "4", name: "রক্ত", icon: Droplets, iconColor: "hsl(0, 80%, 55%)", iconBg: "hsl(0, 80%, 93%)", status: "active", order: 4 },
+  { id: "4", name: "রক্ত", icon: Droplets, iconColor: "hsl(0, 80%, 55%)", iconBg: "hsl(0, 80%, 93%)", status: "active", order: 4, route: "/blood-bank" },
   { id: "5", name: "পুলিশ", icon: Shield, iconColor: "hsl(265, 50%, 55%)", iconBg: "hsl(265, 50%, 93%)", status: "active", order: 5 },
   { id: "6", name: "অ্যাম্বুলেন্স", icon: Ambulance, iconColor: "hsl(150, 55%, 45%)", iconBg: "hsl(150, 55%, 92%)", status: "active", order: 6 },
   { id: "7", name: "ডাক্তার তালিকা", icon: Stethoscope, iconColor: "hsl(185, 60%, 42%)", iconBg: "hsl(185, 60%, 92%)", status: "active", order: 7 },
@@ -30,32 +32,30 @@ export const services: Service[] = [
   { id: "11", name: "যাতায়াত", icon: Bus, iconColor: "hsl(220, 20%, 40%)", iconBg: "hsl(220, 20%, 92%)", status: "active", order: 11 },
   { id: "12", name: "শিক্ষা", icon: GraduationCap, iconColor: "hsl(120, 45%, 40%)", iconBg: "hsl(120, 45%, 92%)", status: "active", order: 12 },
   { id: "13", name: "পর্যটন", icon: Umbrella, iconColor: "hsl(200, 60%, 50%)", iconBg: "hsl(200, 60%, 92%)", status: "active", order: 13 },
-  { id: "14", name: "চাকরি", icon: Briefcase, iconColor: "hsl(250, 40%, 50%)", iconBg: "hsl(250, 40%, 92%)", status: "active", order: 14 },
+  { id: "14", name: "চাকরি", icon: Briefcase, iconColor: "hsl(250, 40%, 50%)", iconBg: "hsl(250, 40%, 92%)", status: "active", order: 14, route: "/jobs" },
   { id: "15", name: "আইনি সহায়তা", icon: Scale, iconColor: "hsl(220, 30%, 45%)", iconBg: "hsl(220, 30%, 92%)", status: "active", order: 15 },
   { id: "16", name: "দোকান", icon: Store, iconColor: "hsl(330, 55%, 55%)", iconBg: "hsl(330, 55%, 92%)", status: "active", order: 16 },
   { id: "17", name: "উদ্যোক্তা", icon: Lightbulb, iconColor: "hsl(40, 80%, 50%)", iconBg: "hsl(40, 80%, 92%)", status: "active", order: 17 },
   { id: "18", name: "সংগঠন", icon: Users, iconColor: "hsl(210, 50%, 50%)", iconBg: "hsl(210, 50%, 92%)", status: "active", order: 18 },
-  { id: "19", name: "আমাদের টিম", icon: Users, iconColor: "hsl(170, 50%, 42%)", iconBg: "hsl(170, 50%, 92%)", status: "active", order: 19 },
-  { id: "20", name: "ডিজিটাল মার্কেট", icon: ShoppingCart, iconColor: "hsl(280, 50%, 55%)", iconBg: "hsl(280, 50%, 92%)", status: "active", order: 20 },
-  { id: "21", name: "প্রাইভেসি পলিসি", icon: ShieldCheck, iconColor: "hsl(150, 45%, 42%)", iconBg: "hsl(150, 45%, 92%)", status: "active", order: 21 },
-  { id: "22", name: "সাপোর্ট সিস্টেম", icon: Headphones, iconColor: "hsl(220, 40%, 45%)", iconBg: "hsl(220, 40%, 92%)", status: "active", order: 22 },
+  { id: "19", name: "ইভেন্ট", icon: Calendar, iconColor: "hsl(270, 60%, 55%)", iconBg: "hsl(270, 60%, 92%)", status: "active", order: 19, route: "/events" },
+  { id: "20", name: "অভিযোগ বক্স", icon: AlertTriangle, iconColor: "hsl(0, 60%, 50%)", iconBg: "hsl(0, 60%, 92%)", status: "active", order: 20, route: "/complaints" },
+  { id: "21", name: "প্রবাসী কর্নার", icon: Globe, iconColor: "hsl(195, 70%, 50%)", iconBg: "hsl(195, 70%, 92%)", status: "active", order: 21, route: "/expatriate-corner" },
+  { id: "22", name: "অনুদান", icon: Heart, iconColor: "hsl(340, 70%, 55%)", iconBg: "hsl(340, 70%, 92%)", status: "active", order: 22, route: "/donation" },
   { id: "23", name: "ব্যাংক", icon: Landmark, iconColor: "hsl(170, 55%, 40%)", iconBg: "hsl(170, 55%, 92%)", status: "active", order: 23 },
-  { id: "24", name: "শর্তাবলী", icon: FileText, iconColor: "hsl(220, 25%, 45%)", iconBg: "hsl(220, 25%, 92%)", status: "active", order: 24 },
-  { id: "25", name: "গ্যালারি", icon: Image, iconColor: "hsl(200, 55%, 48%)", iconBg: "hsl(200, 55%, 92%)", status: "active", order: 25 },
-  { id: "26", name: "ব্লগ", icon: BookOpen, iconColor: "hsl(25, 75%, 50%)", iconBg: "hsl(25, 75%, 92%)", status: "active", order: 26 },
-  { id: "27", name: "হারানো বিজ্ঞপ্তি", icon: MapPin, iconColor: "hsl(0, 60%, 50%)", iconBg: "hsl(0, 60%, 92%)", status: "active", order: 27 },
-  { id: "28", name: "কুরিয়ার ও পার্সেল", icon: Package, iconColor: "hsl(30, 60%, 50%)", iconBg: "hsl(30, 60%, 92%)", status: "active", order: 28 },
-  { id: "29", name: "কৃষি ও খামার", icon: Sprout, iconColor: "hsl(100, 50%, 42%)", iconBg: "hsl(100, 50%, 92%)", status: "active", order: 29 },
+  { id: "24", name: "গ্যালারি", icon: Image, iconColor: "hsl(200, 55%, 48%)", iconBg: "hsl(200, 55%, 92%)", status: "active", order: 24 },
+  { id: "25", name: "ব্লগ", icon: BookOpen, iconColor: "hsl(25, 75%, 50%)", iconBg: "hsl(25, 75%, 92%)", status: "active", order: 25 },
+  { id: "26", name: "হারানো বিজ্ঞপ্তি", icon: MapPin, iconColor: "hsl(0, 60%, 50%)", iconBg: "hsl(0, 60%, 92%)", status: "active", order: 26 },
+  { id: "27", name: "কুরিয়ার ও পার্সেল", icon: Package, iconColor: "hsl(30, 60%, 50%)", iconBg: "hsl(30, 60%, 92%)", status: "active", order: 27 },
+  { id: "28", name: "কৃষি ও খামার", icon: Sprout, iconColor: "hsl(100, 50%, 42%)", iconBg: "hsl(100, 50%, 92%)", status: "active", order: 28 },
+  { id: "29", name: "সাপোর্ট", icon: Headphones, iconColor: "hsl(220, 40%, 45%)", iconBg: "hsl(220, 40%, 92%)", status: "active", order: 29 },
   // Coming Soon
   { id: "c1", name: "ডেভেলপার তথ্য", icon: MonitorSmartphone, iconColor: "hsl(220, 50%, 50%)", iconBg: "hsl(220, 20%, 92%)", status: "coming_soon", order: 1 },
   { id: "c2", name: "বাসা ভাড়া", icon: Home, iconColor: "hsl(25, 80%, 50%)", iconBg: "hsl(25, 80%, 92%)", status: "coming_soon", order: 2 },
-  { id: "c3", name: "কৃষি ও খামার", icon: Sprout, iconColor: "hsl(100, 50%, 45%)", iconBg: "hsl(100, 50%, 92%)", status: "coming_soon", order: 3 },
-  { id: "c4", name: "কুরিয়ার ও পার্সেল", icon: Truck, iconColor: "hsl(200, 50%, 50%)", iconBg: "hsl(200, 50%, 92%)", status: "coming_soon", order: 4 },
-  { id: "c5", name: "টিউশন মিডিয়া", icon: BookOpenCheck, iconColor: "hsl(170, 50%, 42%)", iconBg: "hsl(170, 50%, 92%)", status: "coming_soon", order: 5 },
-  { id: "c6", name: "খাবার ডেলিভারি", icon: UtensilsCrossed, iconColor: "hsl(30, 75%, 50%)", iconBg: "hsl(30, 75%, 92%)", status: "coming_soon", order: 6 },
-  { id: "c7", name: "মেরামতি সেবা", icon: Wrench, iconColor: "hsl(220, 30%, 45%)", iconBg: "hsl(220, 30%, 92%)", status: "coming_soon", order: 7 },
-  { id: "c8", name: "দলিল লেখক", icon: PenTool, iconColor: "hsl(250, 40%, 50%)", iconBg: "hsl(250, 40%, 92%)", status: "coming_soon", order: 8 },
-  { id: "c9", name: "বিবাহ মিডিয়া", icon: Heart, iconColor: "hsl(340, 70%, 55%)", iconBg: "hsl(340, 70%, 92%)", status: "coming_soon", order: 9 },
+  { id: "c3", name: "টিউশন মিডিয়া", icon: BookOpenCheck, iconColor: "hsl(170, 50%, 42%)", iconBg: "hsl(170, 50%, 92%)", status: "coming_soon", order: 3 },
+  { id: "c4", name: "খাবার ডেলিভারি", icon: UtensilsCrossed, iconColor: "hsl(30, 75%, 50%)", iconBg: "hsl(30, 75%, 92%)", status: "coming_soon", order: 4 },
+  { id: "c5", name: "মেরামতি সেবা", icon: Wrench, iconColor: "hsl(220, 30%, 45%)", iconBg: "hsl(220, 30%, 92%)", status: "coming_soon", order: 5 },
+  { id: "c6", name: "দলিল লেখক", icon: PenTool, iconColor: "hsl(250, 40%, 50%)", iconBg: "hsl(250, 40%, 92%)", status: "coming_soon", order: 6 },
+  { id: "c7", name: "বিবাহ মিডিয়া", icon: Heart, iconColor: "hsl(340, 70%, 55%)", iconBg: "hsl(340, 70%, 92%)", status: "coming_soon", order: 7 },
 ];
 
 export const activeServices = services.filter(s => s.status === "active");
