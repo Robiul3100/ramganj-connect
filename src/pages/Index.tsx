@@ -20,8 +20,8 @@ const Index = () => {
       <div className="space-y-5 pb-6 mt-2">
         <HeroSlider />
         <AnnouncementBar />
-        <LatestNews />
         <ServiceGrid />
+        <LatestNews />
         <FeaturedServices />
         <StatsSection />
         <Footer />
