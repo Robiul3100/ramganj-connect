@@ -4,7 +4,7 @@ import SearchBar from "@/components/SearchBar";
 import HeroSlider from "@/components/HeroSlider";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import ServiceGrid from "@/components/ServiceGrid";
-import ComingSoonSection from "@/components/ComingSoonSection";
+import FeaturedServices from "@/components/FeaturedServices";
 import StatsSection from "@/components/StatsSection";
 import Footer from "@/components/Footer";
 import DrawerMenu from "@/components/DrawerMenu";
@@ -21,8 +21,8 @@ const Index = () => {
         <SearchBar />
         <HeroSlider />
         <AnnouncementBar />
+        <FeaturedServices />
         <ServiceGrid />
-        <ComingSoonSection />
         <StatsSection />
         <Footer />
       </div>
