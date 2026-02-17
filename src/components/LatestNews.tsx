@@ -66,21 +66,21 @@ const LatestNews = () => {
               <Link
                 to={`/news/${item.id}`}
                 key={`${item.id}-${i}`}
-                className="glass-card overflow-hidden w-[220px] h-[220px] shrink-0 flex flex-col transition-transform duration-200 hover:scale-[1.03]"
+                className="glass-card overflow-hidden w-[200px] shrink-0 flex flex-col transition-transform duration-200 hover:scale-[1.03]"
               >
-                {/* Strict 16:9 thumbnail */}
-                <div className="w-[220px] h-[124px] bg-muted overflow-hidden shrink-0">
+                {/* 16:9 thumbnail */}
+                <div className="w-full aspect-video bg-muted overflow-hidden shrink-0">
                   {item.thumbnail_url ? (
                     <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-primary/5">
-                      <Newspaper className="w-8 h-8 text-muted-foreground/30" />
+                      <Newspaper className="w-7 h-7 text-muted-foreground/30" />
                     </div>
                   )}
                 </div>
-                <div className="p-2.5 flex flex-col flex-1 min-h-0">
-                  <h3 className="font-bold text-foreground text-xs leading-snug line-clamp-2 mb-auto">{item.title}</h3>
-                  <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-1.5">
+                <div className="p-2 flex flex-col gap-1">
+                  <h3 className="font-bold text-foreground text-[11px] leading-snug line-clamp-2">{item.title}</h3>
+                  <div className="flex items-center gap-2 text-[9px] text-muted-foreground">
                     <span className="flex items-center gap-0.5">
                       <Calendar className="w-2.5 h-2.5" /> {date}
                     </span>

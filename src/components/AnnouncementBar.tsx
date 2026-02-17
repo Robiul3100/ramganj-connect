@@ -25,12 +25,16 @@ const AnnouncementBar = () => {
 
   return (
     <div className="px-4">
-      <div className="announcement-bar">
-        <span className="update-badge">
+      <div className="announcement-bar overflow-hidden">
+        <span className="update-badge shrink-0">
           <Zap className="w-3.5 h-3.5" />
           আপডেট
         </span>
-        <p className="text-sm text-muted-foreground truncate">{text}</p>
+        <div className="overflow-hidden flex-1 min-w-0">
+          <p className="text-sm text-muted-foreground whitespace-nowrap marquee-text">
+            {text}
+          </p>
+        </div>
       </div>
     </div>
   );
