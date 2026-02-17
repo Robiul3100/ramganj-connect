@@ -825,6 +825,9 @@ const AdminDashboard = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button onClick={() => navigate("/")} className="w-9 h-9 rounded-xl bg-muted/80 hover:bg-primary/10 flex items-center justify-center transition-colors group" title="হোমপেজ">
+              <Home className="w-4 h-4 text-foreground group-hover:text-primary transition-colors" />
+            </button>
             {counts.pending > 0 && (
               <button onClick={() => setActiveTab("pending")} className="relative w-9 h-9 rounded-xl bg-muted/80 hover:bg-muted flex items-center justify-center transition-colors">
                 <Bell className="w-4 h-4 text-foreground" />
