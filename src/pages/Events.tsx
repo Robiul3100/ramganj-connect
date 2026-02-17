@@ -48,7 +48,7 @@ const Events = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background max-w-4xl mx-auto">
+    <div className="min-h-screen bg-background max-w-4xl mx-auto pb-6">
       <PageHeader title="ইভেন্ট" color="linear-gradient(135deg, hsl(270,60%,55%), hsl(290,70%,60%))" onAdd={() => setShowForm(true)} />
       
       <div className="px-4 -mt-2 space-y-3">

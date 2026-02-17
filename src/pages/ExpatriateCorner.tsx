@@ -43,7 +43,7 @@ const ExpatriateCorner = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background max-w-4xl mx-auto">
+    <div className="min-h-screen bg-background max-w-4xl mx-auto pb-6">
       <PageHeader title="প্রবাসী কর্নার" color="linear-gradient(135deg, hsl(195,70%,50%), hsl(210,75%,55%))" onAdd={() => setShowForm(true)} />
       
       <div className="px-4 -mt-2 space-y-3">

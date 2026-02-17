@@ -10,7 +10,7 @@ const ServiceGrid = () => {
         <h2 className="text-lg font-bold text-foreground">চালু সেবাসমূহ</h2>
         <span className="text-sm font-semibold text-primary">{activeServices.length} টি</span>
       </div>
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
         {activeServices.map((service) => {
           const Icon = service.icon;
           return (
