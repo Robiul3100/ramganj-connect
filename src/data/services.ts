@@ -4,7 +4,7 @@ import {
   Lightbulb, Users, ShoppingCart, ShieldCheck, Headphones, Landmark, FileText,
   Image, BookOpen, MapPin, Package,
   MonitorSmartphone, Home, Sprout, Truck, BookOpenCheck, UtensilsCrossed, Wrench, PenTool, Heart,
-  AlertTriangle, Calendar, Globe
+  AlertTriangle, Calendar, Globe, Tag
 } from "lucide-react";
 
 export interface Service {
@@ -25,17 +25,17 @@ export const services: Service[] = [
   { id: "4", name: "রক্ত", icon: Droplets, iconColor: "hsl(0, 80%, 55%)", iconBg: "hsl(0, 80%, 93%)", status: "active", order: 4, route: "/blood-bank" },
   { id: "5", name: "পুলিশ", icon: Shield, iconColor: "hsl(265, 50%, 55%)", iconBg: "hsl(265, 50%, 93%)", status: "active", order: 5 },
   { id: "6", name: "অ্যাম্বুলেন্স", icon: Ambulance, iconColor: "hsl(150, 55%, 45%)", iconBg: "hsl(150, 55%, 92%)", status: "active", order: 6 },
-  { id: "7", name: "ডাক্তার তালিকা", icon: Stethoscope, iconColor: "hsl(185, 60%, 42%)", iconBg: "hsl(185, 60%, 92%)", status: "active", order: 7 },
+  { id: "7", name: "ডাক্তার তালিকা", icon: Stethoscope, iconColor: "hsl(185, 60%, 42%)", iconBg: "hsl(185, 60%, 92%)", status: "active", order: 7, route: "/doctors" },
   { id: "8", name: "ফার্মেসি", icon: Pill, iconColor: "hsl(160, 50%, 45%)", iconBg: "hsl(160, 50%, 92%)", status: "active", order: 8 },
   { id: "9", name: "বিদ্যুৎ অফিস", icon: Zap, iconColor: "hsl(50, 80%, 45%)", iconBg: "hsl(50, 80%, 92%)", status: "active", order: 9 },
   { id: "10", name: "ফায়ার সার্ভিস", icon: Flame, iconColor: "hsl(15, 80%, 50%)", iconBg: "hsl(15, 40%, 90%)", status: "active", order: 10 },
   { id: "11", name: "যাতায়াত", icon: Bus, iconColor: "hsl(220, 20%, 40%)", iconBg: "hsl(220, 20%, 92%)", status: "active", order: 11 },
-  { id: "12", name: "শিক্ষা", icon: GraduationCap, iconColor: "hsl(120, 45%, 40%)", iconBg: "hsl(120, 45%, 92%)", status: "active", order: 12 },
+  { id: "12", name: "শিক্ষা", icon: GraduationCap, iconColor: "hsl(120, 45%, 40%)", iconBg: "hsl(120, 45%, 92%)", status: "active", order: 12, route: "/education" },
   { id: "13", name: "পর্যটন", icon: Umbrella, iconColor: "hsl(200, 60%, 50%)", iconBg: "hsl(200, 60%, 92%)", status: "active", order: 13 },
   { id: "14", name: "চাকরি", icon: Briefcase, iconColor: "hsl(250, 40%, 50%)", iconBg: "hsl(250, 40%, 92%)", status: "active", order: 14, route: "/jobs" },
   { id: "15", name: "আইনি সহায়তা", icon: Scale, iconColor: "hsl(220, 30%, 45%)", iconBg: "hsl(220, 30%, 92%)", status: "active", order: 15 },
-  { id: "16", name: "দোকান", icon: Store, iconColor: "hsl(330, 55%, 55%)", iconBg: "hsl(330, 55%, 92%)", status: "active", order: 16 },
-  { id: "17", name: "উদ্যোক্তা", icon: Lightbulb, iconColor: "hsl(40, 80%, 50%)", iconBg: "hsl(40, 80%, 92%)", status: "active", order: 17 },
+  { id: "16", name: "দোকান", icon: Store, iconColor: "hsl(330, 55%, 55%)", iconBg: "hsl(330, 55%, 92%)", status: "active", order: 16, route: "/shops" },
+  { id: "17", name: "মার্কেটপ্লেস", icon: Tag, iconColor: "hsl(160, 50%, 40%)", iconBg: "hsl(160, 50%, 92%)", status: "active", order: 17, route: "/marketplace" },
   { id: "18", name: "সংগঠন", icon: Users, iconColor: "hsl(210, 50%, 50%)", iconBg: "hsl(210, 50%, 92%)", status: "active", order: 18 },
   { id: "19", name: "ইভেন্ট", icon: Calendar, iconColor: "hsl(270, 60%, 55%)", iconBg: "hsl(270, 60%, 92%)", status: "active", order: 19, route: "/events" },
   { id: "20", name: "অভিযোগ বক্স", icon: AlertTriangle, iconColor: "hsl(0, 60%, 50%)", iconBg: "hsl(0, 60%, 92%)", status: "active", order: 20, route: "/complaints" },

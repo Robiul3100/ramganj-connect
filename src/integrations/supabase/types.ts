@@ -194,6 +194,42 @@ export type Database = {
         }
         Relationships: []
       }
+      doctors: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          is_approved: boolean
+          location: string | null
+          name: string
+          phone: string | null
+          specialty: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_approved?: boolean
+          location?: string | null
+          name: string
+          phone?: string | null
+          specialty?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_approved?: boolean
+          location?: string | null
+          name?: string
+          phone?: string | null
+          specialty?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       donation_methods: {
         Row: {
           account_number: string
@@ -257,6 +293,42 @@ export type Database = {
           payment_method?: string
           phone?: string
           trx_id?: string | null
+        }
+        Relationships: []
+      }
+      education_institutes: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean
+          is_approved: boolean
+          location: string | null
+          name: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_approved?: boolean
+          location?: string | null
+          name: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_approved?: boolean
+          location?: string | null
+          name?: string
+          phone?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -455,6 +527,48 @@ export type Database = {
         }
         Relationships: []
       }
+      marketplace: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          is_approved: boolean
+          location: string | null
+          phone: string | null
+          price: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_approved?: boolean
+          location?: string | null
+          phone?: string | null
+          price?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_approved?: boolean
+          location?: string | null
+          phone?: string | null
+          price?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -482,6 +596,42 @@ export type Database = {
           phone?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      shops: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean
+          is_approved: boolean
+          location: string | null
+          name: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_approved?: boolean
+          location?: string | null
+          name: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_approved?: boolean
+          location?: string | null
+          name?: string
+          phone?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

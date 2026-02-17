@@ -4,11 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { 
   LogOut, LayoutDashboard, Image, Megaphone, Phone, Droplets, Briefcase, Calendar, 
   AlertTriangle, Globe, Heart, FileText, Clock, Users, Activity, Shield, 
-  TrendingUp, Eye, CheckCircle, XCircle, Trash2, RefreshCw
+  TrendingUp, Eye, CheckCircle, XCircle, Trash2, RefreshCw, Tag, Stethoscope, GraduationCap, Store, MapPin
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
-type Tab = "dashboard" | "slider" | "announcements" | "emergency" | "blood" | "jobs" | "events" | "complaints" | "expatriate" | "donation" | "about" | "timeline" | "users" | "activity";
+type Tab = "dashboard" | "slider" | "announcements" | "emergency" | "blood" | "jobs" | "events" | "complaints" | "expatriate" | "donation" | "about" | "timeline" | "users" | "activity" | "marketplace" | "doctors" | "education" | "shops" | "lost_found";
 
 const tabs: { id: Tab; label: string; icon: any }[] = [
   { id: "dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard },
@@ -23,7 +23,12 @@ const tabs: { id: Tab; label: string; icon: any }[] = [
   { id: "complaints", label: "অভিযোগ", icon: AlertTriangle },
   { id: "expatriate", label: "প্রবাসী", icon: Globe },
   { id: "donation", label: "অনুদান", icon: Heart },
-  { id: "about", label: "রামগঞ্জ সম্পর্কে", icon: FileText },
+  { id: "marketplace", label: "মার্কেটপ্লেস", icon: Tag },
+  { id: "doctors", label: "ডক্টর", icon: Stethoscope },
+  { id: "education", label: "শিক্ষা", icon: GraduationCap },
+  { id: "shops", label: "দোকান", icon: Store },
+  { id: "lost_found", label: "হারানো", icon: MapPin },
+  { id: "about", label: "রামগঞ্জ", icon: FileText },
   { id: "timeline", label: "টাইমলাইন", icon: Clock },
 ];
 
@@ -50,7 +55,7 @@ const AdminDashboard = () => {
   }, [navigate]);
 
   const fetchCounts = useCallback(async () => {
-    const tableNames = ["emergency_calls", "blood_donors", "jobs", "events", "complaints", "expatriate_forums", "donations", "slider_items", "announcements", "timeline_events"];
+    const tableNames = ["emergency_calls", "blood_donors", "jobs", "events", "complaints", "expatriate_forums", "donations", "slider_items", "announcements", "timeline_events", "marketplace", "doctors", "education_institutes", "shops", "lost_found"];
     const results: Record<string, number> = {};
     const pending: Record<string, number> = {};
     
@@ -59,8 +64,7 @@ const AdminDashboard = () => {
       results[t] = count || 0;
     }));
 
-    // Pending approvals
-    const approvalTables = ["blood_donors", "jobs", "events", "complaints", "expatriate_forums"];
+    const approvalTables = ["blood_donors", "jobs", "events", "complaints", "expatriate_forums", "marketplace", "doctors", "education_institutes", "shops", "lost_found"];
     await Promise.all(approvalTables.map(async (t) => {
       const { count } = await (supabase.from as any)(t).select("*", { count: "exact", head: true }).eq("is_approved", false);
       pending[t] = count || 0;
@@ -75,11 +79,7 @@ const AdminDashboard = () => {
   const logActivity = useCallback(async (action: string, tableName?: string, recordId?: string, details?: string) => {
     if (!currentUser) return;
     await (supabase.from as any)("admin_activity_log").insert({
-      user_id: currentUser.id,
-      action,
-      table_name: tableName || null,
-      record_id: recordId || null,
-      details: details || null,
+      user_id: currentUser.id, action, table_name: tableName || null, record_id: recordId || null, details: details || null,
     });
   }, [currentUser]);
 
@@ -87,6 +87,7 @@ const AdminDashboard = () => {
     slider: "slider_items", announcements: "announcements", emergency: "emergency_calls",
     blood: "blood_donors", jobs: "jobs", events: "events", complaints: "complaints",
     expatriate: "expatriate_forums", donation: "donations", about: "about_content", timeline: "timeline_events",
+    marketplace: "marketplace", doctors: "doctors", education: "education_institutes", shops: "shops", lost_found: "lost_found",
   };
 
   useEffect(() => {
@@ -95,17 +96,12 @@ const AdminDashboard = () => {
     if (activeTab === "activity") {
       const fetchActivity = async () => {
         setLoading(true);
-        const { data } = await (supabase.from as any)("admin_activity_log")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(50);
+        const { data } = await (supabase.from as any)("admin_activity_log").select("*").order("created_at", { ascending: false }).limit(50);
         setActivityLog(data || []);
         setLoading(false);
       };
       fetchActivity();
-      const ch = supabase.channel("admin_activity_rt")
-        .on("postgres_changes", { event: "INSERT", schema: "public", table: "admin_activity_log" }, () => fetchActivity())
-        .subscribe();
+      const ch = supabase.channel("admin_activity_rt").on("postgres_changes", { event: "INSERT", schema: "public", table: "admin_activity_log" }, () => fetchActivity()).subscribe();
       return () => { supabase.removeChannel(ch); };
     }
 
@@ -115,8 +111,7 @@ const AdminDashboard = () => {
         const { data: profiles } = await (supabase.from as any)("profiles").select("*").order("created_at", { ascending: false });
         const { data: roles } = await (supabase.from as any)("user_roles").select("*");
         const merged = (profiles || []).map((p: any) => ({
-          ...p,
-          roles: (roles || []).filter((r: any) => r.user_id === p.user_id).map((r: any) => r.role),
+          ...p, roles: (roles || []).filter((r: any) => r.user_id === p.user_id).map((r: any) => r.role),
         }));
         setUsersList(merged);
         setLoading(false);
@@ -173,7 +168,6 @@ const AdminDashboard = () => {
 
   const renderDashboard = () => (
     <div className="space-y-5">
-      {/* Welcome */}
       <div className="glass-card p-4 border-l-4 border-l-primary">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center">
@@ -186,7 +180,6 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Pending Alert */}
       {totalPending > 0 && (
         <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-2">
@@ -194,42 +187,37 @@ const AdminDashboard = () => {
             <h3 className="font-bold text-sm text-amber-800 dark:text-amber-200">অনুমোদন অপেক্ষমান ({totalPending})</h3>
           </div>
           <div className="flex flex-wrap gap-2">
-            {pendingCounts.blood_donors > 0 && (
-              <button onClick={() => setActiveTab("blood")} className="text-xs bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 px-2.5 py-1 rounded-lg">
-                রক্তদাতা ({pendingCounts.blood_donors})
-              </button>
-            )}
-            {pendingCounts.jobs > 0 && (
-              <button onClick={() => setActiveTab("jobs")} className="text-xs bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 px-2.5 py-1 rounded-lg">
-                চাকরি ({pendingCounts.jobs})
-              </button>
-            )}
-            {pendingCounts.events > 0 && (
-              <button onClick={() => setActiveTab("events")} className="text-xs bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 px-2.5 py-1 rounded-lg">
-                ইভেন্ট ({pendingCounts.events})
-              </button>
-            )}
-            {pendingCounts.complaints > 0 && (
-              <button onClick={() => setActiveTab("complaints")} className="text-xs bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 px-2.5 py-1 rounded-lg">
-                অভিযোগ ({pendingCounts.complaints})
-              </button>
-            )}
-            {pendingCounts.expatriate_forums > 0 && (
-              <button onClick={() => setActiveTab("expatriate")} className="text-xs bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 px-2.5 py-1 rounded-lg">
-                প্রবাসী ({pendingCounts.expatriate_forums})
-              </button>
-            )}
+            {Object.entries(pendingCounts).filter(([, v]) => v > 0).map(([key, val]) => {
+              const labelMap: Record<string, { label: string; tab: Tab }> = {
+                blood_donors: { label: "রক্তদাতা", tab: "blood" },
+                jobs: { label: "চাকরি", tab: "jobs" },
+                events: { label: "ইভেন্ট", tab: "events" },
+                complaints: { label: "অভিযোগ", tab: "complaints" },
+                expatriate_forums: { label: "প্রবাসী", tab: "expatriate" },
+                marketplace: { label: "মার্কেটপ্লেস", tab: "marketplace" },
+                doctors: { label: "ডক্টর", tab: "doctors" },
+                education_institutes: { label: "শিক্ষা", tab: "education" },
+                shops: { label: "দোকান", tab: "shops" },
+                lost_found: { label: "হারানো", tab: "lost_found" },
+              };
+              const info = labelMap[key];
+              if (!info) return null;
+              return (
+                <button key={key} onClick={() => setActiveTab(info.tab)} className="text-xs bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 px-2.5 py-1 rounded-lg">
+                  {info.label} ({val})
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* Stats Grid */}
       <div>
         <div className="flex items-center gap-2 mb-3">
           <TrendingUp className="w-4 h-4 text-primary" />
           <h2 className="text-sm font-bold text-foreground">পরিসংখ্যান</h2>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {[
             { label: "জরুরি কল", count: counts.emergency_calls, icon: Phone, color: "hsl(0 70% 50%)" },
             { label: "রক্তদাতা", count: counts.blood_donors, icon: Droplets, color: "hsl(0 80% 55%)" },
@@ -238,7 +226,11 @@ const AdminDashboard = () => {
             { label: "অভিযোগ", count: counts.complaints, icon: AlertTriangle, color: "hsl(15 80% 55%)" },
             { label: "প্রবাসী", count: counts.expatriate_forums, icon: Globe, color: "hsl(195 70% 50%)" },
             { label: "অনুদান", count: counts.donations, icon: Heart, color: "hsl(340 75% 60%)" },
-            { label: "স্লাইডার", count: counts.slider_items, icon: Image, color: "hsl(150 60% 40%)" },
+            { label: "মার্কেটপ্লেস", count: counts.marketplace, icon: Tag, color: "hsl(160 50% 40%)" },
+            { label: "ডক্টর", count: counts.doctors, icon: Stethoscope, color: "hsl(185 60% 42%)" },
+            { label: "শিক্ষা", count: counts.education_institutes, icon: GraduationCap, color: "hsl(150 50% 38%)" },
+            { label: "দোকান", count: counts.shops, icon: Store, color: "hsl(330 55% 55%)" },
+            { label: "হারানো", count: counts.lost_found, icon: MapPin, color: "hsl(0 60% 50%)" },
           ].map((s) => {
             const Icon = s.icon;
             return (
@@ -254,10 +246,9 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
       <div>
         <h2 className="text-sm font-bold text-foreground mb-3">⚡ দ্রুত অ্যাকশন</h2>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
           {[
             { label: "স্লাইডার", tab: "slider" as Tab, icon: Image },
             { label: "ঘোষণা", tab: "announcements" as Tab, icon: Megaphone },
@@ -287,34 +278,21 @@ const AdminDashboard = () => {
           <Activity className="w-4 h-4 text-primary" /> সাম্প্রতিক কার্যকলাপ
         </h2>
         <div className="flex items-center gap-1 text-xs text-green-600">
-          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-          লাইভ
+          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /> লাইভ
         </div>
       </div>
-      {loading ? (
-        <p className="text-center text-muted-foreground py-8">লোড হচ্ছে...</p>
-      ) : activityLog.length === 0 ? (
-        <p className="text-center text-muted-foreground py-8">কোন অ্যাক্টিভিটি নেই</p>
-      ) : (
+      {loading ? <p className="text-center text-muted-foreground py-8">লোড হচ্ছে...</p> : activityLog.length === 0 ? <p className="text-center text-muted-foreground py-8">কোন অ্যাক্টিভিটি নেই</p> : (
         activityLog.map((log: any) => (
           <div key={log.id} className="glass-card p-3 flex items-start gap-3">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-              log.action === "approved" ? "bg-green-100 text-green-600" :
-              log.action === "deleted" ? "bg-red-100 text-red-600" :
-              log.action === "logout" ? "bg-gray-100 text-gray-600" :
-              "bg-blue-100 text-blue-600"
+              log.action === "approved" ? "bg-green-100 text-green-600" : log.action === "deleted" ? "bg-red-100 text-red-600" : log.action === "logout" ? "bg-gray-100 text-gray-600" : "bg-blue-100 text-blue-600"
             }`}>
-              {log.action === "approved" ? <CheckCircle className="w-4 h-4" /> :
-               log.action === "deleted" ? <Trash2 className="w-4 h-4" /> :
-               log.action === "logout" ? <LogOut className="w-4 h-4" /> :
-               <Eye className="w-4 h-4" />}
+              {log.action === "approved" ? <CheckCircle className="w-4 h-4" /> : log.action === "deleted" ? <Trash2 className="w-4 h-4" /> : log.action === "logout" ? <LogOut className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground capitalize">{log.action}</p>
               {log.table_name && <p className="text-xs text-muted-foreground">{log.table_name}{log.details ? ` — ${log.details}` : ""}</p>}
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {new Date(log.created_at).toLocaleString("bn-BD")}
-              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">{new Date(log.created_at).toLocaleString("bn-BD")}</p>
             </div>
           </div>
         ))
@@ -327,11 +305,7 @@ const AdminDashboard = () => {
       <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
         <Users className="w-4 h-4 text-primary" /> ইউজার ম্যানেজমেন্ট
       </h2>
-      {loading ? (
-        <p className="text-center text-muted-foreground py-8">লোড হচ্ছে...</p>
-      ) : usersList.length === 0 ? (
-        <p className="text-center text-muted-foreground py-8">কোন ইউজার নেই</p>
-      ) : (
+      {loading ? <p className="text-center text-muted-foreground py-8">লোড হচ্ছে...</p> : usersList.length === 0 ? <p className="text-center text-muted-foreground py-8">কোন ইউজার নেই</p> : (
         usersList.map((user: any) => (
           <div key={user.id} className="glass-card p-4">
             <div className="flex items-center gap-3">
@@ -341,23 +315,14 @@ const AdminDashboard = () => {
               <div className="flex-1 min-w-0">
                 <h3 className="font-bold text-sm text-foreground truncate">{user.display_name || "No Name"}</h3>
                 <p className="text-xs text-muted-foreground">{user.phone || "ফোন নেই"}</p>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(user.created_at).toLocaleDateString("bn-BD")}
-                </p>
               </div>
               <div className="flex flex-col gap-1">
                 {user.roles.map((r: string) => (
                   <span key={r} className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                    r === "admin" ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" :
-                    r === "moderator" ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300" :
-                    "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                  }`}>
-                    {r === "admin" ? "🛡️ এডমিন" : r === "moderator" ? "👮 মডারেটর" : "👤 ইউজার"}
-                  </span>
+                    r === "admin" ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" : r === "moderator" ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300" : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                  }`}>{r === "admin" ? "🛡️ এডমিন" : r === "moderator" ? "👮 মডারেটর" : "👤 ইউজার"}</span>
                 ))}
-                {user.roles.length === 0 && (
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">👤 সাধারণ</span>
-                )}
+                {user.roles.length === 0 && <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">👤 সাধারণ</span>}
               </div>
             </div>
           </div>
@@ -380,26 +345,22 @@ const AdminDashboard = () => {
           </button>
         </div>
         {tableData.map((item: any) => {
-          const itemName = item.title || item.name || item.text || item.method_name || item.article_title || item.donor_name || `${item.year || ""}`;
+          const itemName = item.title || item.name || item.text || item.method_name || item.article_title || item.donor_name || item.item_name || `${item.year || ""}`;
           return (
             <div key={item.id} className="glass-card p-4">
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-foreground text-sm truncate">{itemName}</h3>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {item.category || item.blood_group || item.country || item.account_number || ""}
+                    {item.category || item.blood_group || item.country || item.account_number || item.specialty || item.type || ""}
                   </p>
-                  {item.description && (
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{item.description}</p>
-                  )}
+                  {item.description && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{item.description}</p>}
                   {item.phone && <p className="text-xs text-muted-foreground">📞 {item.phone}</p>}
-                  {item.created_at && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      📅 {new Date(item.created_at).toLocaleDateString("bn-BD")}
-                    </p>
-                  )}
+                  {item.price && <p className="text-xs font-semibold text-primary">💰 {item.price}</p>}
+                  {item.location && <p className="text-xs text-muted-foreground">📍 {item.location}</p>}
+                  {item.created_at && <p className="text-xs text-muted-foreground mt-1">📅 {new Date(item.created_at).toLocaleDateString("bn-BD")}</p>}
                 </div>
-                <div className="flex gap-1.5 shrink-0">
+                <div className="flex gap-1.5 shrink-0 flex-wrap justify-end">
                   {"is_approved" in item && (
                     <button onClick={() => toggleApproval(table, item.id, item.is_approved, itemName)}
                       className={`text-xs px-2 py-1 rounded-lg transition-colors ${item.is_approved ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"}`}>
@@ -426,16 +387,14 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background max-w-lg mx-auto">
+    <div className="min-h-screen bg-background max-w-4xl mx-auto">
       <div className="gradient-primary p-4 flex items-center justify-between sticky top-0 z-50">
         <h1 className="text-lg font-bold text-white flex items-center gap-2">
           <Shield className="w-5 h-5" /> এডমিন প্যানেল
         </h1>
         <div className="flex items-center gap-2">
           {totalPending > 0 && (
-            <span className="bg-amber-400 text-amber-900 text-xs font-bold px-2 py-0.5 rounded-full">
-              {totalPending}
-            </span>
+            <span className="bg-amber-400 text-amber-900 text-xs font-bold px-2 py-0.5 rounded-full">{totalPending}</span>
           )}
           <button onClick={handleLogout} className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
             <LogOut className="w-4 h-4 text-white" />
@@ -443,7 +402,6 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Tab bar */}
       <div className="px-2 py-3 overflow-x-auto sticky top-[60px] z-40 bg-background/95 backdrop-blur-sm">
         <div className="flex gap-2 min-w-max">
           {tabs.map((tab) => {

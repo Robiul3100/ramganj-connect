@@ -52,7 +52,7 @@ const AboutRamganj = () => {
   }, [nextSlide, gallery.length]);
 
   return (
-    <div className="min-h-screen bg-background max-w-lg mx-auto">
+    <div className="min-h-screen bg-background max-w-4xl mx-auto">
       {content?.meta_description && (
         <meta name="description" content={content.meta_description} />
       )}

@@ -57,7 +57,7 @@ const Donation = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background max-w-lg mx-auto">
+    <div className="min-h-screen bg-background max-w-4xl mx-auto">
       <div className="flex items-center gap-3 px-4 py-4">
         <button onClick={() => navigate(-1)}><ArrowLeft className="w-6 h-6 text-foreground" /></button>
         <div>
