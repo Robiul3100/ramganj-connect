@@ -1,6 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import { activeServices } from "@/data/services";
 
 const ServiceGrid = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="px-4">
       <div className="flex items-center justify-between mb-4">
@@ -13,6 +16,7 @@ const ServiceGrid = () => {
           return (
             <button
               key={service.id}
+              onClick={() => service.route && navigate(service.route)}
               className="glass-card-hover flex flex-col items-center gap-2 py-4 px-1"
             >
               <div
