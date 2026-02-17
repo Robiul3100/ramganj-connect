@@ -4,13 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   Stethoscope, Building2, Pill, GraduationCap, Store, Tag, Briefcase, MapPin,
   Calendar, Globe, Ambulance, Shield, Flame, Bus, Zap, Scale, Landmark, Users,
-  Umbrella, Package, Sprout, Home, BookOpenCheck, UtensilsCrossed, Wrench, PenTool, Heart
+  Umbrella, Package, Sprout, Home, BookOpenCheck, UtensilsCrossed, Wrench, PenTool, Heart,
+  Newspaper
 } from "lucide-react";
 
 const iconMap: Record<string, any> = {
   Stethoscope, Building2, Pill, GraduationCap, Store, Tag, Briefcase, MapPin,
   Calendar, Globe, Ambulance, Shield, Flame, Bus, Zap, Scale, Landmark, Users,
   Umbrella, Package, Sprout, Home, BookOpenCheck, UtensilsCrossed, Wrench, PenTool, Heart,
+  Newspaper,
 };
 
 const colorMap: Record<string, { iconColor: string; iconBg: string }> = {
@@ -41,6 +43,7 @@ const colorMap: Record<string, { iconColor: string; iconBg: string }> = {
   Wrench: { iconColor: "hsl(220,30%,45%)", iconBg: "hsl(220,30%,92%)" },
   PenTool: { iconColor: "hsl(250,40%,50%)", iconBg: "hsl(250,40%,92%)" },
   Heart: { iconColor: "hsl(340,70%,55%)", iconBg: "hsl(340,70%,92%)" },
+  Newspaper: { iconColor: "hsl(0,75%,50%)", iconBg: "hsl(0,75%,92%)" },
 };
 
 interface Category {
@@ -51,6 +54,8 @@ interface Category {
   sort_order: number;
   is_active: boolean;
 }
+
+const newsItem = { id: "news-static", name: "খবর ও সংবাদ", slug: "news", icon: "Newspaper", sort_order: -1 };
 
 const ServiceGrid = () => {
   const navigate = useNavigate();
@@ -64,17 +69,20 @@ const ServiceGrid = () => {
     fetch();
   }, []);
 
-  // Static routes that aren't category pages
-  const staticRoutes: Record<string, string> = {};
+  const allItems = [newsItem as Category, ...categories];
+
+  const staticRoutes: Record<string, string> = {
+    news: "/news",
+  };
 
   return (
     <section className="px-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-foreground">সেবাসমূহ</h2>
-        <span className="text-sm font-semibold text-primary">{categories.length} টি</span>
+        <span className="text-sm font-semibold text-primary">{allItems.length} টি</span>
       </div>
       <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-        {categories.map((cat) => {
+        {allItems.map((cat) => {
           const Icon = iconMap[cat.icon] || Tag;
           const colors = colorMap[cat.icon] || { iconColor: "hsl(210,85%,55%)", iconBg: "hsl(210,85%,93%)" };
           const route = staticRoutes[cat.slug] || `/service/${cat.slug}`;
@@ -83,9 +91,9 @@ const ServiceGrid = () => {
             <button
               key={cat.id}
               onClick={() => navigate(route)}
-              className="glass-card-hover flex flex-col items-center gap-2 py-4 px-1"
+              className="glass-card-hover flex flex-col items-center gap-2 py-4 px-1 h-full transition-transform duration-200 hover:scale-105 active:scale-95"
             >
-              <div className="service-icon-wrapper" style={{ backgroundColor: colors.iconBg, color: colors.iconColor }}>
+              <div className="service-icon-wrapper transition-transform duration-200 group-hover:scale-110" style={{ backgroundColor: colors.iconBg, color: colors.iconColor }}>
                 <Icon className="w-6 h-6" />
               </div>
               <span className="text-xs font-medium text-foreground text-center leading-tight">
