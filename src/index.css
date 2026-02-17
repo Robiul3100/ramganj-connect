@@ -194,3 +194,13 @@
 .marquee-right:hover {
   animation-play-state: paused;
 }
+
+/* Announcement text marquee */
+@keyframes marquee-text {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+.marquee-text {
+  display: inline-block;
+  animation: marquee-text 15s linear infinite;
+}
