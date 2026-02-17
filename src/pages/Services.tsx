@@ -7,13 +7,15 @@ import BottomNav from "@/components/BottomNav";
 import {
   Stethoscope, Building2, Pill, GraduationCap, Store, Tag, Briefcase, MapPin,
   Calendar, Globe, Ambulance, Shield, Flame, Bus, Zap, Scale, Landmark, Users,
-  Umbrella, Package, Sprout, Home, BookOpenCheck, UtensilsCrossed, Wrench, PenTool, Heart
+  Umbrella, Package, Sprout, Home, BookOpenCheck, UtensilsCrossed, Wrench, PenTool, Heart,
+  Activity, Car, Building, TrendingUp, BedDouble, Coffee, Video, TreePine
 } from "lucide-react";
 
 const iconMap: Record<string, any> = {
   Stethoscope, Building2, Pill, GraduationCap, Store, Tag, Briefcase, MapPin,
   Calendar, Globe, Ambulance, Shield, Flame, Bus, Zap, Scale, Landmark, Users,
   Umbrella, Package, Sprout, Home, BookOpenCheck, UtensilsCrossed, Wrench, PenTool, Heart,
+  Activity, Car, Building, TrendingUp, BedDouble, Coffee, Video, TreePine,
 };
 
 const colorMap: Record<string, { color: string; bg: string }> = {
@@ -44,6 +46,14 @@ const colorMap: Record<string, { color: string; bg: string }> = {
   Wrench: { color: "hsl(220,30%,45%)", bg: "hsl(220,30%,92%)" },
   PenTool: { color: "hsl(250,40%,50%)", bg: "hsl(250,40%,92%)" },
   Heart: { color: "hsl(340,70%,55%)", bg: "hsl(340,70%,92%)" },
+  Activity: { color: "hsl(190,60%,45%)", bg: "hsl(190,60%,92%)" },
+  Car: { color: "hsl(160,55%,40%)", bg: "hsl(160,55%,92%)" },
+  Building: { color: "hsl(210,40%,50%)", bg: "hsl(210,40%,92%)" },
+  TrendingUp: { color: "hsl(140,50%,42%)", bg: "hsl(140,50%,92%)" },
+  BedDouble: { color: "hsl(35,70%,50%)", bg: "hsl(35,70%,92%)" },
+  Coffee: { color: "hsl(15,70%,50%)", bg: "hsl(15,70%,92%)" },
+  Video: { color: "hsl(240,50%,55%)", bg: "hsl(240,50%,92%)" },
+  TreePine: { color: "hsl(130,50%,40%)", bg: "hsl(130,50%,92%)" },
 };
 
 interface Category {
