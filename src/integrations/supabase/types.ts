@@ -416,6 +416,45 @@ export type Database = {
         }
         Relationships: []
       }
+      lost_found: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_approved: boolean
+          item_date: string | null
+          item_name: string
+          location: string | null
+          phone: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_approved?: boolean
+          item_date?: string | null
+          item_name: string
+          location?: string | null
+          phone?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_approved?: boolean
+          item_date?: string | null
+          item_name?: string
+          location?: string | null
+          phone?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
