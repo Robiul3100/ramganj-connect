@@ -579,6 +579,7 @@ export type Database = {
           thumbnail_url: string | null
           title: string
           updated_at: string
+          view_count: number
         }
         Insert: {
           body?: string
@@ -589,6 +590,7 @@ export type Database = {
           thumbnail_url?: string | null
           title: string
           updated_at?: string
+          view_count?: number
         }
         Update: {
           body?: string
@@ -599,6 +601,7 @@ export type Database = {
           thumbnail_url?: string | null
           title?: string
           updated_at?: string
+          view_count?: number
         }
         Relationships: []
       }
@@ -874,6 +877,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_news_view: { Args: { news_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Newspaper, Calendar, Clock, Search, Radio } from "lucide-react";
+import { Newspaper, Search, Radio, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 
@@ -9,6 +9,7 @@ interface NewsItem {
   title: string;
   thumbnail_url: string | null;
   published_at: string;
+  view_count: number;
 }
 
 const News = () => {
@@ -21,7 +22,7 @@ const News = () => {
       setLoading(true);
       const { data } = await supabase
         .from("news")
-        .select("id, title, thumbnail_url, published_at")
+        .select("id, title, thumbnail_url, published_at, view_count")
         .eq("is_active", true)
         .order("published_at", { ascending: false });
       setNews(data || []);
@@ -37,13 +38,6 @@ const News = () => {
   }, []);
 
   const filtered = news.filter((n) => n.title.toLowerCase().includes(search.toLowerCase()));
-
-  const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr);
-    const date = d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-    const time = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
-    return { date, time };
-  };
 
   return (
     <div className="min-h-screen bg-background max-w-4xl mx-auto pb-20">
@@ -76,7 +70,7 @@ const News = () => {
         </div>
       </div>
 
-      <div className="px-4 pt-3">
+      <div className="px-4 pt-3 space-y-4">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -91,41 +85,33 @@ const News = () => {
             <p className="text-sm text-muted-foreground mt-1">বর্তমানে কোনো ব্রেকিং নিউজ পাওয়া যায়নি।</p>
           </div>
         ) : (
-          <div className="divide-y divide-border/50">
-            {filtered.map((item) => {
-              const { date, time } = formatDate(item.published_at);
-              return (
-                <Link
-                  to={`/news/${item.id}`}
-                  key={item.id}
-                  className="flex gap-3 py-3 group transition-colors hover:bg-muted/30 -mx-4 px-4"
-                >
-                  {/* Fixed-size thumbnail */}
-                  <div className="w-[130px] h-[90px] rounded-xl bg-muted overflow-hidden shrink-0">
-                    {item.thumbnail_url ? (
-                      <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-primary/5">
-                        <Newspaper className="w-8 h-8 text-muted-foreground/30" />
-                      </div>
-                    )}
+          filtered.map((item) => (
+            <Link
+              to={`/news/${item.id}`}
+              key={item.id}
+              className="glass-card overflow-hidden block group transition-all duration-200 hover:shadow-lg hover:scale-[1.01] border border-primary/10"
+            >
+              {/* Full-width 16:9 thumbnail */}
+              <div className="w-full aspect-video bg-muted overflow-hidden relative">
+                {item.thumbnail_url ? (
+                  <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-primary/5">
+                    <Newspaper className="w-12 h-12 text-muted-foreground/20" />
                   </div>
-                  {/* Content */}
-                  <div className="flex-1 min-w-0 flex flex-col justify-center">
-                    <h3 className="font-bold text-foreground text-sm leading-snug line-clamp-2 group-hover:text-primary transition-colors">{item.title}</h3>
-                    <p className="text-xs text-muted-foreground mt-1">বিস্তারিত জানতে এখানে ক্লিক করুন!</p>
-                    <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mt-1">
-                      <Calendar className="w-3 h-3 shrink-0" />
-                      <span>{date}</span>
-                      <span className="mx-0.5">||</span>
-                      <Clock className="w-3 h-3 shrink-0" />
-                      <span>{time}</span>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+                )}
+                {/* View count badge */}
+                <div className="absolute top-3 right-3 bg-background/90 backdrop-blur-sm rounded-full px-2.5 py-1 flex items-center gap-1 shadow-sm">
+                  <Eye className="w-3.5 h-3.5 text-destructive" />
+                  <span className="text-xs font-bold text-foreground">{item.view_count}</span>
+                </div>
+              </div>
+              {/* Title below thumbnail */}
+              <div className="p-3">
+                <h3 className="font-bold text-foreground text-base leading-snug group-hover:text-primary transition-colors">{item.title}</h3>
+              </div>
+            </Link>
+          ))
         )}
       </div>
 
