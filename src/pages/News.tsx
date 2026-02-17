@@ -111,7 +111,7 @@ const News = () => {
               <div className="p-3 space-y-2">
                 <h3 className="font-bold text-foreground text-base leading-snug group-hover:text-primary transition-colors">{item.title}</h3>
                 {item.body && (
-                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{item.body}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{item.body.replace(/<[^>]*>/g, '')}</p>
                 )}
                 <div className="flex items-center gap-3 text-[11px] text-muted-foreground pt-1">
                   <div className="flex items-center gap-1">
