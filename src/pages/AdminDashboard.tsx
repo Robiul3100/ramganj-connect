@@ -4,14 +4,16 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   LogOut, LayoutDashboard, Shield, Activity, Users, TrendingUp,
   CheckCircle, XCircle, Trash2, RefreshCw, Search, Edit3, Save, X,
-  Eye, Clock, AlertTriangle, Star, StarOff, Filter
+  Eye, Clock, AlertTriangle, Star, StarOff, Filter, Newspaper, Plus,
+  Image as ImageIcon
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
-type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline";
+type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news";
 
 const tabs: { id: Tab; label: string; icon: any }[] = [
   { id: "dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard },
+  { id: "news", label: "নিউজ", icon: Newspaper },
   { id: "pending", label: "অপেক্ষমান", icon: Clock },
   { id: "services", label: "সেবাসমূহ", icon: Eye },
   { id: "categories", label: "ক্যাটাগরি", icon: Filter },
@@ -42,6 +44,10 @@ const AdminDashboard = () => {
   const [activityLog, setActivityLog] = useState<any[]>([]);
   const [usersList, setUsersList] = useState<any[]>([]);
   const [legacyData, setLegacyData] = useState<any[]>([]);
+  const [newsItems, setNewsItems] = useState<any[]>([]);
+  const [newsForm, setNewsForm] = useState({ title: "", body: "", thumbnail_url: "" });
+  const [newsEditId, setNewsEditId] = useState<string | null>(null);
+  const [newsUploading, setNewsUploading] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -137,6 +143,15 @@ const AdminDashboard = () => {
         setLoading(false);
       };
       fetch();
+    }
+    if (activeTab === "news") {
+      const fetchNews = async () => {
+        setLoading(true);
+        const { data } = await supabase.from("news").select("*").order("published_at", { ascending: false });
+        setNewsItems(data || []);
+        setLoading(false);
+      };
+      fetchNews();
     }
   }, [activeTab]);
 
@@ -437,6 +452,115 @@ const AdminDashboard = () => {
     );
   };
 
+  const handleNewsUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setNewsUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `news/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("media").upload(path, file);
+    if (error) { toast({ title: "আপলোড ব্যর্থ", variant: "destructive" }); setNewsUploading(false); return; }
+    const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+    setNewsForm({ ...newsForm, thumbnail_url: urlData.publicUrl });
+    setNewsUploading(false);
+  };
+
+  const saveNews = async () => {
+    if (!newsForm.title.trim()) { toast({ title: "শিরোনাম দিন", variant: "destructive" }); return; }
+    if (newsEditId) {
+      await supabase.from("news").update({ title: newsForm.title, body: newsForm.body, thumbnail_url: newsForm.thumbnail_url || null }).eq("id", newsEditId);
+      await logActivity("edited", "news", newsEditId, newsForm.title);
+      toast({ title: "নিউজ আপডেট হয়েছে ✅" });
+    } else {
+      await supabase.from("news").insert({ title: newsForm.title, body: newsForm.body, thumbnail_url: newsForm.thumbnail_url || null });
+      await logActivity("created", "news", undefined, newsForm.title);
+      toast({ title: "নিউজ প্রকাশিত হয়েছে ✅" });
+    }
+    setNewsForm({ title: "", body: "", thumbnail_url: "" });
+    setNewsEditId(null);
+    // refetch
+    const { data } = await supabase.from("news").select("*").order("published_at", { ascending: false });
+    setNewsItems(data || []);
+  };
+
+  const deleteNews = async (id: string, title: string) => {
+    if (!confirm("মুছে ফেলতে চান?")) return;
+    await supabase.from("news").delete().eq("id", id);
+    await logActivity("deleted", "news", id, title);
+    toast({ title: "মুছে ফেলা হয়েছে" });
+    setNewsItems(newsItems.filter((n) => n.id !== id));
+  };
+
+  const toggleNewsActive = async (id: string, current: boolean) => {
+    await supabase.from("news").update({ is_active: !current }).eq("id", id);
+    setNewsItems(newsItems.map((n) => n.id === id ? { ...n, is_active: !current } : n));
+    toast({ title: !current ? "সক্রিয় করা হয়েছে" : "নিষ্ক্রিয় করা হয়েছে" });
+  };
+
+  const renderNews = () => (
+    <div className="space-y-4">
+      {/* Form */}
+      <div className="glass-card p-4 space-y-3">
+        <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
+          <Newspaper className="w-4 h-4 text-primary" /> {newsEditId ? "নিউজ এডিট" : "নতুন নিউজ যোগ করুন"}
+        </h2>
+        <input className="w-full bg-muted/50 rounded-xl px-3 py-2.5 text-sm border border-border outline-none" placeholder="নিউজ শিরোনাম" value={newsForm.title} onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })} />
+        <textarea className="w-full bg-muted/50 rounded-xl px-3 py-2.5 text-sm border border-border outline-none min-h-[120px]" placeholder="নিউজ বিস্তারিত..." value={newsForm.body} onChange={(e) => setNewsForm({ ...newsForm, body: e.target.value })} />
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-2 text-xs text-primary font-medium cursor-pointer bg-primary/10 px-3 py-2 rounded-xl">
+            <ImageIcon className="w-4 h-4" /> {newsUploading ? "আপলোড হচ্ছে..." : "থাম্বনেইল"}
+            <input type="file" accept="image/*" className="hidden" onChange={handleNewsUpload} disabled={newsUploading} />
+          </label>
+          {newsForm.thumbnail_url && <img src={newsForm.thumbnail_url} alt="thumb" className="w-12 h-12 rounded-lg object-cover" />}
+        </div>
+        <div className="flex gap-2">
+          <button onClick={saveNews} className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-1.5">
+            <Save className="w-4 h-4" /> {newsEditId ? "আপডেট" : "প্রকাশ করুন"}
+          </button>
+          {newsEditId && (
+            <button onClick={() => { setNewsEditId(null); setNewsForm({ title: "", body: "", thumbnail_url: "" }); }} className="px-4 py-2.5 rounded-xl bg-muted text-foreground text-sm font-medium">
+              বাতিল
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* List */}
+      <p className="text-xs text-muted-foreground">মোট: {newsItems.length}টি নিউজ</p>
+      {loading ? <p className="text-center text-muted-foreground py-8">লোড হচ্ছে...</p> : newsItems.map((item: any) => (
+        <div key={item.id} className="glass-card p-3 flex gap-3">
+          <div className="w-20 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
+            {item.thumbnail_url ? (
+              <img src={item.thumbnail_url} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center"><Newspaper className="w-5 h-5 text-muted-foreground/40" /></div>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-foreground text-sm line-clamp-1">{item.title}</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {new Date(item.published_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+            </p>
+            <div className="flex gap-1.5 mt-2 flex-wrap">
+              <button onClick={() => { setNewsEditId(item.id); setNewsForm({ title: item.title, body: item.body || "", thumbnail_url: item.thumbnail_url || "" }); }}
+                className="text-xs px-2.5 py-1 rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 font-medium">
+                <Edit3 className="w-3 h-3 inline mr-0.5" />এডিট
+              </button>
+              <button onClick={() => toggleNewsActive(item.id, item.is_active)}
+                className={`text-xs px-2.5 py-1 rounded-lg font-medium ${item.is_active ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"}`}>
+                {item.is_active ? "✅ সক্রিয়" : "⏸ নিষ্ক্রিয়"}
+              </button>
+              <button onClick={() => deleteNews(item.id, item.title)}
+                className="text-xs px-2.5 py-1 rounded-lg bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 font-medium">
+                <Trash2 className="w-3 h-3 inline mr-0.5" />মুছুন
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard": return renderDashboard();
@@ -444,6 +568,7 @@ const AdminDashboard = () => {
       case "categories": return renderCategories();
       case "activity": return renderActivity();
       case "users": return renderUsers();
+      case "news": return renderNews();
       default: return renderLegacy();
     }
   };

@@ -5,6 +5,7 @@ import HeroSlider from "@/components/HeroSlider";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import ServiceGrid from "@/components/ServiceGrid";
 import FeaturedServices from "@/components/FeaturedServices";
+import LatestNews from "@/components/LatestNews";
 import StatsSection from "@/components/StatsSection";
 import Footer from "@/components/Footer";
 import DrawerMenu from "@/components/DrawerMenu";
@@ -21,6 +22,7 @@ const Index = () => {
         <SearchBar />
         <HeroSlider />
         <AnnouncementBar />
+        <LatestNews />
         <FeaturedServices />
         <ServiceGrid />
         <StatsSection />

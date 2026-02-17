@@ -16,6 +16,8 @@ import Contact from "./pages/Contact";
 import Notifications from "./pages/Notifications";
 import Services from "./pages/Services";
 import CategoryServices from "./pages/CategoryServices";
+import News from "./pages/News";
+import NewsDetail from "./pages/NewsDetail";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +38,8 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
