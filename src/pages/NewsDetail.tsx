@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Calendar, Clock, Newspaper } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Newspaper, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 
@@ -10,6 +10,7 @@ interface NewsItem {
   body: string;
   thumbnail_url: string | null;
   published_at: string;
+  view_count: number;
 }
 
 const NewsDetail = () => {
@@ -24,12 +25,17 @@ const NewsDetail = () => {
       setLoading(true);
       const { data } = await supabase
         .from("news")
-        .select("id, title, body, thumbnail_url, published_at")
+        .select("id, title, body, thumbnail_url, published_at, view_count")
         .eq("id", id)
         .eq("is_active", true)
         .single();
       setNews(data);
       setLoading(false);
+
+      // Increment view count
+      if (data) {
+        await supabase.rpc("increment_news_view", { news_id: id });
+      }
     };
     fetchNews();
   }, [id]);
@@ -70,7 +76,6 @@ const NewsDetail = () => {
 
   return (
     <div className="min-h-screen bg-background max-w-4xl mx-auto pb-20">
-      {/* Header */}
       <div className="sticky top-0 z-50 gradient-primary p-4 flex items-center gap-3">
         <button onClick={() => navigate("/news")} className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
           <ArrowLeft className="w-5 h-5 text-white" />
@@ -79,26 +84,27 @@ const NewsDetail = () => {
       </div>
 
       <div className="px-4 py-4 space-y-4">
-        {/* Thumbnail */}
         {news.thumbnail_url && (
           <div className="rounded-2xl overflow-hidden">
             <img src={news.thumbnail_url} alt={news.title} className="w-full max-h-[300px] object-cover" />
           </div>
         )}
 
-        {/* Title */}
         <h1 className="text-xl font-bold text-foreground leading-snug">{news.title}</h1>
 
-        {/* Date/Time */}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Calendar className="w-3.5 h-3.5" />
-          <span>{formatDate(news.published_at)}</span>
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>{formatDate(news.published_at)}</span>
+          </div>
+          <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded-full">
+            <Eye className="w-3.5 h-3.5 text-destructive" />
+            <span className="font-bold">{news.view_count + 1}</span>
+          </div>
         </div>
 
-        {/* Divider */}
         <hr className="border-border" />
 
-        {/* Body */}
         <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
           {news.body}
         </div>
