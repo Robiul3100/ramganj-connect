@@ -8,12 +8,13 @@ import ComingSoonSection from "@/components/ComingSoonSection";
 import StatsSection from "@/components/StatsSection";
 import Footer from "@/components/Footer";
 import DrawerMenu from "@/components/DrawerMenu";
+import BottomNav from "@/components/BottomNav";
 
 const Index = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background max-w-lg mx-auto">
+    <div className="min-h-screen bg-background max-w-lg mx-auto pb-16">
       <Navbar onMenuClick={() => setDrawerOpen(true)} />
 
       <div className="space-y-5 pb-6 mt-2">
@@ -27,6 +28,7 @@ const Index = () => {
       </div>
 
       <DrawerMenu open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <BottomNav />
     </div>
   );
 };

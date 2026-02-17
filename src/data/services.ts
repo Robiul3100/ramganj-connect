@@ -44,7 +44,7 @@ export const services: Service[] = [
   { id: "23", name: "ব্যাংক", icon: Landmark, iconColor: "hsl(170, 55%, 40%)", iconBg: "hsl(170, 55%, 92%)", status: "active", order: 23 },
   { id: "24", name: "গ্যালারি", icon: Image, iconColor: "hsl(200, 55%, 48%)", iconBg: "hsl(200, 55%, 92%)", status: "active", order: 24 },
   { id: "25", name: "ব্লগ", icon: BookOpen, iconColor: "hsl(25, 75%, 50%)", iconBg: "hsl(25, 75%, 92%)", status: "active", order: 25 },
-  { id: "26", name: "হারানো বিজ্ঞপ্তি", icon: MapPin, iconColor: "hsl(0, 60%, 50%)", iconBg: "hsl(0, 60%, 92%)", status: "active", order: 26 },
+  { id: "26", name: "হারানো বিজ্ঞপ্তি", icon: MapPin, iconColor: "hsl(0, 60%, 50%)", iconBg: "hsl(0, 60%, 92%)", status: "active", order: 26, route: "/lost-found" },
   { id: "27", name: "কুরিয়ার ও পার্সেল", icon: Package, iconColor: "hsl(30, 60%, 50%)", iconBg: "hsl(30, 60%, 92%)", status: "active", order: 27 },
   { id: "28", name: "কৃষি ও খামার", icon: Sprout, iconColor: "hsl(100, 50%, 42%)", iconBg: "hsl(100, 50%, 92%)", status: "active", order: 28 },
   { id: "29", name: "সাপোর্ট", icon: Headphones, iconColor: "hsl(220, 40%, 45%)", iconBg: "hsl(220, 40%, 92%)", status: "active", order: 29 },
