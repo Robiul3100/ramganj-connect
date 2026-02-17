@@ -34,7 +34,6 @@ const FeaturedServices = () => {
 
   if (services.length === 0) return null;
 
-  // Duplicate for infinite loop
   const items = [...services, ...services];
 
   return (
@@ -45,19 +44,19 @@ const FeaturedServices = () => {
       </div>
 
       <div className="overflow-hidden -mx-4 px-4">
-        <div
-          className="flex gap-3 marquee-right"
-          style={{ width: "max-content" }}
-        >
+        <div className="flex gap-3 marquee-right" style={{ width: "max-content" }}>
           {items.map((s, i) => (
-            <div key={`${s.id}-${i}`} className="glass-card overflow-hidden w-[220px] shrink-0 border-t-4 border-t-amber-400 flex flex-col">
+            <div
+              key={`${s.id}-${i}`}
+              className="glass-card overflow-hidden w-[220px] h-[220px] shrink-0 border-t-4 border-t-amber-400 flex flex-col group transition-all duration-200 hover:scale-[1.03] hover:shadow-lg hover:border-t-amber-300"
+            >
               <div className="p-3 flex flex-col flex-1">
                 <div className="flex items-start justify-between gap-2 mb-1.5">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-foreground text-xs leading-snug line-clamp-2">{s.title}</h3>
+                    <h3 className="font-bold text-foreground text-xs leading-snug line-clamp-2 group-hover:text-primary transition-colors duration-200">{s.title}</h3>
                     <span className="text-[10px] text-muted-foreground">{s.service_categories?.name || ""}</span>
                   </div>
-                  <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0 mt-0.5" />
+                  <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0 mt-0.5 group-hover:scale-110 transition-transform duration-200" />
                 </div>
                 {s.address && (
                   <p className="text-[10px] text-muted-foreground flex items-center gap-1 mb-1.5">
@@ -67,12 +66,12 @@ const FeaturedServices = () => {
                 {s.description && <p className="text-[10px] text-muted-foreground mb-2 line-clamp-2">{s.description}</p>}
                 <div className="flex gap-2 mt-auto">
                   {s.phone && (
-                    <a href={`tel:${s.phone}`} className="flex-1 py-1.5 rounded-xl bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center gap-1">
+                    <a href={`tel:${s.phone}`} className="flex-1 py-1.5 rounded-xl bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center gap-1 hover:opacity-90 active:scale-95 transition-all duration-150">
                       <Phone className="w-3 h-3" /> কল
                     </a>
                   )}
                   {s.whatsapp && (
-                    <a href={`https://wa.me/88${s.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex-1 py-1.5 rounded-xl text-[10px] font-bold flex items-center justify-center gap-1 bg-[hsl(140,70%,45%)] text-white">
+                    <a href={`https://wa.me/88${s.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex-1 py-1.5 rounded-xl text-[10px] font-bold flex items-center justify-center gap-1 bg-[hsl(140,70%,45%)] text-white hover:opacity-90 active:scale-95 transition-all duration-150">
                       <MessageCircle className="w-3 h-3" /> WhatsApp
                     </a>
                   )}
