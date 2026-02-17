@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Newspaper, Search, Radio, Eye } from "lucide-react";
+import { Newspaper, Search, Radio, Eye, Calendar, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 
 interface NewsItem {
   id: string;
   title: string;
+  body: string;
   thumbnail_url: string | null;
   published_at: string;
   view_count: number;
@@ -22,7 +23,7 @@ const News = () => {
       setLoading(true);
       const { data } = await supabase
         .from("news")
-        .select("id, title, thumbnail_url, published_at, view_count")
+        .select("id, title, body, thumbnail_url, published_at, view_count")
         .eq("is_active", true)
         .order("published_at", { ascending: false });
       setNews(data || []);
@@ -106,9 +107,24 @@ const News = () => {
                   <span className="text-xs font-bold text-foreground">{item.view_count}</span>
                 </div>
               </div>
-              {/* Title below thumbnail */}
-              <div className="p-3">
+              {/* Content below thumbnail */}
+              <div className="p-3 space-y-2">
                 <h3 className="font-bold text-foreground text-base leading-snug group-hover:text-primary transition-colors">{item.title}</h3>
+                {item.body && (
+                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{item.body}</p>
+                )}
+                <div className="flex items-center gap-3 text-[11px] text-muted-foreground pt-1">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    <span>{new Date(item.published_at).toLocaleDateString("bn-BD", { day: "numeric", month: "long", year: "numeric" })}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    <span>{new Date(item.published_at).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })}</span>
+                  </div>
+                  <span className="text-muted-foreground/50">•</span>
+                  <span>{new Date(item.published_at).toLocaleDateString("bn-BD", { weekday: "long" })}</span>
+                </div>
               </div>
             </Link>
           ))

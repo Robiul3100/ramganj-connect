@@ -74,7 +74,7 @@ const AdminDashboard = () => {
   const [usersList, setUsersList] = useState<any[]>([]);
   const [legacyData, setLegacyData] = useState<any[]>([]);
   const [newsItems, setNewsItems] = useState<any[]>([]);
-  const [newsForm, setNewsForm] = useState({ title: "", body: "", thumbnail_url: "" });
+  const [newsForm, setNewsForm] = useState({ title: "", body: "", thumbnail_url: "", published_at: "" });
   const [newsEditId, setNewsEditId] = useState<string | null>(null);
   const [newsUploading, setNewsUploading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -252,16 +252,17 @@ const AdminDashboard = () => {
 
   const saveNews = async () => {
     if (!newsForm.title.trim()) { toast({ title: "শিরোনাম দিন", variant: "destructive" }); return; }
+    const publishedAt = newsForm.published_at ? new Date(newsForm.published_at).toISOString() : new Date().toISOString();
     if (newsEditId) {
-      await supabase.from("news").update({ title: newsForm.title, body: newsForm.body, thumbnail_url: newsForm.thumbnail_url || null }).eq("id", newsEditId);
+      await supabase.from("news").update({ title: newsForm.title, body: newsForm.body, thumbnail_url: newsForm.thumbnail_url || null, published_at: publishedAt }).eq("id", newsEditId);
       await logActivity("edited", "news", newsEditId, newsForm.title);
       toast({ title: "নিউজ আপডেট হয়েছে ✅" });
     } else {
-      await supabase.from("news").insert({ title: newsForm.title, body: newsForm.body, thumbnail_url: newsForm.thumbnail_url || null });
+      await supabase.from("news").insert({ title: newsForm.title, body: newsForm.body, thumbnail_url: newsForm.thumbnail_url || null, published_at: publishedAt });
       await logActivity("created", "news", undefined, newsForm.title);
       toast({ title: "নিউজ প্রকাশিত হয়েছে ✅" });
     }
-    setNewsForm({ title: "", body: "", thumbnail_url: "" });
+    setNewsForm({ title: "", body: "", thumbnail_url: "", published_at: "" });
     setNewsEditId(null);
     const { data } = await supabase.from("news").select("*").order("published_at", { ascending: false });
     setNewsItems(data || []);
@@ -578,6 +579,16 @@ const AdminDashboard = () => {
         </h2>
         <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:ring-2 focus:ring-primary/20" placeholder="নিউজ শিরোনাম" value={newsForm.title} onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })} />
         <textarea className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none min-h-[120px] focus:ring-2 focus:ring-primary/20" placeholder="নিউজ বিস্তারিত..." value={newsForm.body} onChange={(e) => setNewsForm({ ...newsForm, body: e.target.value })} />
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">প্রকাশের তারিখ ও সময়</label>
+          <input
+            type="datetime-local"
+            className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:ring-2 focus:ring-primary/20"
+            value={newsForm.published_at}
+            onChange={(e) => setNewsForm({ ...newsForm, published_at: e.target.value })}
+          />
+          <p className="text-[10px] text-muted-foreground mt-1">খালি রাখলে বর্তমান সময় ব্যবহার হবে</p>
+        </div>
         <div className="flex items-center gap-3">
           <label className="flex items-center gap-2 text-xs text-primary font-medium cursor-pointer bg-primary/10 px-4 py-2.5 rounded-xl hover:bg-primary/15 transition-colors">
             <ImageIcon className="w-4 h-4" /> {newsUploading ? "আপলোড হচ্ছে..." : "থাম্বনেইল"}
@@ -590,7 +601,7 @@ const AdminDashboard = () => {
             <Save className="w-4 h-4" /> {newsEditId ? "আপডেট" : "প্রকাশ করুন"}
           </button>
           {newsEditId && (
-            <button onClick={() => { setNewsEditId(null); setNewsForm({ title: "", body: "", thumbnail_url: "" }); }} className="px-5 py-3 rounded-xl bg-muted text-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
+            <button onClick={() => { setNewsEditId(null); setNewsForm({ title: "", body: "", thumbnail_url: "", published_at: "" }); }} className="px-5 py-3 rounded-xl bg-muted text-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
               বাতিল
             </button>
           )}
@@ -615,7 +626,7 @@ const AdminDashboard = () => {
               {new Date(item.published_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
             </p>
             <div className="flex gap-1.5 mt-2 flex-wrap">
-              <ActionBtn color="blue" onClick={() => { setNewsEditId(item.id); setNewsForm({ title: item.title, body: item.body || "", thumbnail_url: item.thumbnail_url || "" }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
+              <ActionBtn color="blue" onClick={() => { setNewsEditId(item.id); setNewsForm({ title: item.title, body: item.body || "", thumbnail_url: item.thumbnail_url || "", published_at: item.published_at ? new Date(item.published_at).toISOString().slice(0, 16) : "" }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
               <button onClick={() => toggleNewsActive(item.id, item.is_active)}
                 className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${item.is_active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-muted text-muted-foreground"}`}>
                 {item.is_active ? "✅ সক্রিয়" : "⏸ নিষ্ক্রিয়"}
