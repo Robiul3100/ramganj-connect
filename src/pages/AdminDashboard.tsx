@@ -362,22 +362,84 @@ const AdminDashboard = () => {
         <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
           <Zap className="w-4 h-4 text-accent" /> দ্রুত অ্যাকশন
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2.5">
           {[
-            { label: "অপেক্ষমান", tab: "pending" as Tab, icon: Clock, desc: "রিভিউ করুন", gradient: "from-amber-500 to-orange-500" },
-            { label: "সকল সেবা", tab: "services" as Tab, icon: Globe, desc: "সেবা দেখুন", gradient: "from-blue-500 to-cyan-500" },
-            { label: "নিউজ", tab: "news" as Tab, icon: Newspaper, desc: "প্রকাশ করুন", gradient: "from-emerald-500 to-teal-500" },
-            { label: "ক্যাটাগরি", tab: "categories" as Tab, icon: Layers, desc: "ম্যানেজ করুন", gradient: "from-violet-500 to-purple-500" },
-            { label: "ইউজার", tab: "users" as Tab, icon: Users, desc: "ব্যবস্থাপনা", gradient: "from-pink-500 to-rose-500" },
-            { label: "অ্যাক্টিভিটি", tab: "activity" as Tab, icon: Activity, desc: "লগ দেখুন", gradient: "from-slate-500 to-zinc-500" },
+            { label: "অপেক্ষমান", tab: "pending" as Tab, icon: Clock, desc: "রিভিউ", gradient: "from-amber-500 to-orange-500" },
+            { label: "সকল সেবা", tab: "services" as Tab, icon: Globe, desc: "সেবা", gradient: "from-blue-500 to-cyan-500" },
+            { label: "নিউজ", tab: "news" as Tab, icon: Newspaper, desc: "প্রকাশ", gradient: "from-emerald-500 to-teal-500" },
+            { label: "ক্যাটাগরি", tab: "categories" as Tab, icon: Layers, desc: "ম্যানেজ", gradient: "from-violet-500 to-purple-500" },
+            { label: "ইউজার", tab: "users" as Tab, icon: Users, desc: "তালিকা", gradient: "from-pink-500 to-rose-500" },
+            { label: "লগ", tab: "activity" as Tab, icon: Activity, desc: "দেখুন", gradient: "from-slate-500 to-zinc-500" },
           ].map((a) => (
             <button key={a.label} onClick={() => { setActiveTab(a.tab); setSidebarOpen(false); }}
-              className="bg-card border border-border rounded-2xl p-4 text-left hover:shadow-md hover:border-primary/20 transition-all group">
-              <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${a.gradient} flex items-center justify-center mb-3 group-hover:scale-105 transition-transform`}>
-                <a.icon className="w-4 h-4 text-white" />
+              className="bg-card border border-border rounded-2xl p-3 text-left hover:shadow-md hover:border-primary/20 transition-all group">
+              <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${a.gradient} flex items-center justify-center mb-2 group-hover:scale-105 transition-transform`}>
+                <a.icon className="w-3.5 h-3.5 text-white" />
               </div>
-              <p className="text-sm font-bold text-foreground">{a.label}</p>
-              <p className="text-xs text-muted-foreground">{a.desc}</p>
+              <p className="text-xs font-bold text-foreground leading-tight">{a.label}</p>
+              <p className="text-[10px] text-muted-foreground">{a.desc}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Service Editors Grid */}
+      <div>
+        <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+          <Layers className="w-4 h-4 text-primary" /> সার্ভিস এডিটর
+        </h3>
+        <div className="grid grid-cols-3 gap-2.5">
+          {categories.filter((c: any) => c.is_active).map((cat: any) => {
+            const iconGradients = [
+              "from-blue-500 to-indigo-500", "from-emerald-500 to-green-500", "from-purple-500 to-violet-500",
+              "from-rose-500 to-pink-500", "from-amber-500 to-yellow-500", "from-cyan-500 to-teal-500",
+              "from-orange-500 to-red-500", "from-lime-500 to-emerald-500", "from-fuchsia-500 to-purple-500",
+            ];
+            const gradient = iconGradients[(cat.sort_order || 0) % iconGradients.length];
+            return (
+              <button key={cat.id} onClick={() => { setActiveTab("services"); setFilterCategory(cat.id); setSidebarOpen(false); }}
+                className="bg-card border border-border rounded-2xl p-3 text-left hover:shadow-md hover:border-primary/20 transition-all group relative overflow-hidden">
+                <div className={`absolute top-0 right-0 w-12 h-12 rounded-full bg-gradient-to-br ${gradient} opacity-[0.06] -translate-y-1/3 translate-x-1/3 group-hover:opacity-[0.12] transition-opacity`} />
+                <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center mb-2 group-hover:scale-105 transition-transform`}>
+                  <span className="text-white text-xs font-bold">{cat.name.charAt(0)}</span>
+                </div>
+                <p className="text-xs font-bold text-foreground leading-tight truncate">{cat.name}</p>
+                <p className="text-[10px] text-muted-foreground flex items-center gap-0.5 mt-0.5">
+                  <ArrowUpRight className="w-2.5 h-2.5" /> এডিট
+                </p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Content Editors Grid */}
+      <div>
+        <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+          <FileText className="w-4 h-4 text-accent" /> কন্টেন্ট এডিটর
+        </h3>
+        <div className="grid grid-cols-3 gap-2.5">
+          {[
+            { label: "ঘোষণা", tab: "announcements" as Tab, icon: Megaphone, gradient: "from-red-500 to-rose-500" },
+            { label: "স্লাইডার", tab: "slider" as Tab, icon: SlidersHorizontal, gradient: "from-blue-500 to-sky-500" },
+            { label: "সম্পর্কে", tab: "about" as Tab, icon: Info, gradient: "from-teal-500 to-cyan-500" },
+            { label: "টাইমলাইন", tab: "timeline" as Tab, icon: History, gradient: "from-violet-500 to-indigo-500" },
+            { label: "জরুরি কল", tab: "emergency" as Tab, icon: Phone, gradient: "from-orange-500 to-amber-500" },
+            { label: "রক্তদাতা", tab: "blood" as Tab, icon: Droplets, gradient: "from-red-600 to-rose-500" },
+            { label: "অনুদান", tab: "donations" as Tab, icon: Heart, gradient: "from-pink-500 to-fuchsia-500" },
+            { label: "নিউজ", tab: "news" as Tab, icon: Newspaper, gradient: "from-emerald-500 to-green-500" },
+            { label: "সেটিংস", tab: "users" as Tab, icon: Settings, gradient: "from-slate-500 to-gray-500" },
+          ].map((item) => (
+            <button key={item.label} onClick={() => { setActiveTab(item.tab); setSidebarOpen(false); }}
+              className="bg-card border border-border rounded-2xl p-3 text-left hover:shadow-md hover:border-primary/20 transition-all group relative overflow-hidden">
+              <div className={`absolute top-0 right-0 w-12 h-12 rounded-full bg-gradient-to-br ${item.gradient} opacity-[0.06] -translate-y-1/3 translate-x-1/3 group-hover:opacity-[0.12] transition-opacity`} />
+              <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center mb-2 group-hover:scale-105 transition-transform`}>
+                <item.icon className="w-3.5 h-3.5 text-white" />
+              </div>
+              <p className="text-xs font-bold text-foreground leading-tight">{item.label}</p>
+              <p className="text-[10px] text-muted-foreground flex items-center gap-0.5 mt-0.5">
+                <ArrowUpRight className="w-2.5 h-2.5" /> ম্যানেজ
+              </p>
             </button>
           ))}
         </div>
