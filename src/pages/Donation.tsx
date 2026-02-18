@@ -69,8 +69,8 @@ const Donation = () => {
       <div className="px-4 space-y-5 pb-8">
         {/* Info card */}
         <div className="glass-card p-6 text-center">
-          <div className="w-16 h-16 mx-auto rounded-full bg-blue-100 flex items-center justify-center mb-3">
-            <Heart className="w-8 h-8 text-blue-500" />
+          <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-3">
+            <Heart className="w-8 h-8 text-primary" />
           </div>
           <h2 className="font-bold text-lg text-foreground">রামগঞ্জ সেবার পাশে দাঁড়ান</h2>
           <p className="text-sm text-muted-foreground mt-2">আপনার ক্ষুদ্র অনুদান আমাদের এই ডিজিটাল সেবা কার্যক্রম চালিয়ে রাখতে এবং নতুন ফিচার যুক্ত করতে সাহায্য করবে। এটি একটি স্বেচ্ছাসেবী উদ্যোগ।</p>

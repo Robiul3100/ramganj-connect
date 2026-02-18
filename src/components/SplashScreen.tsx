@@ -19,7 +19,7 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white transition-opacity duration-500 ${
+      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background transition-opacity duration-500 ${
         fadeOut ? "opacity-0" : "opacity-100"
       }`}
     >
@@ -50,11 +50,10 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
         {[0, 1, 2].map((i) => (
           <span
             key={i}
-            className="block rounded-full"
+            className="block rounded-full bg-primary"
             style={{
               width: 10,
               height: 10,
-              background: "#0097A7",
               animation: `fb-bounce 1.2s ease-in-out ${i * 0.18}s infinite`,
             }}
           />
@@ -64,7 +63,7 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
       {/* Text block — each line slides up with stagger */}
       <div className="flex flex-col items-center gap-1 overflow-hidden">
         <p
-          className="text-lg font-bold text-gray-800 tracking-wide"
+          className="text-lg font-bold text-foreground tracking-wide"
           style={{ animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.35s both" }}
         >
           পরিকল্পনা ও বাস্তবায়ন
@@ -73,30 +72,27 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
         <div
           className="w-40 h-px my-1"
           style={{
-            background: "linear-gradient(90deg, transparent, #0097A7, transparent)",
+            background: "linear-gradient(90deg, transparent, hsl(var(--primary)), transparent)",
             animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.48s both",
           }}
         />
 
         <p
-          className="text-base font-bold"
-          style={{
-            color: "#0097A7",
-            animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.58s both",
-          }}
+          className="text-base font-bold text-primary"
+          style={{ animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.58s both" }}
         >
           Ramganj City Organisation
         </p>
 
         <p
-          className="text-sm text-gray-500 mt-1"
+          className="text-sm text-muted-foreground mt-1"
           style={{ animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.70s both" }}
         >
           রামগঞ্জকে দেখুন, রামগঞ্জকে জানুন
         </p>
 
         <p
-          className="text-xs text-gray-400"
+          className="text-xs text-muted-foreground/70"
           style={{ animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.82s both" }}
         >
           www.ramganjcity.com
@@ -108,11 +104,11 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
         className="absolute bottom-8 flex items-center justify-center"
         style={{ animation: "slide-up-text 0.5s ease-out 1s both" }}
       >
-        <p className="text-xs" style={{ color: "#111" }}>
+        <p className="text-xs text-foreground/70">
           Developed by:{" "}
-          <span style={{ color: "#e53e3e" }}>&lt;/</span>
-          <span style={{ color: "#111", fontWeight: 600 }}>RSF ROBIUL</span>
-          <span style={{ color: "#e53e3e" }}>&lt;/&gt;</span>
+          <span className="text-destructive font-mono">&lt;/</span>
+          <span className="text-foreground font-semibold">RSF ROBIUL</span>
+          <span className="text-destructive font-mono">&lt;/&gt;</span>
         </p>
       </div>
 
