@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import SplashScreen from "@/components/SplashScreen";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import EmergencyCalls from "./pages/EmergencyCalls";
@@ -23,35 +25,40 @@ import NewsDetail from "./pages/NewsDetail";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <ThemeProvider defaultTheme="system" storageKey="ramganj-theme">
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/service/tuition" element={<TuitionMedia />} />
-          <Route path="/service/:slug" element={<CategoryServices />} />
-          <Route path="/emergency-calls" element={<EmergencyCalls />} />
-          <Route path="/blood-bank" element={<BloodBank />} />
-          <Route path="/donation" element={<Donation />} />
-          <Route path="/about-ramganj" element={<AboutRamganj />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/news" element={<News />} />
-          <Route path="/news/:id" element={<NewsDetail />} />
-          <Route path="/admin-login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
-  </ThemeProvider>
-);
+const App = () => {
+  const [splashDone, setSplashDone] = useState(false);
+
+  return (
+    <ThemeProvider defaultTheme="system" storageKey="ramganj-theme">
+      {!splashDone && <SplashScreen onFinish={() => setSplashDone(true)} />}
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/service/tuition" element={<TuitionMedia />} />
+              <Route path="/service/:slug" element={<CategoryServices />} />
+              <Route path="/emergency-calls" element={<EmergencyCalls />} />
+              <Route path="/blood-bank" element={<BloodBank />} />
+              <Route path="/donation" element={<Donation />} />
+              <Route path="/about-ramganj" element={<AboutRamganj />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/news" element={<News />} />
+              <Route path="/news/:id" element={<NewsDetail />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
+  );
+};
 
 export default App;
