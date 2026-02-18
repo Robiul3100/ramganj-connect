@@ -18,6 +18,34 @@ const gradientMap: Record<string, string> = {
   "from-purple-500 to-violet-500": "linear-gradient(135deg, #a855f7, #8b5cf6)",
 };
 
+// Static donation methods override (replaces DB data for display)
+const STATIC_METHODS = [
+  {
+    id: "bkash",
+    method_name: "বিকাশ",
+    account_type: "Personal",
+    account_number: "01840036984",
+    gradient_colors: "from-pink-500 to-rose-500",
+    note: null,
+  },
+  {
+    id: "nagad",
+    method_name: "নগদ",
+    account_type: "Personal",
+    account_number: "01840036984",
+    gradient_colors: "from-orange-400 to-amber-500",
+    note: "নগদ ও রকেট একাউন্ট নাই এই নাম্বারে",
+  },
+  {
+    id: "rocket",
+    method_name: "রকেট",
+    account_type: "Personal",
+    account_number: "01840036984",
+    gradient_colors: "from-purple-500 to-violet-500",
+    note: "নগদ ও রকেট একাউন্ট নাই এই নাম্বারে",
+  },
+];
+
 const Donation = () => {
   const navigate = useNavigate();
   const [methods, setMethods] = useState<DonationMethod[]>([]);
@@ -80,23 +108,30 @@ const Donation = () => {
         <div>
           <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">💳 পেমেন্ট মেথড</h3>
           <div className="space-y-3">
-            {methods.map((m) => (
-              <div
-                key={m.id}
-                className="rounded-2xl p-4 flex items-center justify-between text-white"
-                style={{ background: gradientMap[m.gradient_colors] || "linear-gradient(135deg, #6366f1, #8b5cf6)" }}
-              >
-                <div>
-                  <p className="text-sm opacity-90">{m.method_name} ({m.account_type})</p>
-                  <p className="text-xl font-bold">{m.account_number}</p>
+            {STATIC_METHODS.map((m) => (
+              <div key={m.id}>
+                <div
+                  className="rounded-2xl p-4 flex items-center justify-between text-white"
+                  style={{ background: gradientMap[m.gradient_colors] || "linear-gradient(135deg, #6366f1, #8b5cf6)" }}
+                >
+                  <div>
+                    <p className="text-sm opacity-90">{m.method_name} ({m.account_type})</p>
+                    <p className="text-xl font-bold">{m.account_number}</p>
+                  </div>
+                  <button onClick={() => copyNumber(m.account_number)} className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <Copy className="w-5 h-5" />
+                  </button>
                 </div>
-                <button onClick={() => copyNumber(m.account_number)} className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                  <Copy className="w-5 h-5" />
-                </button>
+                {m.note && (
+                  <p className="text-xs text-muted-foreground mt-1.5 ml-2 flex items-center gap-1">
+                    ⚠️ {m.note}
+                  </p>
+                )}
               </div>
             ))}
           </div>
         </div>
+
 
         {/* Donation form */}
         <div className="glass-card p-5 space-y-4">
