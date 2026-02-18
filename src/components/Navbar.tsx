@@ -1,6 +1,7 @@
 import { Menu, Sun, Moon, Monitor } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import { useState, useRef, useEffect } from "react";
+import ramganjCityLogo from "@/assets/ramganj-city-logo.png";
 
 interface NavbarProps {
   onMenuClick: () => void;
@@ -38,9 +39,13 @@ const Navbar = ({ onMenuClick }: NavbarProps) => {
           <Menu className="w-5 h-5 text-muted-foreground" />
         </button>
 
-        <div className="flex-1 ml-3">
-          <h1 className="text-xl font-bold text-foreground leading-tight">রামগঞ্জ সেবা</h1>
-          <p className="text-xs text-muted-foreground">আপনার ডিজিটাল সহযোগী</p>
+        {/* Logo centered */}
+        <div className="flex-1 flex justify-center">
+          <img
+            src={ramganjCityLogo}
+            alt="রামগঞ্জ সিটি"
+            className="h-10 w-auto object-contain"
+          />
         </div>
 
         <div className="relative" ref={ref}>
