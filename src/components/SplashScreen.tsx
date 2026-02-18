@@ -9,8 +9,8 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    const fadeTimer = setTimeout(() => setFadeOut(true), 2600);
-    const finishTimer = setTimeout(() => onFinish(), 3100);
+    const fadeTimer = setTimeout(() => setFadeOut(true), 3500);
+    const finishTimer = setTimeout(() => onFinish(), 4000);
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(finishTimer);
@@ -23,8 +23,8 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
         fadeOut ? "opacity-0" : "opacity-100"
       }`}
     >
-      {/* Clean logo with smooth shine sweep */}
-      <div className="relative overflow-hidden" style={{ width: 220, height: 220 }}>
+      {/* Clean logo with smooth shine sweep — larger, shifted slightly down */}
+      <div className="relative overflow-hidden mt-8" style={{ width: 270, height: 270 }}>
         <img
           src={logoImg}
           alt="Ramganj City Logo"
