@@ -23,7 +23,6 @@ interface Service {
 const colors = {
   gradient: "linear-gradient(135deg, hsl(170,50%,42%), hsl(180,55%,48%))",
   accent: "hsl(170,50%,42%)",
-  bg: "hsl(170,50%,92%)",
 };
 
 const TuitionMedia = () => {
@@ -204,7 +203,6 @@ const TuitionMedia = () => {
               const m = s.metadata || {};
               const isTeach = m.tuition_type === "teach";
               const typeColor = isTeach ? "hsl(170,50%,42%)" : "hsl(200,60%,45%)";
-              const typeBg = isTeach ? "hsl(170,50%,92%)" : "hsl(200,60%,92%)";
               const typeLabel = isTeach ? "পড়াতে চাই" : "শিক্ষক চাই";
               const dateStr = new Date(s.created_at).toLocaleDateString("bn-BD");
 
@@ -216,7 +214,7 @@ const TuitionMedia = () => {
                       {s.image_url ? (
                         <img src={s.image_url} alt={s.title} className="w-16 h-16 rounded-full object-cover shrink-0 border-2" style={{ borderColor: typeColor }} />
                       ) : (
-                        <div className="w-16 h-16 rounded-full flex items-center justify-center shrink-0 text-xl font-bold border-2" style={{ background: typeBg, color: typeColor, borderColor: typeColor }}>
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center shrink-0 text-xl font-bold border-2 bg-muted" style={{ color: typeColor, borderColor: typeColor }}>
                           {s.title.charAt(0)}
                         </div>
                       )}
@@ -227,7 +225,7 @@ const TuitionMedia = () => {
                             {typeLabel}
                           </span>
                           {s.is_featured && (
-                            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 flex items-center gap-0.5">
+                            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-500 flex items-center gap-0.5">
                               <Star className="w-3 h-3 fill-amber-500 text-amber-500" /> ফিচার্ড
                             </span>
                           )}
@@ -240,7 +238,7 @@ const TuitionMedia = () => {
 
                   {/* Details grid */}
                   <div className="px-4 pb-3">
-                    <div className="rounded-xl p-3 space-y-2" style={{ background: typeBg }}>
+                    <div className="rounded-xl p-3 space-y-2 bg-muted/50">
                       {s.description && (
                         <p className="text-sm text-foreground font-medium text-center mb-2">{s.description}</p>
                       )}
