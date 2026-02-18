@@ -33,7 +33,6 @@ export function ThemeProvider({
   const [ripple, setRipple] = useState<{
     x: number;
     y: number;
-    active: boolean;
     targetTheme: Theme;
   } | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -57,18 +56,18 @@ export function ThemeProvider({
   const triggerThemeTransition = useCallback((x: number, y: number, nextTheme: Theme) => {
     if (navigator.vibrate) navigator.vibrate(30);
 
-    setRipple({ x, y, active: true, targetTheme: nextTheme });
+    setRipple({ x, y, targetTheme: nextTheme });
 
-    // Switch theme at ~60% of animation
+    // Switch theme when ripple fully covers screen
     const switchTimer = setTimeout(() => {
       localStorage.setItem(storageKey, nextTheme);
       setThemeState(nextTheme);
-    }, 380);
+    }, 500);
 
-    // Remove overlay after animation completes
+    // Remove overlay after theme has switched
     const removeTimer = setTimeout(() => {
       setRipple(null);
-    }, 700);
+    }, 620);
 
     return () => {
       clearTimeout(switchTimer);
@@ -87,21 +86,21 @@ export function ThemeProvider({
     ? "hsl(220, 25%, 8%)"
     : "hsl(220, 20%, 95%)";
 
-  // Calculate max radius to cover entire viewport
+  // Calculate max radius to fully cover viewport from click point
   const maxRadius = ripple
     ? Math.ceil(
         Math.sqrt(
           Math.pow(Math.max(ripple.x, window.innerWidth - ripple.x), 2) +
           Math.pow(Math.max(ripple.y, window.innerHeight - ripple.y), 2)
         )
-      ) + 50
+      ) + 20
     : 0;
 
   return (
     <ThemeProviderContext.Provider value={value}>
       {children}
 
-      {/* Full-screen waterdrop transition overlay */}
+      {/* Waterdrop clip-path ripple overlay */}
       {ripple && (
         <div
           ref={overlayRef}
@@ -110,31 +109,20 @@ export function ThemeProvider({
             inset: 0,
             zIndex: 9999,
             pointerEvents: "none",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              left: ripple.x,
-              top: ripple.y,
-              width: 0,
-              height: 0,
-              borderRadius: "50%",
-              background: overlayBg,
-              transform: "translate(-50%, -50%)",
-              animation: `theme-ripple-expand 0.65s cubic-bezier(0.22, 0.61, 0.36, 1) forwards`,
-              "--ripple-max": `${maxRadius * 2}px`,
-            } as React.CSSProperties}
-          />
-        </div>
+            background: overlayBg,
+            "--ripple-x": `${ripple.x}px`,
+            "--ripple-y": `${ripple.y}px`,
+            "--ripple-max": `${maxRadius}px`,
+            clipPath: `circle(0px at ${ripple.x}px ${ripple.y}px)`,
+            animation: "theme-ripple-clip 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards",
+          } as React.CSSProperties}
+        />
       )}
 
       <style>{`
-        @keyframes theme-ripple-expand {
-          0%   { width: 0px; height: 0px; opacity: 1; }
-          85%  { opacity: 1; }
-          100% { width: var(--ripple-max); height: var(--ripple-max); opacity: 0; }
+        @keyframes theme-ripple-clip {
+          from { clip-path: circle(0px at var(--ripple-x) var(--ripple-y)); }
+          to   { clip-path: circle(var(--ripple-max) at var(--ripple-x) var(--ripple-y)); }
         }
       `}</style>
     </ThemeProviderContext.Provider>
