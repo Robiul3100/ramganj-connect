@@ -1,6 +1,5 @@
 import { Sun, Moon, Menu } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
-import { useState, useRef, useEffect } from "react";
 import ramganjCityLogo from "@/assets/ramganj-city-logo.png";
 
 interface NavbarProps {
@@ -8,30 +7,15 @@ interface NavbarProps {
 }
 
 const Navbar = ({ onMenuClick }: NavbarProps) => {
-  const { theme, setTheme } = useTheme();
-  const [ripple, setRipple] = useState<{ x: number; y: number; key: number } | null>(null);
-  const rippleKey = useRef(0);
+  const { theme, triggerThemeTransition } = useTheme();
 
-  // Treat system as light if needed — only light/dark
   const isDark = theme === "dark";
 
   const handleToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     const rect = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    // Vibration (if supported)
-    if (navigator.vibrate) navigator.vibrate(30);
-
-    rippleKey.current += 1;
-    setRipple({ x, y, key: rippleKey.current });
-
-    // Delay theme switch slightly so ripple starts first
-    setTimeout(() => {
-      setTheme(isDark ? "light" : "dark");
-    }, 80);
-
-    setTimeout(() => setRipple(null), 600);
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    triggerThemeTransition(x, y, isDark ? "light" : "dark");
   };
 
   return (
@@ -74,27 +58,6 @@ const Navbar = ({ onMenuClick }: NavbarProps) => {
             flexShrink: 0,
           }}
         >
-          {/* Waterdrop ripple */}
-          {ripple && (
-            <span
-              key={ripple.key}
-              style={{
-                position: "absolute",
-                left: ripple.x,
-                top: ripple.y,
-                width: 0,
-                height: 0,
-                borderRadius: "50%",
-                background: isDark
-                  ? "rgba(255,255,255,0.18)"
-                  : "rgba(30,60,120,0.13)",
-                transform: "translate(-50%, -50%)",
-                animation: "waterdrop-ripple 0.55s cubic-bezier(0.25,0.46,0.45,0.94) forwards",
-                pointerEvents: "none",
-              }}
-            />
-          )}
-
           {/* Icons — sun left, moon right */}
           <span
             style={{
@@ -151,13 +114,6 @@ const Navbar = ({ onMenuClick }: NavbarProps) => {
           </span>
         </button>
       </div>
-
-      <style>{`
-        @keyframes waterdrop-ripple {
-          0%   { width: 0; height: 0; opacity: 1; }
-          100% { width: 120px; height: 120px; opacity: 0; }
-        }
-      `}</style>
     </header>
   );
 };
