@@ -42,8 +42,27 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
         />
       </div>
 
+      {/* Facebook Lite style bouncing dots loader — between logo and text */}
+      <div
+        className="flex items-center gap-2 mt-3 mb-2"
+        style={{ animation: "slide-up-text 0.5s ease-out 0.25s both" }}
+      >
+        {[0, 1, 2].map((i) => (
+          <span
+            key={i}
+            className="block rounded-full"
+            style={{
+              width: 10,
+              height: 10,
+              background: "#0097A7",
+              animation: `fb-bounce 1.2s ease-in-out ${i * 0.18}s infinite`,
+            }}
+          />
+        ))}
+      </div>
+
       {/* Text block — each line slides up with stagger */}
-      <div className="flex flex-col items-center gap-1 mt-2 overflow-hidden">
+      <div className="flex flex-col items-center gap-1 overflow-hidden">
         <p
           className="text-lg font-bold text-gray-800 tracking-wide"
           style={{ animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.35s both" }}
@@ -84,23 +103,17 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
         </p>
       </div>
 
-      {/* Facebook Lite style bouncing dots loader */}
+      {/* Developer credit at bottom */}
       <div
-        className="absolute bottom-14 flex items-center gap-2"
+        className="absolute bottom-8 flex items-center justify-center"
         style={{ animation: "slide-up-text 0.5s ease-out 1s both" }}
       >
-        {[0, 1, 2].map((i) => (
-          <span
-            key={i}
-            className="block rounded-full"
-            style={{
-              width: 10,
-              height: 10,
-              background: "#0097A7",
-              animation: `fb-bounce 1.2s ease-in-out ${i * 0.18}s infinite`,
-            }}
-          />
-        ))}
+        <p className="text-xs" style={{ color: "#111" }}>
+          Developed by:{" "}
+          <span style={{ color: "#e53e3e" }}>&lt;/</span>
+          <span style={{ color: "#111", fontWeight: 600 }}>RSF ROBIUL</span>
+          <span style={{ color: "#e53e3e" }}>&lt;/&gt;</span>
+        </p>
       </div>
 
       <style>{`
