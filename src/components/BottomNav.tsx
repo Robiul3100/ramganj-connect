@@ -18,7 +18,7 @@ const BottomNav = () => {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 safe-area-bottom">
       {/* Frosted glass backdrop */}
-      <div className="bg-card/80 backdrop-blur-2xl border-t border-border/50 shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
+      <div className="bg-card/80 backdrop-blur-2xl border-t border-border/50 shadow-[0_-4px_24px_rgba(0,0,0,0.08)]" style={{ borderTopLeftRadius: 15, borderTopRightRadius: 15 }}>
         <div className="max-w-4xl mx-auto flex items-end justify-around px-2 pt-2 pb-2">
           {navItems.map((item, idx) => {
             const Icon = item.icon;
