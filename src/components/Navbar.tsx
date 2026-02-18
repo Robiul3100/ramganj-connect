@@ -35,7 +35,7 @@ const Navbar = ({ onMenuClick }: NavbarProps) => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border" style={{ borderBottomLeftRadius: 15, borderBottomRightRadius: 15 }}>
+    <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-2xl" style={{ borderBottomLeftRadius: 15, borderBottomRightRadius: 15, borderBottom: "2px solid hsl(var(--border) / 0.5)", boxShadow: "0 4px 24px rgba(0,0,0,0.08)" }}>
       <div className="flex items-center justify-between px-4 py-3 max-w-4xl mx-auto">
         {/* Menu button */}
         <button
