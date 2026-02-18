@@ -9,8 +9,8 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    const fadeTimer = setTimeout(() => setFadeOut(true), 2400);
-    const finishTimer = setTimeout(() => onFinish(), 2900);
+    const fadeTimer = setTimeout(() => setFadeOut(true), 2600);
+    const finishTimer = setTimeout(() => onFinish(), 3100);
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(finishTimer);
@@ -23,70 +23,103 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
         fadeOut ? "opacity-0" : "opacity-100"
       }`}
     >
-      {/* Logo with glass shining effect */}
-      <div className="relative flex items-center justify-center mb-6">
-        {/* Glow behind logo */}
+      {/* Clean logo with smooth shine sweep */}
+      <div className="relative overflow-hidden" style={{ width: 220, height: 220 }}>
+        <img
+          src={logoImg}
+          alt="Ramganj City Logo"
+          className="w-full h-full object-contain"
+          style={{ animation: "logo-appear 0.5s ease-out both" }}
+        />
+        {/* Smooth glass shine — wider, softer beam */}
         <div
-          className="absolute rounded-full blur-2xl opacity-30 animate-pulse"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            width: 220,
-            height: 220,
             background:
-              "radial-gradient(circle, hsl(200,85%,65%) 0%, hsl(185,70%,55%) 50%, transparent 80%)",
+              "linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.12) 40%, rgba(255,255,255,0.72) 50%, rgba(255,255,255,0.12) 60%, transparent 75%)",
+            animation: "shine-smooth 2.2s cubic-bezier(0.4,0,0.2,1) infinite",
+          }}
+        />
+      </div>
+
+      {/* Text block — each line slides up with stagger */}
+      <div className="flex flex-col items-center gap-1 mt-2 overflow-hidden">
+        <p
+          className="text-lg font-bold text-gray-800 tracking-wide"
+          style={{ animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.35s both" }}
+        >
+          পরিকল্পনা ও বাস্তবায়ন
+        </p>
+
+        <div
+          className="w-40 h-px my-1"
+          style={{
+            background: "linear-gradient(90deg, transparent, #0097A7, transparent)",
+            animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.48s both",
           }}
         />
 
-        {/* Logo image container with shine effect */}
-        <div className="relative overflow-hidden rounded-3xl" style={{ width: 200, height: 200 }}>
-          <img
-            src={logoImg}
-            alt="Ramganj City Logo"
-            className="w-full h-full object-contain animate-fade-in"
-            style={{ animationDuration: "0.6s" }}
-          />
-          {/* Glass shine sweep */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                "linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.65) 48%, rgba(255,255,255,0.85) 52%, transparent 80%)",
-              animation: "shine-sweep 2.5s ease-in-out infinite",
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Text block */}
-      <div className="flex flex-col items-center gap-1 animate-fade-in" style={{ animationDelay: "0.3s", animationFillMode: "both" }}>
-        <p className="text-lg font-bold text-gray-800 tracking-wide">পরিকল্পনা ও বাস্তবায়ন</p>
-        <div className="w-40 h-0.5 bg-gradient-to-r from-transparent via-cyan-500 to-transparent my-1" />
-        <p className="text-base font-bold" style={{ color: "#0097A7" }}>
+        <p
+          className="text-base font-bold"
+          style={{
+            color: "#0097A7",
+            animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.58s both",
+          }}
+        >
           Ramganj City Organisation
         </p>
-        <p className="text-sm text-gray-500 mt-1">রামগঞ্জকে দেখুন, রামগঞ্জকে জানুন</p>
-        <p className="text-xs text-gray-400">www.ramganjcity.com</p>
+
+        <p
+          className="text-sm text-gray-500 mt-1"
+          style={{ animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.70s both" }}
+        >
+          রামগঞ্জকে দেখুন, রামগঞ্জকে জানুন
+        </p>
+
+        <p
+          className="text-xs text-gray-400"
+          style={{ animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.82s both" }}
+        >
+          www.ramganjcity.com
+        </p>
       </div>
 
-      {/* Bottom loading bar */}
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-32 h-1 rounded-full bg-gray-100 overflow-hidden">
-        <div
-          className="h-full rounded-full"
-          style={{
-            background: "linear-gradient(90deg, hsl(200,85%,55%), hsl(185,70%,50%))",
-            animation: "loading-bar 2.4s ease-in-out forwards",
-          }}
-        />
+      {/* Facebook Lite style bouncing dots loader */}
+      <div
+        className="absolute bottom-14 flex items-center gap-2"
+        style={{ animation: "slide-up-text 0.5s ease-out 1s both" }}
+      >
+        {[0, 1, 2].map((i) => (
+          <span
+            key={i}
+            className="block rounded-full"
+            style={{
+              width: 10,
+              height: 10,
+              background: "#0097A7",
+              animation: `fb-bounce 1.2s ease-in-out ${i * 0.18}s infinite`,
+            }}
+          />
+        ))}
       </div>
 
       <style>{`
-        @keyframes shine-sweep {
-          0% { transform: translateX(-150%); }
-          40% { transform: translateX(150%); }
-          100% { transform: translateX(150%); }
+        @keyframes logo-appear {
+          from { opacity: 0; transform: scale(0.88); }
+          to   { opacity: 1; transform: scale(1); }
         }
-        @keyframes loading-bar {
-          0% { width: 0%; }
-          100% { width: 100%; }
+        @keyframes shine-smooth {
+          0%   { transform: translateX(-160%); }
+          50%  { transform: translateX(160%); }
+          100% { transform: translateX(160%); }
+        }
+        @keyframes slide-up-text {
+          from { opacity: 0; transform: translateY(22px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fb-bounce {
+          0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+          40%            { transform: scale(1);   opacity: 1; }
         }
       `}</style>
     </div>
