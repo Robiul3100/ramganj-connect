@@ -4,9 +4,18 @@ import { supabase } from "@/integrations/supabase/client";
 
 const AnnouncementBar = () => {
   const [text, setText] = useState("আসসালামু আলাইকুম — রামগঞ্জ সেবায় স্বাগতম!");
+  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchAll = async () => {
+      // Fetch enabled setting
+      const { data: setting } = await (supabase.from as any)("site_settings")
+        .select("value")
+        .eq("key", "announcement_bar_enabled")
+        .single();
+      setEnabled(setting?.value === "true");
+
+      // Fetch latest announcement text
       const { data } = await (supabase.from as any)("announcements")
         .select("text")
         .eq("is_active", true)
@@ -15,13 +24,25 @@ const AnnouncementBar = () => {
         .single();
       if (data) setText(data.text);
     };
-    fetch();
+    fetchAll();
 
-    const ch = supabase.channel("announce_rt")
-      .on("postgres_changes", { event: "*", schema: "public", table: "announcements" }, () => fetch())
+    // Realtime for announcements
+    const ch1 = supabase.channel("announce_rt")
+      .on("postgres_changes", { event: "*", schema: "public", table: "announcements" }, fetchAll)
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+
+    // Realtime for settings
+    const ch2 = supabase.channel("settings_announce_rt")
+      .on("postgres_changes", { event: "*", schema: "public", table: "site_settings" }, fetchAll)
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(ch1);
+      supabase.removeChannel(ch2);
+    };
   }, []);
+
+  if (!enabled) return null;
 
   return (
     <div className="px-4">
