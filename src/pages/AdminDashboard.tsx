@@ -17,8 +17,9 @@ import {
   Hotel, Coffee, Video, Flower2, type LucideIcon
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import SiteSettingsPanel from "@/components/SiteSettingsPanel";
 
-type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news";
+type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings";
 
 const tabGroups = [
   {
@@ -56,6 +57,7 @@ const tabGroups = [
   {
     label: "সিস্টেম",
     items: [
+      { id: "site_settings" as Tab, label: "সাইট সেটিং", icon: Settings },
       { id: "users" as Tab, label: "ইউজার", icon: Users },
       { id: "activity" as Tab, label: "অ্যাক্টিভিটি", icon: Activity },
     ],
@@ -793,6 +795,8 @@ const AdminDashboard = () => {
     </div>
   );
 
+  const renderSiteSettings = () => <SiteSettingsPanel />;
+
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard": return renderDashboard();
@@ -801,6 +805,7 @@ const AdminDashboard = () => {
       case "activity": return renderActivity();
       case "users": return renderUsers();
       case "news": return renderNews();
+      case "site_settings": return renderSiteSettings();
       default: return renderLegacy();
     }
   };
