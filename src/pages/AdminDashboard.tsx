@@ -14,11 +14,12 @@ import {
   Flame, Bus, Lightbulb, Scale, Landmark, UsersRound, MapPin,
   Package, Tractor, Home, BookOpen, UtensilsCrossed, Wrench,
   ScrollText, HeartHandshake, Microscope, Car, Building, Rocket,
-  Hotel, Coffee, Video, Flower2, type LucideIcon
+  Hotel, Coffee, Video, Flower2, type LucideIcon, ArrowLeft
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import SiteSettingsPanel from "@/components/SiteSettingsPanel";
 import AnalyticsCharts from "@/components/AnalyticsCharts";
+import AddServiceForm from "@/components/admin/AddServiceForm";
 
 type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements";
 
@@ -68,6 +69,85 @@ const tabGroups = [
 
 const allTabs = tabGroups.flatMap(g => g.items);
 
+// Legacy table configs for CRUD
+const legacyTableConfig: Record<string, { table: string; fields: { name: string; label: string; type?: string; options?: string[] }[]; nameKey: string }> = {
+  emergency: {
+    table: "emergency_calls",
+    nameKey: "name",
+    fields: [
+      { name: "name", label: "নাম" },
+      { name: "phone", label: "ফোন নম্বর" },
+      { name: "description", label: "বিবরণ" },
+      { name: "sort_order", label: "ক্রম", type: "number" },
+    ],
+  },
+  blood: {
+    table: "blood_donors",
+    nameKey: "name",
+    fields: [
+      { name: "name", label: "নাম" },
+      { name: "phone", label: "ফোন নম্বর" },
+      { name: "blood_group", label: "রক্তের গ্রুপ", type: "select", options: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"] },
+      { name: "address", label: "ঠিকানা" },
+    ],
+  },
+  announcements: {
+    table: "announcements",
+    nameKey: "text",
+    fields: [
+      { name: "text", label: "ঘোষণার টেক্সট" },
+    ],
+  },
+  timeline: {
+    table: "timeline_events",
+    nameKey: "title",
+    fields: [
+      { name: "title", label: "শিরোনাম" },
+      { name: "year", label: "সাল", type: "number" },
+      { name: "description", label: "বিবরণ" },
+      { name: "sort_order", label: "ক্রম", type: "number" },
+    ],
+  },
+};
+
+const slugIconMap: Record<string, { icon: LucideIcon; gradient: string }> = {
+  "doctors": { icon: Stethoscope, gradient: "from-blue-500 to-indigo-500" },
+  "hospitals": { icon: Building2, gradient: "from-sky-500 to-blue-500" },
+  "pharmacy": { icon: Pill, gradient: "from-emerald-500 to-green-500" },
+  "education": { icon: GraduationCap, gradient: "from-violet-500 to-purple-500" },
+  "shops": { icon: Store, gradient: "from-amber-500 to-orange-500" },
+  "marketplace": { icon: ShoppingBag, gradient: "from-pink-500 to-rose-500" },
+  "jobs": { icon: Briefcase, gradient: "from-cyan-500 to-teal-500" },
+  "lost-found": { icon: SearchX, gradient: "from-orange-500 to-red-500" },
+  "events": { icon: CalendarHeart, gradient: "from-fuchsia-500 to-pink-500" },
+  "expatriate": { icon: Plane, gradient: "from-indigo-500 to-blue-500" },
+  "ambulance": { icon: Ambulance, gradient: "from-red-500 to-rose-500" },
+  "police": { icon: ShieldAlert, gradient: "from-slate-600 to-blue-600" },
+  "fire": { icon: Flame, gradient: "from-orange-600 to-red-600" },
+  "transport": { icon: Bus, gradient: "from-teal-500 to-cyan-500" },
+  "electricity": { icon: Lightbulb, gradient: "from-yellow-500 to-amber-500" },
+  "legal": { icon: Scale, gradient: "from-gray-500 to-slate-600" },
+  "bank": { icon: Landmark, gradient: "from-emerald-600 to-teal-600" },
+  "organizations": { icon: UsersRound, gradient: "from-purple-500 to-indigo-500" },
+  "tourism": { icon: MapPin, gradient: "from-green-500 to-emerald-500" },
+  "courier": { icon: Package, gradient: "from-amber-600 to-orange-500" },
+  "agriculture": { icon: Tractor, gradient: "from-lime-600 to-green-600" },
+  "rent": { icon: Home, gradient: "from-blue-600 to-indigo-600" },
+  "tuition": { icon: BookOpen, gradient: "from-violet-600 to-purple-600" },
+  "food": { icon: UtensilsCrossed, gradient: "from-red-500 to-orange-500" },
+  "repair": { icon: Wrench, gradient: "from-zinc-500 to-slate-600" },
+  "deed-writer": { icon: ScrollText, gradient: "from-amber-700 to-yellow-600" },
+  "marriage": { icon: HeartHandshake, gradient: "from-rose-500 to-pink-500" },
+  "diagnostic": { icon: Microscope, gradient: "from-cyan-600 to-blue-600" },
+  "car-rental": { icon: Car, gradient: "from-blue-500 to-sky-500" },
+  "municipal": { icon: Building, gradient: "from-slate-500 to-zinc-600" },
+  "entrepreneur": { icon: Rocket, gradient: "from-orange-500 to-amber-500" },
+  "hotel": { icon: Hotel, gradient: "from-indigo-500 to-violet-500" },
+  "restaurant": { icon: Coffee, gradient: "from-amber-600 to-brown-500" },
+  "video": { icon: Video, gradient: "from-red-600 to-rose-600" },
+  "nursery": { icon: Flower2, gradient: "from-green-500 to-lime-500" },
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
@@ -97,6 +177,14 @@ const AdminDashboard = () => {
   const [adForm, setAdForm] = useState({ title: "", description: "", image_url: "", link_url: "", sort_order: 0 });
   const [adEditId, setAdEditId] = useState<string | null>(null);
   const [adUploading, setAdUploading] = useState(false);
+  // New states for add service form
+  const [showAddService, setShowAddService] = useState(false);
+  const [addServiceCategoryId, setAddServiceCategoryId] = useState<string>("");
+  // Legacy add form
+  const [showLegacyForm, setShowLegacyForm] = useState(false);
+  const [legacyForm, setLegacyForm] = useState<Record<string, string>>({});
+  const [legacyEditId, setLegacyEditId] = useState<string | null>(null);
+
   // --- All business logic remains exactly the same ---
   useEffect(() => {
     const checkAuth = async () => {
@@ -157,6 +245,18 @@ const AdminDashboard = () => {
     return () => { supabase.removeChannel(ch); };
   }, [fetchServices, fetchCounts]);
 
+  const fetchLegacyData = useCallback(async (tabName: string) => {
+    const legacyTabs: Record<string, string> = {
+      emergency: "emergency_calls", blood: "blood_donors", donations: "donations",
+      announcements: "announcements", about: "about_content", timeline: "timeline_events",
+    };
+    if (!legacyTabs[tabName]) return;
+    setLoading(true);
+    const { data } = await (supabase.from as any)(legacyTabs[tabName]).select("*").order("created_at", { ascending: false });
+    setLegacyData(data || []);
+    setLoading(false);
+  }, []);
+
   useEffect(() => {
     if (activeTab === "activity") {
       const fetch = async () => {
@@ -184,13 +284,7 @@ const AdminDashboard = () => {
       announcements: "announcements", about: "about_content", timeline: "timeline_events",
     };
     if (legacyTabs[activeTab]) {
-      const fetch = async () => {
-        setLoading(true);
-        const { data } = await (supabase.from as any)(legacyTabs[activeTab]).select("*").order("created_at", { ascending: false });
-        setLegacyData(data || []);
-        setLoading(false);
-      };
-      fetch();
+      fetchLegacyData(activeTab);
     }
     if (activeTab === "news") {
       const fetchNews = async () => {
@@ -219,7 +313,11 @@ const AdminDashboard = () => {
       };
       fetchAds();
     }
-  }, [activeTab]);
+    // Reset legacy form when tab changes
+    setShowLegacyForm(false);
+    setLegacyForm({});
+    setLegacyEditId(null);
+  }, [activeTab, fetchLegacyData]);
 
   const logActivity = useCallback(async (action: string, tableName?: string, recordId?: string, details?: string) => {
     if (!currentUser) return;
@@ -318,33 +416,77 @@ const AdminDashboard = () => {
     toast({ title: !current ? "সক্রিয় করা হয়েছে" : "নিষ্ক্রিয় করা হয়েছে" });
   };
 
+  // Legacy CRUD
+  const saveLegacyItem = async () => {
+    const config = legacyTableConfig[activeTab];
+    if (!config) return;
+    const requiredField = config.fields[0].name;
+    if (!legacyForm[requiredField]?.trim()) {
+      toast({ title: `${config.fields[0].label} দিন`, variant: "destructive" });
+      return;
+    }
+    const insertData: Record<string, any> = {};
+    config.fields.forEach(f => {
+      if (legacyForm[f.name] !== undefined && legacyForm[f.name] !== "") {
+        insertData[f.name] = f.type === "number" ? parseInt(legacyForm[f.name]) || 0 : legacyForm[f.name];
+      }
+    });
+    // Set defaults for approval
+    if (activeTab === "blood") insertData.is_approved = true;
+    if (activeTab === "emergency") insertData.is_active = true;
+
+    if (legacyEditId) {
+      await (supabase.from as any)(config.table).update(insertData).eq("id", legacyEditId);
+      await logActivity("edited", config.table, legacyEditId, legacyForm[requiredField]);
+      toast({ title: "আপডেট হয়েছে ✅" });
+    } else {
+      await (supabase.from as any)(config.table).insert(insertData);
+      await logActivity("created", config.table, undefined, legacyForm[requiredField]);
+      toast({ title: "সফলভাবে যোগ হয়েছে ✅" });
+    }
+    setShowLegacyForm(false);
+    setLegacyForm({});
+    setLegacyEditId(null);
+    fetchLegacyData(activeTab);
+  };
+
+  const deleteLegacyItem = async (id: string, name: string) => {
+    const config = legacyTableConfig[activeTab];
+    if (!config) return;
+    if (!confirm("মুছে ফেলতে চান?")) return;
+    await (supabase.from as any)(config.table).delete().eq("id", id);
+    await logActivity("deleted", config.table, id, name);
+    toast({ title: "মুছে ফেলা হয়েছে" });
+    setLegacyData(legacyData.filter(d => d.id !== id));
+  };
+
+  const startLegacyEdit = (item: any) => {
+    const config = legacyTableConfig[activeTab];
+    if (!config) return;
+    const formData: Record<string, string> = {};
+    config.fields.forEach(f => {
+      formData[f.name] = item[f.name]?.toString() || "";
+    });
+    setLegacyForm(formData);
+    setLegacyEditId(item.id);
+    setShowLegacyForm(true);
+  };
+
   const activeTabData = allTabs.find(t => t.id === activeTab);
+
+  // Open add service form for a specific category
+  const openAddServiceForCategory = (categoryId: string) => {
+    setAddServiceCategoryId(categoryId);
+    setShowAddService(true);
+    setActiveTab("services");
+    setFilterCategory(categoryId);
+    setSidebarOpen(false);
+  };
 
   // ===================== RENDER SECTIONS =====================
 
   const renderDashboard = () => (
     <div className="space-y-6">
-      {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/3" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full translate-y-1/2 -translate-x-1/4" />
-        <div className="relative p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Sparkles className="w-4 h-4 text-primary" />
-                <span className="text-xs font-semibold text-primary uppercase tracking-wider">অ্যাডমিন প্যানেল</span>
-              </div>
-              <h1 className="text-2xl font-bold text-foreground">স্বাগতম! 👋</h1>
-              <p className="text-sm text-muted-foreground mt-1">সকল সেবা ও কন্টেন্ট ম্যানেজ করুন এখান থেকে</p>
-            </div>
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <Shield className="w-6 h-6 text-primary" />
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Pending Alert */}
       {counts.pending > 0 && (
         <button onClick={() => setActiveTab("pending")} className="w-full group">
@@ -421,64 +563,46 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Service Editors Grid */}
+      {/* Service Editors Grid - with + buttons */}
       <div>
         <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-          <Layers className="w-4 h-4 text-primary" /> সার্ভিস এডিটর
+          <Layers className="w-4 h-4 text-primary" /> সার্ভিস পেজে ডাটা যোগ করুন
         </h3>
-        <div className="grid grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
           {categories.filter((c: any) => c.is_active).map((cat: any) => {
-            const slugIconMap: Record<string, { icon: LucideIcon; gradient: string }> = {
-              "doctors": { icon: Stethoscope, gradient: "from-blue-500 to-indigo-500" },
-              "hospitals": { icon: Building2, gradient: "from-sky-500 to-blue-500" },
-              "pharmacy": { icon: Pill, gradient: "from-emerald-500 to-green-500" },
-              "education": { icon: GraduationCap, gradient: "from-violet-500 to-purple-500" },
-              "shops": { icon: Store, gradient: "from-amber-500 to-orange-500" },
-              "marketplace": { icon: ShoppingBag, gradient: "from-pink-500 to-rose-500" },
-              "jobs": { icon: Briefcase, gradient: "from-cyan-500 to-teal-500" },
-              "lost-found": { icon: SearchX, gradient: "from-orange-500 to-red-500" },
-              "events": { icon: CalendarHeart, gradient: "from-fuchsia-500 to-pink-500" },
-              "expatriate": { icon: Plane, gradient: "from-indigo-500 to-blue-500" },
-              "ambulance": { icon: Ambulance, gradient: "from-red-500 to-rose-500" },
-              "police": { icon: ShieldAlert, gradient: "from-slate-600 to-blue-600" },
-              "fire": { icon: Flame, gradient: "from-orange-600 to-red-600" },
-              "transport": { icon: Bus, gradient: "from-teal-500 to-cyan-500" },
-              "electricity": { icon: Lightbulb, gradient: "from-yellow-500 to-amber-500" },
-              "legal": { icon: Scale, gradient: "from-gray-500 to-slate-600" },
-              "bank": { icon: Landmark, gradient: "from-emerald-600 to-teal-600" },
-              "organizations": { icon: UsersRound, gradient: "from-purple-500 to-indigo-500" },
-              "tourism": { icon: MapPin, gradient: "from-green-500 to-emerald-500" },
-              "courier": { icon: Package, gradient: "from-amber-600 to-orange-500" },
-              "agriculture": { icon: Tractor, gradient: "from-lime-600 to-green-600" },
-              "rent": { icon: Home, gradient: "from-blue-600 to-indigo-600" },
-              "tuition": { icon: BookOpen, gradient: "from-violet-600 to-purple-600" },
-              "food": { icon: UtensilsCrossed, gradient: "from-red-500 to-orange-500" },
-              "repair": { icon: Wrench, gradient: "from-zinc-500 to-slate-600" },
-              "deed-writer": { icon: ScrollText, gradient: "from-amber-700 to-yellow-600" },
-              "marriage": { icon: HeartHandshake, gradient: "from-rose-500 to-pink-500" },
-              "diagnostic": { icon: Microscope, gradient: "from-cyan-600 to-blue-600" },
-              "car-rental": { icon: Car, gradient: "from-blue-500 to-sky-500" },
-              "municipal": { icon: Building, gradient: "from-slate-500 to-zinc-600" },
-              "entrepreneur": { icon: Rocket, gradient: "from-orange-500 to-amber-500" },
-              "hotel": { icon: Hotel, gradient: "from-indigo-500 to-violet-500" },
-              "restaurant": { icon: Coffee, gradient: "from-amber-600 to-brown-500" },
-              "video": { icon: Video, gradient: "from-red-600 to-rose-600" },
-              "nursery": { icon: Flower2, gradient: "from-green-500 to-lime-500" },
-            };
             const match = slugIconMap[cat.slug] || { icon: Globe, gradient: "from-gray-500 to-slate-500" };
             const IconComp = match.icon;
             return (
-              <button key={cat.id} onClick={() => { setActiveTab("services"); setFilterCategory(cat.id); setSidebarOpen(false); }}
-                className="bg-card border border-border rounded-2xl p-3 text-left hover:shadow-md hover:border-primary/20 transition-all group relative overflow-hidden">
+              <div key={cat.id} className="bg-card border border-border rounded-2xl p-3 hover:shadow-md hover:border-primary/20 transition-all group relative overflow-hidden">
                 <div className={`absolute top-0 right-0 w-12 h-12 rounded-full bg-gradient-to-br ${match.gradient} opacity-[0.06] -translate-y-1/3 translate-x-1/3 group-hover:opacity-[0.12] transition-opacity`} />
-                <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${match.gradient} flex items-center justify-center mb-2 group-hover:scale-105 transition-transform`}>
-                  <IconComp className="w-3.5 h-3.5 text-white" />
+                <div className="flex items-center justify-between mb-2">
+                  <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${match.gradient} flex items-center justify-center group-hover:scale-105 transition-transform`}>
+                    <IconComp className="w-3.5 h-3.5 text-white" />
+                  </div>
+                  <button
+                    onClick={() => openAddServiceForCategory(cat.id)}
+                    className="w-7 h-7 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
+                    title={`${cat.name} এ নতুন সেবা যোগ করুন`}
+                  >
+                    <Plus className="w-3.5 h-3.5 text-primary" />
+                  </button>
                 </div>
                 <p className="text-xs font-bold text-foreground leading-tight truncate">{cat.name}</p>
-                <p className="text-[10px] text-muted-foreground flex items-center gap-0.5 mt-0.5">
-                  <ArrowUpRight className="w-2.5 h-2.5" /> এডিট
-                </p>
-              </button>
+                <div className="flex items-center gap-2 mt-1">
+                  <button
+                    onClick={() => { setActiveTab("services"); setFilterCategory(cat.id); setSidebarOpen(false); }}
+                    className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-0.5 transition-colors"
+                  >
+                    <Eye className="w-2.5 h-2.5" /> দেখুন
+                  </button>
+                  <button
+                    onClick={() => openAddServiceForCategory(cat.id)}
+                    className="text-[10px] text-primary font-semibold flex items-center gap-0.5"
+                  >
+                    <Plus className="w-2.5 h-2.5" /> যোগ করুন
+                  </button>
+                </div>
+              </div>
             );
           })}
         </div>
@@ -500,7 +624,7 @@ const AdminDashboard = () => {
             { label: "রক্তদাতা", tab: "blood" as Tab, icon: Droplets, gradient: "from-red-600 to-rose-500" },
             { label: "অনুদান", tab: "donations" as Tab, icon: Heart, gradient: "from-pink-500 to-fuchsia-500" },
             { label: "নিউজ", tab: "news" as Tab, icon: Newspaper, gradient: "from-emerald-500 to-green-500" },
-            { label: "সেটিংস", tab: "users" as Tab, icon: Settings, gradient: "from-slate-500 to-gray-500" },
+            { label: "সেটিংস", tab: "site_settings" as Tab, icon: Settings, gradient: "from-slate-500 to-gray-500" },
           ].map((item) => (
             <button key={item.label} onClick={() => { setActiveTab(item.tab); setSidebarOpen(false); }}
               className="bg-card border border-border rounded-2xl p-3 text-left hover:shadow-md hover:border-primary/20 transition-all group relative overflow-hidden">
@@ -521,11 +645,32 @@ const AdminDashboard = () => {
 
   const renderServicesList = () => (
     <div className="space-y-4">
+      {/* Add Service Form */}
+      {showAddService && (
+        <AddServiceForm
+          categories={categories}
+          preselectedCategoryId={addServiceCategoryId}
+          onClose={() => { setShowAddService(false); setAddServiceCategoryId(""); }}
+          onSaved={() => { fetchServices(); fetchCounts(); }}
+          logActivity={logActivity}
+        />
+      )}
+
       {/* Search & Filters */}
       <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input type="text" placeholder="নাম, ফোন বা ঠিকানা দিয়ে খুঁজুন..." className="w-full bg-muted/50 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none border border-border focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input type="text" placeholder="নাম, ফোন বা ঠিকানা দিয়ে খুঁজুন..." className="w-full bg-muted/50 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none border border-border focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          </div>
+          {!showAddService && (
+            <button
+              onClick={() => { setShowAddService(true); setAddServiceCategoryId(filterCategory !== "all" ? filterCategory : ""); }}
+              className="shrink-0 h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+            >
+              <Plus className="w-4 h-4" /> যোগ করুন
+            </button>
+          )}
         </div>
         <div className="flex gap-2 flex-wrap">
           {activeTab !== "pending" && (
@@ -600,7 +745,6 @@ const AdminDashboard = () => {
               ) : (
                 <div className="p-4">
                   <div className="flex gap-3">
-                    {/* Thumbnail */}
                     {item.image_url && (
                       <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-muted">
                         <img src={item.image_url} alt="" className="w-full h-full object-cover" />
@@ -625,7 +769,6 @@ const AdminDashboard = () => {
                       </p>
                     </div>
                   </div>
-                  {/* Actions */}
                   <div className="flex gap-1.5 mt-3 pt-3 border-t border-border/50 flex-wrap">
                     {item.status !== "approved" && (
                       <ActionBtn variant="success" onClick={() => updateServiceStatus(item.id, "approved", item.title)} icon={<CheckCircle className="w-3.5 h-3.5" />} label="অনুমোদন" />
@@ -663,9 +806,18 @@ const AdminDashboard = () => {
               <p className="text-xs text-muted-foreground">/{c.slug} • {c.icon}</p>
             </div>
           </div>
-          <span className={`text-xs px-3 py-1 rounded-full font-semibold ${c.is_active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-muted text-muted-foreground"}`}>
-            {c.is_active ? "✅ সক্রিয়" : "⏸ নিষ্ক্রিয়"}
-          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => openAddServiceForCategory(c.id)}
+              className="w-8 h-8 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
+              title="নতুন সেবা যোগ করুন"
+            >
+              <Plus className="w-4 h-4 text-primary" />
+            </button>
+            <span className={`text-xs px-3 py-1 rounded-full font-semibold ${c.is_active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-muted text-muted-foreground"}`}>
+              {c.is_active ? "✅ সক্রিয়" : "⏸ নিষ্ক্রিয়"}
+            </span>
+          </div>
         </div>
       ))}
     </div>
@@ -732,23 +884,111 @@ const AdminDashboard = () => {
   );
 
   const renderLegacy = () => {
+    const config = legacyTableConfig[activeTab];
+    const hasCRUD = !!config;
+
     if (loading) return <LoadingState />;
-    if (legacyData.length === 0) return <EmptyState />;
+
     return (
-      <div className="space-y-3">
+      <div className="space-y-4">
+        {/* Add form for legacy sections */}
+        {hasCRUD && (
+          <>
+            {showLegacyForm ? (
+              <div className="bg-card border-2 border-primary/20 rounded-2xl p-5 space-y-4 shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Plus className="w-4 h-4 text-primary" />
+                    </div>
+                    <h2 className="text-sm font-bold text-foreground">
+                      {legacyEditId ? "এডিট করুন" : "নতুন যোগ করুন"}
+                    </h2>
+                  </div>
+                  <button onClick={() => { setShowLegacyForm(false); setLegacyForm({}); setLegacyEditId(null); }} className="w-8 h-8 rounded-xl bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors">
+                    <X className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </div>
+                {config.fields.map((field) => (
+                  <div key={field.name}>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{field.label}</label>
+                    {field.type === "select" && field.options ? (
+                      <select
+                        className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 transition-all"
+                        value={legacyForm[field.name] || ""}
+                        onChange={(e) => setLegacyForm({ ...legacyForm, [field.name]: e.target.value })}
+                      >
+                        <option value="">নির্বাচন করুন</option>
+                        {field.options.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    ) : (
+                      <input
+                        type={field.type === "number" ? "number" : "text"}
+                        className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
+                        placeholder={field.label}
+                        value={legacyForm[field.name] || ""}
+                        onChange={(e) => setLegacyForm({ ...legacyForm, [field.name]: e.target.value })}
+                      />
+                    )}
+                  </div>
+                ))}
+                <button
+                  onClick={saveLegacyItem}
+                  className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+                >
+                  <Save className="w-4 h-4" /> {legacyEditId ? "আপডেট করুন" : "যোগ করুন"}
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowLegacyForm(true)}
+                className="w-full py-3 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors"
+              >
+                <Plus className="w-4 h-4" /> নতুন {activeTabData?.label} যোগ করুন
+              </button>
+            )}
+          </>
+        )}
+
+        {/* Data list */}
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> মোট: {legacyData.length}টি</span>
         </div>
-        {legacyData.map((item: any) => {
+        {legacyData.length === 0 ? <EmptyState /> : legacyData.map((item: any) => {
           const name = item.title || item.name || item.text || item.method_name || item.article_title || item.donor_name || item.item_name || `${item.year || ""}`;
           return (
             <div key={item.id} className="bg-card border border-border rounded-2xl p-4 hover:shadow-sm transition-all">
-              <h3 className="font-bold text-sm text-foreground">{name}</h3>
-              {item.phone && <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Phone className="w-3 h-3" /> {item.phone}</p>}
-              {item.description && <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{item.description}</p>}
-              <p className="text-[10px] text-muted-foreground/60 mt-1.5 flex items-center gap-1">
-                <CalendarDays className="w-3 h-3" /> {new Date(item.created_at).toLocaleDateString("bn-BD")}
-              </p>
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-sm text-foreground">{name}</h3>
+                  {item.phone && <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Phone className="w-3 h-3" /> {item.phone}</p>}
+                  {item.blood_group && <p className="text-xs text-muted-foreground mt-0.5">🩸 {item.blood_group}</p>}
+                  {item.address && <p className="text-xs text-muted-foreground mt-0.5">📍 {item.address}</p>}
+                  {item.description && <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{item.description}</p>}
+                  {item.year && <p className="text-xs text-muted-foreground mt-0.5">📅 {item.year}</p>}
+                  <p className="text-[10px] text-muted-foreground/60 mt-1.5 flex items-center gap-1">
+                    <CalendarDays className="w-3 h-3" /> {new Date(item.created_at).toLocaleDateString("bn-BD")}
+                  </p>
+                </div>
+                {/* Active/Approved badge */}
+                {item.is_active !== undefined && (
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0 ${item.is_active ? "bg-emerald-500/10 text-emerald-600" : "bg-muted text-muted-foreground"}`}>
+                    {item.is_active ? "✅" : "⏸"}
+                  </span>
+                )}
+                {item.is_approved !== undefined && (
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0 ${item.is_approved ? "bg-emerald-500/10 text-emerald-600" : "bg-amber-500/10 text-amber-600"}`}>
+                    {item.is_approved ? "✅" : "🕐"}
+                  </span>
+                )}
+              </div>
+              {/* Actions */}
+              {hasCRUD && (
+                <div className="flex gap-1.5 mt-3 pt-3 border-t border-border/50 flex-wrap">
+                  <ActionBtn variant="info" onClick={() => startLegacyEdit(item)} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
+                  <ActionBtn variant="danger" onClick={() => deleteLegacyItem(item.id, name)} icon={<Trash2 className="w-3 h-3" />} label="মুছুন" />
+                </div>
+              )}
             </div>
           );
         })}
@@ -880,7 +1120,6 @@ const AdminDashboard = () => {
 
   const renderSlider = () => (
     <div className="space-y-4">
-      {/* Slider Form */}
       <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -916,7 +1155,6 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Slider List */}
       <div className="flex items-center justify-between">
         <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> {sliderItems.length}টি স্লাইড</span>
       </div>
@@ -1078,44 +1316,40 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border">
-        <div className="flex items-center justify-between px-4 py-3 max-w-6xl mx-auto">
+      {/* Gradient Header */}
+      <div className="relative overflow-hidden" style={{ background: "var(--gradient-primary)" }}>
+        <div className="flex items-center justify-between px-4 py-5 pb-12 max-w-6xl mx-auto">
           <div className="flex items-center gap-3">
-            <button onClick={() => setSidebarOpen(true)} className="lg:hidden w-9 h-9 rounded-xl bg-muted/80 hover:bg-muted flex items-center justify-center transition-colors">
-              <Menu className="w-5 h-5 text-foreground" />
+            <button onClick={() => navigate("/")} className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+              <ArrowLeft className="w-5 h-5 text-white" />
             </button>
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm">
-                <Shield className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <div className="hidden sm:block">
-                <span className="text-sm font-bold text-foreground">রামগঞ্জ সেবা</span>
-                <span className="text-[10px] text-muted-foreground block -mt-0.5">অ্যাডমিন</span>
-              </div>
+            <div>
+              <h1 className="text-lg font-bold text-white">অ্যাডমিন প্যানেল</h1>
+              <p className="text-[11px] text-white/70">রামগঞ্জ সেবা ম্যানেজমেন্ট</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => navigate("/")} className="w-9 h-9 rounded-xl bg-muted/80 hover:bg-primary/10 flex items-center justify-center transition-colors group" title="হোমপেজ">
-              <Home className="w-4 h-4 text-foreground group-hover:text-primary transition-colors" />
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+              <Menu className="w-5 h-5 text-white" />
             </button>
             {counts.pending > 0 && (
-              <button onClick={() => setActiveTab("pending")} className="relative w-9 h-9 rounded-xl bg-muted/80 hover:bg-muted flex items-center justify-center transition-colors">
-                <Bell className="w-4 h-4 text-foreground" />
+              <button onClick={() => setActiveTab("pending")} className="relative w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                <Bell className="w-5 h-5 text-white" />
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">{counts.pending}</span>
               </button>
             )}
-            <button onClick={handleLogout} className="w-9 h-9 rounded-xl bg-muted/80 hover:bg-destructive/10 flex items-center justify-center transition-colors group" title="লগআউট">
-              <LogOut className="w-4 h-4 text-foreground group-hover:text-destructive transition-colors" />
+            <button onClick={handleLogout} className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center" title="লগআউট">
+              <LogOut className="w-5 h-5 text-white" />
             </button>
           </div>
         </div>
-      </header>
+        <div className="absolute bottom-0 left-0 right-0 h-6 bg-background rounded-t-3xl" />
+      </div>
 
-      <div className="flex max-w-6xl mx-auto">
+      <div className="flex max-w-6xl mx-auto -mt-2">
         {/* Desktop Sidebar */}
-        <aside className="hidden lg:flex flex-col w-[240px] shrink-0 sticky top-[57px] h-[calc(100vh-57px)] border-r border-border bg-card/40">
-          <nav className="flex-1 overflow-y-auto p-3 space-y-5">
+        <aside className="hidden lg:flex flex-col w-[240px] shrink-0 sticky top-0 h-screen border-r border-border bg-card/40">
+          <nav className="flex-1 overflow-y-auto p-3 space-y-5 pt-4">
             {tabGroups.map(group => (
               <div key={group.label}>
                 <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground/70 font-bold px-3 mb-2">{group.label}</p>
@@ -1142,7 +1376,6 @@ const AdminDashboard = () => {
               </div>
             ))}
           </nav>
-          {/* Sidebar Footer */}
           <div className="p-3 border-t border-border">
             <div className="px-3 py-2">
               <p className="text-[10px] text-muted-foreground/70 truncate">{currentUser?.email}</p>
@@ -1209,7 +1442,7 @@ const AdminDashboard = () => {
         {/* Main Content */}
         <main className="flex-1 min-w-0">
           {/* Mobile Tab Scroller */}
-          <div className="lg:hidden sticky top-[57px] z-40 bg-background/95 backdrop-blur-md border-b border-border">
+          <div className="lg:hidden sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border">
             <div className="px-3 py-2.5 overflow-x-auto">
               <div className="flex gap-1.5 min-w-max">
                 {allTabs.map((tab) => {
