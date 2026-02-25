@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import SiteSettingsPanel from "@/components/SiteSettingsPanel";
+import AnalyticsCharts from "@/components/AnalyticsCharts";
 
 type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements";
 
@@ -209,7 +210,7 @@ const AdminDashboard = () => {
       };
       fetchSlider();
     }
-    if (activeTab === "advertisements") {
+    if (activeTab === "advertisements" || activeTab === "dashboard") {
       const fetchAds = async () => {
         setLoading(true);
         const { data } = await (supabase.from as any)("advertisements").select("*").order("sort_order");
@@ -390,6 +391,9 @@ const AdminDashboard = () => {
           ))}
         </div>
       </div>
+
+      {/* Analytics Charts */}
+      <AnalyticsCharts categories={categories} adItems={adItems} />
 
       {/* Quick Actions */}
       <div>
