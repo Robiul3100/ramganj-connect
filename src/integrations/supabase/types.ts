@@ -645,6 +645,7 @@ export type Database = {
           name: string
           slug: string
           sort_order: number
+          view_count: number
         }
         Insert: {
           created_at?: string
@@ -655,6 +656,7 @@ export type Database = {
           name: string
           slug: string
           sort_order?: number
+          view_count?: number
         }
         Update: {
           created_at?: string
@@ -665,6 +667,7 @@ export type Database = {
           name?: string
           slug?: string
           sort_order?: number
+          view_count?: number
         }
         Relationships: []
       }
@@ -877,6 +880,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_category_view: { Args: { cat_id: string }; Returns: undefined }
       increment_news_view: { Args: { news_id: string }; Returns: undefined }
     }
     Enums: {
