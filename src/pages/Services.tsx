@@ -108,7 +108,8 @@ const Services = () => {
         (supabase.from as any)("advertisements").select("*").eq("is_active", true).order("sort_order"),
       ]);
       setCategories((catRes.data as Category[]) || []);
-      setAds((adRes.data as Ad[]) || []);
+      const now = new Date().toISOString();
+      setAds(((adRes.data as Ad[]) || []).filter((a: any) => !a.expire_at || a.expire_at > now));
     };
     fetchData();
   }, []);

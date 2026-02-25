@@ -100,6 +100,7 @@ export type Database = {
           click_count: number
           created_at: string
           description: string | null
+          expire_at: string | null
           id: string
           image_url: string | null
           is_active: boolean
@@ -112,6 +113,7 @@ export type Database = {
           click_count?: number
           created_at?: string
           description?: string | null
+          expire_at?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean
@@ -124,6 +126,7 @@ export type Database = {
           click_count?: number
           created_at?: string
           description?: string | null
+          expire_at?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean
@@ -912,6 +915,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      deactivate_expired_ads: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

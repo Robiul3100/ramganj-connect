@@ -174,7 +174,7 @@ const AdminDashboard = () => {
   const [sliderEditId, setSliderEditId] = useState<string | null>(null);
   const [sliderUploading, setSliderUploading] = useState(false);
   const [adItems, setAdItems] = useState<any[]>([]);
-  const [adForm, setAdForm] = useState({ title: "", description: "", image_url: "", link_url: "", sort_order: 0 });
+  const [adForm, setAdForm] = useState({ title: "", description: "", image_url: "", link_url: "", sort_order: 0, expire_at: "" });
   const [adEditId, setAdEditId] = useState<string | null>(null);
   const [adUploading, setAdUploading] = useState(false);
   // New states for add service form
@@ -1310,16 +1310,17 @@ const AdminDashboard = () => {
 
   const saveAd = async () => {
     if (!adForm.title.trim()) { toast({ title: "শিরোনাম দিন", variant: "destructive" }); return; }
+    const expireVal = adForm.expire_at ? new Date(adForm.expire_at).toISOString() : null;
     if (adEditId) {
-      await (supabase.from as any)("advertisements").update({ title: adForm.title, description: adForm.description || null, image_url: adForm.image_url || null, link_url: adForm.link_url || null, sort_order: adForm.sort_order }).eq("id", adEditId);
+      await (supabase.from as any)("advertisements").update({ title: adForm.title, description: adForm.description || null, image_url: adForm.image_url || null, link_url: adForm.link_url || null, sort_order: adForm.sort_order, expire_at: expireVal }).eq("id", adEditId);
       await logActivity("edited", "advertisements", adEditId, adForm.title);
       toast({ title: "বিজ্ঞাপন আপডেট হয়েছে ✅" });
     } else {
-      await (supabase.from as any)("advertisements").insert({ title: adForm.title, description: adForm.description || null, image_url: adForm.image_url || null, link_url: adForm.link_url || null, sort_order: adForm.sort_order });
+      await (supabase.from as any)("advertisements").insert({ title: adForm.title, description: adForm.description || null, image_url: adForm.image_url || null, link_url: adForm.link_url || null, sort_order: adForm.sort_order, expire_at: expireVal });
       await logActivity("created", "advertisements", undefined, adForm.title);
       toast({ title: "বিজ্ঞাপন যোগ হয়েছে ✅" });
     }
-    setAdForm({ title: "", description: "", image_url: "", link_url: "", sort_order: 0 });
+    setAdForm({ title: "", description: "", image_url: "", link_url: "", sort_order: 0, expire_at: "" });
     setAdEditId(null);
     const { data } = await (supabase.from as any)("advertisements").select("*").order("sort_order");
     setAdItems(data || []);
@@ -1356,6 +1357,11 @@ const AdminDashboard = () => {
           <input type="number" className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" placeholder="0" value={adForm.sort_order} onChange={(e) => setAdForm({ ...adForm, sort_order: parseInt(e.target.value) || 0 })} />
         </div>
         <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">মেয়াদ শেষের তারিখ (ঐচ্ছিক)</label>
+          <input type="datetime-local" className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" value={adForm.expire_at} onChange={(e) => setAdForm({ ...adForm, expire_at: e.target.value })} />
+          <p className="text-[10px] text-muted-foreground mt-1">খালি রাখলে মেয়াদ শেষ হবে না। সময় পার হলে অটোমেটিক নিষ্ক্রিয় হবে।</p>
+        </div>
+        <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">বিজ্ঞাপনের ছবি</label>
           <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" placeholder="ছবির লিংক (URL)" value={adForm.image_url} onChange={(e) => setAdForm({ ...adForm, image_url: e.target.value })} />
           <div className="flex items-center gap-3 mt-2">
@@ -1371,7 +1377,7 @@ const AdminDashboard = () => {
             <Save className="w-4 h-4" /> {adEditId ? "আপডেট" : "যোগ করুন"}
           </button>
           {adEditId && (
-            <button onClick={() => { setAdEditId(null); setAdForm({ title: "", description: "", image_url: "", link_url: "", sort_order: 0 }); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
+            <button onClick={() => { setAdEditId(null); setAdForm({ title: "", description: "", image_url: "", link_url: "", sort_order: 0, expire_at: "" }); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
               বাতিল
             </button>
           )}
@@ -1398,9 +1404,14 @@ const AdminDashboard = () => {
             <div className="flex items-center gap-2 mt-0.5">
               <p className="text-[10px] text-muted-foreground">ক্রম: {item.sort_order}</p>
               <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">• 👆 {item.click_count ?? 0} ক্লিক</span>
+              {item.expire_at && (
+                <span className={`text-[10px] flex items-center gap-0.5 ${new Date(item.expire_at) < new Date() ? "text-red-500 font-semibold" : "text-muted-foreground"}`}>
+                  • ⏰ {new Date(item.expire_at) < new Date() ? "মেয়াদ শেষ" : new Date(item.expire_at).toLocaleDateString("bn-BD")}
+                </span>
+              )}
             </div>
             <div className="flex gap-1.5 mt-2 flex-wrap">
-              <ActionBtn variant="info" onClick={() => { setAdEditId(item.id); setAdForm({ title: item.title, description: item.description || "", image_url: item.image_url || "", link_url: item.link_url || "", sort_order: item.sort_order }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
+              <ActionBtn variant="info" onClick={() => { setAdEditId(item.id); setAdForm({ title: item.title, description: item.description || "", image_url: item.image_url || "", link_url: item.link_url || "", sort_order: item.sort_order, expire_at: item.expire_at ? new Date(item.expire_at).toISOString().slice(0, 16) : "" }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
               <button onClick={() => toggleAdActive(item.id, item.is_active)}
                 className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-colors ${item.is_active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
                 {item.is_active ? "✅ সক্রিয়" : "⏸ নিষ্ক্রিয়"}
