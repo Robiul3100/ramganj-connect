@@ -184,6 +184,10 @@ const AdminDashboard = () => {
   const [showLegacyForm, setShowLegacyForm] = useState(false);
   const [legacyForm, setLegacyForm] = useState<Record<string, string>>({});
   const [legacyEditId, setLegacyEditId] = useState<string | null>(null);
+  // About content form
+  const [aboutForm, setAboutForm] = useState({ article_title: "", article_body: "", meta_description: "" });
+  const [aboutLoaded, setAboutLoaded] = useState(false);
+  const [aboutSaving, setAboutSaving] = useState(false);
 
   // --- All business logic remains exactly the same ---
   useEffect(() => {
@@ -285,6 +289,16 @@ const AdminDashboard = () => {
     };
     if (legacyTabs[activeTab]) {
       fetchLegacyData(activeTab);
+    }
+    if (activeTab === "about" && !aboutLoaded) {
+      const fetchAbout = async () => {
+        const { data } = await (supabase.from as any)("about_content").select("*").limit(1).single();
+        if (data) {
+          setAboutForm({ article_title: data.article_title || "", article_body: data.article_body || "", meta_description: data.meta_description || "" });
+          setAboutLoaded(true);
+        }
+      };
+      fetchAbout();
     }
     if (activeTab === "news") {
       const fetchNews = async () => {
@@ -1066,6 +1080,106 @@ const AdminDashboard = () => {
     </div>
   );
 
+  const saveAboutContent = async () => {
+    setAboutSaving(true);
+    const { data: existing } = await (supabase.from as any)("about_content").select("id").limit(1).single();
+    if (existing) {
+      await (supabase.from as any)("about_content").update({
+        article_title: aboutForm.article_title,
+        article_body: aboutForm.article_body,
+        meta_description: aboutForm.meta_description || null,
+      }).eq("id", existing.id);
+    } else {
+      await (supabase.from as any)("about_content").insert({
+        article_title: aboutForm.article_title,
+        article_body: aboutForm.article_body,
+        meta_description: aboutForm.meta_description || null,
+      });
+    }
+    await logActivity("edited", "about_content", undefined, aboutForm.article_title);
+    toast({ title: "আর্টিকেল আপডেট হয়েছে ✅" });
+    setAboutSaving(false);
+  };
+
+  const renderAbout = () => (
+    <div className="space-y-6">
+      {/* Article Editor */}
+      <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center">
+            <FileText className="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <h2 className="text-sm font-bold text-foreground">আর্টিকেল এডিট করুন</h2>
+            <p className="text-[10px] text-muted-foreground">রামগঞ্জ সম্পর্কে পেজের মূল কন্টেন্ট</p>
+          </div>
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">আর্টিকেল শিরোনাম</label>
+          <input
+            className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
+            placeholder="যেমন: রামগঞ্জ সম্পর্কে"
+            value={aboutForm.article_title}
+            onChange={(e) => setAboutForm({ ...aboutForm, article_title: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">মেটা বিবরণ (SEO)</label>
+          <input
+            className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
+            placeholder="সার্চ ইঞ্জিনে দেখানো হবে (ঐচ্ছিক)"
+            value={aboutForm.meta_description}
+            onChange={(e) => setAboutForm({ ...aboutForm, meta_description: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">আর্টিকেল বডি</label>
+          <textarea
+            className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none min-h-[250px] focus:border-primary/40 focus:ring-2 focus:ring-primary/10 font-mono transition-all resize-y"
+            placeholder="রামগঞ্জ সম্পর্কে বিস্তারিত লিখুন..."
+            value={aboutForm.article_body}
+            onChange={(e) => setAboutForm({ ...aboutForm, article_body: e.target.value })}
+          />
+          <p className="text-[10px] text-muted-foreground mt-1">নতুন লাইনে লিখলে নতুন প্যারাগ্রাফ তৈরি হবে</p>
+        </div>
+        <button
+          onClick={saveAboutContent}
+          disabled={aboutSaving}
+          className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
+        >
+          <Save className="w-4 h-4" /> {aboutSaving ? "সেভ হচ্ছে..." : "আর্টিকেল সেভ করুন"}
+        </button>
+      </div>
+
+      {/* Timeline Management Section */}
+      <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center">
+              <History className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-foreground">টাইমলাইন ম্যানেজমেন্ট</h2>
+              <p className="text-[10px] text-muted-foreground">ঐতিহাসিক ইভেন্ট যোগ/এডিট করুন</p>
+            </div>
+          </div>
+          <button
+            onClick={() => { setActiveTab("timeline"); }}
+            className="text-xs text-primary font-semibold flex items-center gap-1 hover:underline"
+          >
+            সব দেখুন <ChevronRight className="w-3 h-3" />
+          </button>
+        </div>
+        <button
+          onClick={() => { setActiveTab("timeline"); setShowLegacyForm(true); }}
+          className="w-full py-3 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors"
+        >
+          <Plus className="w-4 h-4" /> নতুন টাইমলাইন ইভেন্ট যোগ করুন
+        </button>
+      </div>
+    </div>
+  );
+
   const renderSiteSettings = () => <SiteSettingsPanel />;
 
   const refreshSliderItems = async () => {
@@ -1309,6 +1423,7 @@ const AdminDashboard = () => {
       case "news": return renderNews();
       case "slider": return renderSlider();
       case "advertisements": return renderAdvertisements();
+      case "about": return renderAbout();
       case "site_settings": return renderSiteSettings();
       default: return renderLegacy();
     }
