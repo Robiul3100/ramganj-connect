@@ -1039,7 +1039,10 @@ const AdminDashboard = () => {
           <div className="flex-1 min-w-0">
             <h3 className="font-bold text-foreground text-sm line-clamp-1">{item.title}</h3>
             {item.description && <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{item.description}</p>}
-            <p className="text-[10px] text-muted-foreground mt-0.5">ক্রম: {item.sort_order}</p>
+            <div className="flex items-center gap-2 mt-0.5">
+              <p className="text-[10px] text-muted-foreground">ক্রম: {item.sort_order}</p>
+              <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">• 👆 {item.click_count ?? 0} ক্লিক</span>
+            </div>
             <div className="flex gap-1.5 mt-2 flex-wrap">
               <ActionBtn variant="info" onClick={() => { setAdEditId(item.id); setAdForm({ title: item.title, description: item.description || "", image_url: item.image_url || "", link_url: item.link_url || "", sort_order: item.sort_order }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
               <button onClick={() => toggleAdActive(item.id, item.is_active)}

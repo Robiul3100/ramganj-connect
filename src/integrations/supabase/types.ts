@@ -97,6 +97,7 @@ export type Database = {
       }
       advertisements: {
         Row: {
+          click_count: number
           created_at: string
           description: string | null
           id: string
@@ -108,6 +109,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          click_count?: number
           created_at?: string
           description?: string | null
           id?: string
@@ -119,6 +121,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          click_count?: number
           created_at?: string
           description?: string | null
           id?: string
@@ -916,6 +919,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_ad_click: { Args: { ad_id: string }; Returns: undefined }
       increment_category_view: { Args: { cat_id: string }; Returns: undefined }
       increment_news_view: { Args: { news_id: string }; Returns: undefined }
     }
