@@ -175,7 +175,7 @@ const buildMetadata = (slug: string, data: Record<string, string>) => {
   return meta;
 };
 
-// ──── Doctor Card (matches reference image) ────
+// ──── Doctor Card (polished reference-matched design) ────
 const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: string; bg: string; gradient: string }; onShare: () => void }) => {
   const m = s.metadata || {};
   const degrees: string[] = m.degrees || [];
@@ -184,29 +184,57 @@ const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: stri
   const allTags = [...degrees, ...(specialty ? [specialty] : [])];
 
   return (
-    <div className="rounded-2xl overflow-hidden bg-card shadow-md hover:shadow-xl transition-all duration-300" style={{ border: `1.5px solid ${colors.accent}30` }}>
+    <div className="rounded-[20px] overflow-hidden bg-card shadow-[0_4px_24px_-4px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_32px_-4px_rgba(0,0,0,0.15)] transition-all duration-300 relative group">
+      {/* Accent top bar */}
+      <div className="h-1.5 w-full" style={{ background: colors.gradient }} />
+
       {s.is_featured && (
-        <div className="flex items-center gap-1.5 px-4 pt-3">
-          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-          <span className="text-[11px] font-bold text-amber-600">ফিচার্ড</span>
+        <div className="absolute top-3.5 right-3 z-10 flex items-center gap-1 bg-amber-50 dark:bg-amber-900/40 px-2.5 py-1 rounded-full shadow-sm">
+          <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+          <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">ফিচার্ড</span>
         </div>
       )}
 
-      {/* ── Top: Profile Photo + Name + Tags ── */}
-      <div className="px-5 pt-5 pb-4 flex items-center gap-4" style={{ background: `linear-gradient(160deg, hsl(170,45%,95%), hsl(200,35%,97%), hsl(0,0%,100%))` }}>
-        {s.image_url ? (
-          <img src={s.image_url} alt={s.title} className="w-[72px] h-[72px] rounded-full object-cover shrink-0 shadow-md ring-[3px] ring-white" style={{ border: `2.5px solid ${colors.accent}40` }} />
-        ) : (
-          <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center shrink-0 shadow-md ring-[3px] ring-white" style={{ background: `linear-gradient(135deg, ${colors.bg}, hsl(0,0%,96%))`, border: `2.5px solid ${colors.accent}40` }}>
-            <User className="w-8 h-8" style={{ color: colors.accent }} />
-          </div>
-        )}
-        <div className="flex-1 min-w-0">
-          <h3 className="font-extrabold text-foreground text-[15px] leading-snug tracking-tight">{s.title}</h3>
+      {/* ── Profile Section ── */}
+      <div className="px-5 pt-5 pb-4 flex items-start gap-4">
+        <div className="relative shrink-0">
+          {s.image_url ? (
+            <img
+              src={s.image_url}
+              alt={s.title}
+              className="w-20 h-20 rounded-full object-cover shadow-lg"
+              style={{ border: `3px solid ${colors.accent}35`, boxShadow: `0 4px 16px -2px ${colors.accent}25` }}
+            />
+          ) : (
+            <div
+              className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
+              style={{
+                background: `linear-gradient(145deg, ${colors.bg}, hsl(0,0%,97%))`,
+                border: `3px solid ${colors.accent}35`,
+                boxShadow: `0 4px 16px -2px ${colors.accent}25`,
+              }}
+            >
+              <User className="w-9 h-9" style={{ color: colors.accent }} />
+            </div>
+          )}
+          {/* Online dot */}
+          <div className="absolute bottom-0.5 right-0.5 w-4 h-4 rounded-full bg-emerald-500 border-[2.5px] border-card" />
+        </div>
+
+        <div className="flex-1 min-w-0 pt-1">
+          <h3 className="font-extrabold text-foreground text-base leading-tight tracking-tight line-clamp-1">{s.title}</h3>
           {allTags.length > 0 && (
             <div className="flex gap-1.5 mt-2 flex-wrap">
               {allTags.map((tag, i) => (
-                <span key={i} className="text-[10px] font-bold px-2.5 py-[3px] rounded-full" style={{ background: tagColors[i % tagColors.length].bg, color: tagColors[i % tagColors.length].text }}>
+                <span
+                  key={i}
+                  className="text-[10px] font-bold px-2.5 py-[3px] rounded-full border"
+                  style={{
+                    background: tagColors[i % tagColors.length].bg,
+                    color: tagColors[i % tagColors.length].text,
+                    borderColor: `${tagColors[i % tagColors.length].text}20`,
+                  }}
+                >
                   {tag}
                 </span>
               ))}
@@ -215,43 +243,58 @@ const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: stri
         </div>
       </div>
 
-      {/* ── Info Section ── */}
-      <div className="px-5 py-3 space-y-2 border-t" style={{ borderColor: `${colors.accent}20` }}>
+      {/* ── Details Section ── */}
+      <div className="mx-4 mb-3 rounded-xl px-4 py-3 space-y-2" style={{ background: `${colors.accent}08` }}>
         {hospital && (
-          <div className="flex items-start gap-2">
-            <Building2 className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color: colors.accent }} />
-            <p className="text-[13px] font-bold text-foreground leading-snug">{hospital}</p>
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${colors.accent}15` }}>
+              <Building2 className="w-3.5 h-3.5" style={{ color: colors.accent }} />
+            </div>
+            <p className="text-[13px] font-bold text-foreground leading-snug line-clamp-1">{hospital}</p>
           </div>
         )}
         {s.address && (
-          <div className="flex items-start gap-2">
-            <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 text-muted-foreground" />
-            <p className="text-xs text-muted-foreground leading-snug">{s.address}{s.area ? `, ${s.area}` : ""}</p>
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-muted/60">
+              <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+            </div>
+            <p className="text-xs text-muted-foreground leading-snug line-clamp-1">{s.address}{s.area ? `, ${s.area}` : ""}</p>
           </div>
         )}
         {s.description && (
-          <p className="text-xs text-muted-foreground line-clamp-2 pl-[22px]">{s.description}</p>
+          <p className="text-[11px] text-muted-foreground/80 line-clamp-2 pl-[38px] leading-relaxed">{s.description}</p>
         )}
       </div>
 
       {/* ── Contact Badge ── */}
       {(s.phone || s.whatsapp) && (
-        <div className="px-5 py-2">
-          <p className="text-[11px] font-bold text-center rounded-full py-1.5 mx-auto w-fit px-5" style={{ background: "hsl(45,65%,92%)", color: "hsl(35,55%,32%)" }}>
-            সিরিয়ালের জন্য যোগাযোগ করুন
+        <div className="px-4 pb-2">
+          <p className="text-[11px] font-bold text-center rounded-full py-1.5 mx-auto"
+            style={{ background: "hsl(45,65%,92%)", color: "hsl(35,55%,32%)" }}>
+            📞 সিরিয়ালের জন্য যোগাযোগ করুন
           </p>
         </div>
       )}
 
-      {/* ── CTA Buttons: কল করুন + হোয়াটসঅ্যাপ ── */}
-      <div className="flex gap-2.5 px-4 pb-4 pt-1">
+      {/* ── CTA Buttons ── */}
+      <div className="flex gap-2.5 px-4 pb-4 pt-1.5">
         {s.phone && (
-          <a href={`tel:${s.phone}`} className="flex-1 py-3 rounded-xl text-[13px] font-extrabold flex items-center justify-center gap-2 text-white shadow-sm active:scale-[0.97] transition-transform" style={{ background: "linear-gradient(135deg, hsl(142,62%,42%), hsl(152,65%,48%))" }}>
+          <a
+            href={`tel:${s.phone}`}
+            className="flex-1 py-3 rounded-xl text-[13px] font-extrabold flex items-center justify-center gap-2 text-white shadow-md hover:shadow-lg active:scale-[0.97] transition-all duration-200"
+            style={{ background: `linear-gradient(135deg, ${colors.accent}, ${colors.accent}dd)` }}
+          >
             <Phone className="w-4 h-4" /> কল করুন
           </a>
         )}
         {s.whatsapp && (
-          <a href={`https://wa.me/88${s.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex-1 py-3 rounded-xl text-[13px] font-extrabold flex items-center justify-center gap-2 text-white shadow-sm active:scale-[0.97] transition-transform" style={{ background: "linear-gradient(135deg, hsl(148,58%,36%), hsl(158,62%,42%))" }}>
+          <a
+            href={`https://wa.me/88${s.whatsapp}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 py-3 rounded-xl text-[13px] font-extrabold flex items-center justify-center gap-2 text-white shadow-md hover:shadow-lg active:scale-[0.97] transition-all duration-200"
+            style={{ background: "linear-gradient(135deg, hsl(142,70%,38%), hsl(152,65%,45%))" }}
+          >
             <MessageCircle className="w-4 h-4" /> হোয়াটসঅ্যাপ
           </a>
         )}
