@@ -248,3 +248,26 @@
 .ad-shine {
   animation: ad-shine 3s ease-in-out infinite;
 }
+
+/* Service icon animations */
+@keyframes icon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+@keyframes icon-bounce {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-3px); }
+  60% { transform: translateY(-1px); }
+}
+@keyframes icon-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+@keyframes icon-spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-icon-float { animation: icon-float 3s ease-in-out infinite; }
+.animate-icon-bounce { animation: icon-bounce 2s ease-in-out infinite; }
+.animate-icon-pulse { animation: icon-pulse 2s ease-in-out infinite; }
+.animate-icon-spin-slow { animation: icon-spin-slow 20s linear infinite; }
