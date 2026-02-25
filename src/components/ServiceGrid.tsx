@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye } from "lucide-react";
+import { Eye, Megaphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 // Beautiful custom SVG icons for each service category
@@ -447,32 +447,51 @@ interface Category {
 
 const newsItem = { id: "news-static", name: "খবর ও সংবাদ", slug: "news", icon: "Newspaper", sort_order: -1, description: "সকল খবর ও সংবাদ", view_count: 0 };
 
-const AdCard = () => (
-  <div className="rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-4 flex items-center gap-3">
-    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-      <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 text-primary">
-        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" opacity="0.3" stroke="currentColor" strokeWidth="1.5"/>
-      </svg>
+interface Ad {
+  id: string;
+  title: string;
+  description?: string | null;
+  image_url?: string | null;
+  link_url?: string | null;
+}
+
+const AdCard = ({ ad }: { ad?: Ad }) => {
+  if (!ad) return null;
+  const content = (
+    <div className="rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-3 flex items-center gap-3 overflow-hidden">
+      {ad.image_url ? (
+        <img src={ad.image_url} alt={ad.title} className="w-14 h-14 rounded-xl object-cover shrink-0" />
+      ) : (
+        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+          <Megaphone className="w-5 h-5 text-primary" />
+        </div>
+      )}
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-bold text-primary truncate">{ad.title}</p>
+        {ad.description && <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{ad.description}</p>}
+      </div>
+      <span className="text-[10px] font-semibold text-primary/60 bg-primary/10 px-2 py-0.5 rounded-full shrink-0">AD</span>
     </div>
-    <div className="flex-1 min-w-0">
-      <p className="text-xs font-bold text-primary">বিজ্ঞাপন স্পেস</p>
-      <p className="text-[10px] text-muted-foreground mt-0.5">এখানে আপনার বিজ্ঞাপন দিন</p>
-    </div>
-    <span className="text-[10px] font-semibold text-primary/60 bg-primary/10 px-2 py-0.5 rounded-full">AD</span>
-  </div>
-);
+  );
+  return ad.link_url ? <a href={ad.link_url} target="_blank" rel="noopener noreferrer">{content}</a> : content;
+};
 
 const ServiceGrid = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [ads, setAds] = useState<Ad[]>([]);
   const [viewMode, setViewMode] = useState<"grid" | "card">("grid");
 
   useEffect(() => {
-    const fetch = async () => {
-      const { data } = await supabase.from("service_categories").select("*").eq("is_active", true).order("sort_order");
-      setCategories((data as Category[]) || []);
+    const fetchData = async () => {
+      const [catRes, adRes] = await Promise.all([
+        supabase.from("service_categories").select("*").eq("is_active", true).order("sort_order"),
+        (supabase.from as any)("advertisements").select("*").eq("is_active", true).order("sort_order"),
+      ]);
+      setCategories((catRes.data as Category[]) || []);
+      setAds((adRes.data as Ad[]) || []);
     };
-    fetch();
+    fetchData();
   }, []);
 
   const allItems = [newsItem as Category, ...categories];
@@ -568,7 +587,7 @@ const ServiceGrid = () => {
                     <Eye className="w-3 h-3" /> {cat.view_count ?? 0}
                   </span>
                 </button>
-                {(index + 1) % 5 === 0 && <div className="mt-2.5"><AdCard /></div>}
+                {(index + 1) % 5 === 0 && ads.length > 0 && <div className="mt-2.5"><AdCard ad={ads[Math.floor(index / 5) % ads.length]} /></div>}
               </div>
             );
           })}

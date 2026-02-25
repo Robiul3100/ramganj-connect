@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Eye, LayoutGrid, List } from "lucide-react";
+import { Search, Eye, LayoutGrid, List, Megaphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
 import BottomNav from "@/components/BottomNav";
@@ -65,18 +65,52 @@ interface Category {
   view_count?: number;
 }
 
+interface Ad {
+  id: string;
+  title: string;
+  description?: string | null;
+  image_url?: string | null;
+  link_url?: string | null;
+}
+
+const DynamicAdCard = ({ ad }: { ad?: Ad }) => {
+  if (!ad) return null;
+  const content = (
+    <div className="rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-3 flex items-center gap-3 overflow-hidden">
+      {ad.image_url ? (
+        <img src={ad.image_url} alt={ad.title} className="w-14 h-14 rounded-xl object-cover shrink-0" />
+      ) : (
+        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+          <Megaphone className="w-5 h-5 text-primary" />
+        </div>
+      )}
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-bold text-primary truncate">{ad.title}</p>
+        {ad.description && <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{ad.description}</p>}
+      </div>
+      <span className="text-[10px] font-semibold text-primary/60 bg-primary/10 px-2 py-0.5 rounded-full shrink-0">AD</span>
+    </div>
+  );
+  return ad.link_url ? <a href={ad.link_url} target="_blank" rel="noopener noreferrer">{content}</a> : content;
+};
+
 const Services = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [ads, setAds] = useState<Ad[]>([]);
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "card">("grid");
 
   useEffect(() => {
-    const fetchCats = async () => {
-      const { data } = await supabase.from("service_categories").select("*").eq("is_active", true).order("sort_order");
-      setCategories((data as Category[]) || []);
+    const fetchData = async () => {
+      const [catRes, adRes] = await Promise.all([
+        supabase.from("service_categories").select("*").eq("is_active", true).order("sort_order"),
+        (supabase.from as any)("advertisements").select("*").eq("is_active", true).order("sort_order"),
+      ]);
+      setCategories((catRes.data as Category[]) || []);
+      setAds((adRes.data as Ad[]) || []);
     };
-    fetchCats();
+    fetchData();
   }, []);
 
   const filtered = categories.filter(c => c.name.toLowerCase().includes(search.toLowerCase()));
@@ -92,19 +126,6 @@ const Services = () => {
       navigator.vibrate(30);
     }
   };
-
-  const AdCard = () => (
-    <div className="rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-4 flex items-center gap-3">
-      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-        <Tag className="w-5 h-5 text-primary" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-bold text-primary">বিজ্ঞাপন স্পেস</p>
-        <p className="text-[10px] text-muted-foreground mt-0.5">এখানে আপনার বিজ্ঞাপন দিন</p>
-      </div>
-      <span className="text-[10px] font-semibold text-primary/60 bg-primary/10 px-2 py-0.5 rounded-full">AD</span>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-background max-w-4xl mx-auto pb-20">
@@ -173,7 +194,7 @@ const Services = () => {
                       <Eye className="w-3 h-3" /> {cat.view_count ?? 0}
                     </span>
                   </button>
-                  {(index + 1) % 5 === 0 && <div className="mt-2.5"><AdCard /></div>}
+                  {(index + 1) % 5 === 0 && ads.length > 0 && <div className="mt-2.5"><DynamicAdCard ad={ads[Math.floor(index / 5) % ads.length]} /></div>}
                 </div>
               );
             })}

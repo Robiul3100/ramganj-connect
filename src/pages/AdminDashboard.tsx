@@ -19,7 +19,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import SiteSettingsPanel from "@/components/SiteSettingsPanel";
 
-type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings";
+type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements";
 
 const tabGroups = [
   {
@@ -50,6 +50,7 @@ const tabGroups = [
     items: [
       { id: "announcements" as Tab, label: "ঘোষণা", icon: Megaphone },
       { id: "slider" as Tab, label: "স্লাইডার", icon: SlidersHorizontal },
+      { id: "advertisements" as Tab, label: "বিজ্ঞাপন", icon: ImageIcon },
       { id: "about" as Tab, label: "সম্পর্কে", icon: Info },
       { id: "timeline" as Tab, label: "টাইমলাইন", icon: History },
     ],
@@ -91,7 +92,10 @@ const AdminDashboard = () => {
   const [sliderForm, setSliderForm] = useState({ title: "", image_url: "", sort_order: 0 });
   const [sliderEditId, setSliderEditId] = useState<string | null>(null);
   const [sliderUploading, setSliderUploading] = useState(false);
-
+  const [adItems, setAdItems] = useState<any[]>([]);
+  const [adForm, setAdForm] = useState({ title: "", description: "", image_url: "", link_url: "", sort_order: 0 });
+  const [adEditId, setAdEditId] = useState<string | null>(null);
+  const [adUploading, setAdUploading] = useState(false);
   // --- All business logic remains exactly the same ---
   useEffect(() => {
     const checkAuth = async () => {
@@ -204,6 +208,15 @@ const AdminDashboard = () => {
         setLoading(false);
       };
       fetchSlider();
+    }
+    if (activeTab === "advertisements") {
+      const fetchAds = async () => {
+        setLoading(true);
+        const { data } = await (supabase.from as any)("advertisements").select("*").order("sort_order");
+        setAdItems(data || []);
+        setLoading(false);
+      };
+      fetchAds();
     }
   }, [activeTab]);
 
@@ -476,6 +489,7 @@ const AdminDashboard = () => {
           {[
             { label: "ঘোষণা", tab: "announcements" as Tab, icon: Megaphone, gradient: "from-red-500 to-rose-500" },
             { label: "স্লাইডার", tab: "slider" as Tab, icon: SlidersHorizontal, gradient: "from-blue-500 to-sky-500" },
+            { label: "বিজ্ঞাপন", tab: "advertisements" as Tab, icon: ImageIcon, gradient: "from-yellow-500 to-orange-500" },
             { label: "সম্পর্কে", tab: "about" as Tab, icon: Info, gradient: "from-teal-500 to-cyan-500" },
             { label: "টাইমলাইন", tab: "timeline" as Tab, icon: History, gradient: "from-violet-500 to-indigo-500" },
             { label: "জরুরি কল", tab: "emergency" as Tab, icon: Phone, gradient: "from-orange-500 to-amber-500" },
@@ -924,6 +938,122 @@ const AdminDashboard = () => {
     </div>
   );
 
+  // ========== ADVERTISEMENTS CRUD ==========
+  const handleAdUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAdUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `ads/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("media").upload(path, file);
+    if (error) { toast({ title: "আপলোড ব্যর্থ", variant: "destructive" }); setAdUploading(false); return; }
+    const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+    setAdForm({ ...adForm, image_url: urlData.publicUrl });
+    setAdUploading(false);
+  };
+
+  const saveAd = async () => {
+    if (!adForm.title.trim()) { toast({ title: "শিরোনাম দিন", variant: "destructive" }); return; }
+    if (adEditId) {
+      await (supabase.from as any)("advertisements").update({ title: adForm.title, description: adForm.description || null, image_url: adForm.image_url || null, link_url: adForm.link_url || null, sort_order: adForm.sort_order }).eq("id", adEditId);
+      await logActivity("edited", "advertisements", adEditId, adForm.title);
+      toast({ title: "বিজ্ঞাপন আপডেট হয়েছে ✅" });
+    } else {
+      await (supabase.from as any)("advertisements").insert({ title: adForm.title, description: adForm.description || null, image_url: adForm.image_url || null, link_url: adForm.link_url || null, sort_order: adForm.sort_order });
+      await logActivity("created", "advertisements", undefined, adForm.title);
+      toast({ title: "বিজ্ঞাপন যোগ হয়েছে ✅" });
+    }
+    setAdForm({ title: "", description: "", image_url: "", link_url: "", sort_order: 0 });
+    setAdEditId(null);
+    const { data } = await (supabase.from as any)("advertisements").select("*").order("sort_order");
+    setAdItems(data || []);
+  };
+
+  const deleteAd = async (id: string, title: string) => {
+    if (!confirm("এই বিজ্ঞাপন মুছে ফেলতে চান?")) return;
+    await (supabase.from as any)("advertisements").delete().eq("id", id);
+    await logActivity("deleted", "advertisements", id, title);
+    toast({ title: "মুছে ফেলা হয়েছে" });
+    setAdItems(adItems.filter((a) => a.id !== id));
+  };
+
+  const toggleAdActive = async (id: string, current: boolean) => {
+    await (supabase.from as any)("advertisements").update({ is_active: !current }).eq("id", id);
+    setAdItems(adItems.map((a) => a.id === id ? { ...a, is_active: !current } : a));
+    toast({ title: !current ? "সক্রিয় করা হয়েছে" : "নিষ্ক্রিয় করা হয়েছে" });
+  };
+
+  const renderAdvertisements = () => (
+    <div className="space-y-4">
+      <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <ImageIcon className="w-4 h-4 text-primary" />
+          </div>
+          <h2 className="text-sm font-bold text-foreground">{adEditId ? "বিজ্ঞাপন এডিট" : "নতুন বিজ্ঞাপন যোগ করুন"}</h2>
+        </div>
+        <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" placeholder="বিজ্ঞাপনের শিরোনাম" value={adForm.title} onChange={(e) => setAdForm({ ...adForm, title: e.target.value })} />
+        <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" placeholder="বিবরণ (ঐচ্ছিক)" value={adForm.description} onChange={(e) => setAdForm({ ...adForm, description: e.target.value })} />
+        <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" placeholder="লিংক URL (ঐচ্ছিক)" value={adForm.link_url} onChange={(e) => setAdForm({ ...adForm, link_url: e.target.value })} />
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">ক্রম (Sort Order)</label>
+          <input type="number" className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" placeholder="0" value={adForm.sort_order} onChange={(e) => setAdForm({ ...adForm, sort_order: parseInt(e.target.value) || 0 })} />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">বিজ্ঞাপনের ছবি</label>
+          <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" placeholder="ছবির লিংক (URL)" value={adForm.image_url} onChange={(e) => setAdForm({ ...adForm, image_url: e.target.value })} />
+          <div className="flex items-center gap-3 mt-2">
+            <label className="inline-flex items-center gap-2 text-xs text-primary font-semibold cursor-pointer bg-primary/10 px-4 py-2.5 rounded-xl hover:bg-primary/15 transition-colors">
+              <ImageIcon className="w-4 h-4" /> {adUploading ? "আপলোড হচ্ছে..." : "ছবি আপলোড"}
+              <input type="file" accept="image/*" className="hidden" onChange={handleAdUpload} disabled={adUploading} />
+            </label>
+            {adForm.image_url && <img src={adForm.image_url} alt="preview" className="w-20 h-14 rounded-xl object-cover border border-border" />}
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={saveAd} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+            <Save className="w-4 h-4" /> {adEditId ? "আপডেট" : "যোগ করুন"}
+          </button>
+          {adEditId && (
+            <button onClick={() => { setAdEditId(null); setAdForm({ title: "", description: "", image_url: "", link_url: "", sort_order: 0 }); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
+              বাতিল
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> {adItems.length}টি বিজ্ঞাপন</span>
+      </div>
+      {loading ? <LoadingState /> : adItems.length === 0 ? <EmptyState /> : adItems.map((item: any) => (
+        <div key={item.id} className="bg-card border border-border rounded-2xl p-4 flex gap-3 hover:shadow-sm transition-all">
+          {item.image_url ? (
+            <div className="w-24 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
+              <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" />
+            </div>
+          ) : (
+            <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <ImageIcon className="w-6 h-6 text-primary/40" />
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-foreground text-sm line-clamp-1">{item.title}</h3>
+            {item.description && <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{item.description}</p>}
+            <p className="text-[10px] text-muted-foreground mt-0.5">ক্রম: {item.sort_order}</p>
+            <div className="flex gap-1.5 mt-2 flex-wrap">
+              <ActionBtn variant="info" onClick={() => { setAdEditId(item.id); setAdForm({ title: item.title, description: item.description || "", image_url: item.image_url || "", link_url: item.link_url || "", sort_order: item.sort_order }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
+              <button onClick={() => toggleAdActive(item.id, item.is_active)}
+                className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-colors ${item.is_active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+                {item.is_active ? "✅ সক্রিয়" : "⏸ নিষ্ক্রিয়"}
+              </button>
+              <ActionBtn variant="danger" onClick={() => deleteAd(item.id, item.title)} icon={<Trash2 className="w-3 h-3" />} label="মুছুন" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard": return renderDashboard();
@@ -933,6 +1063,7 @@ const AdminDashboard = () => {
       case "users": return renderUsers();
       case "news": return renderNews();
       case "slider": return renderSlider();
+      case "advertisements": return renderAdvertisements();
       case "site_settings": return renderSiteSettings();
       default: return renderLegacy();
     }
