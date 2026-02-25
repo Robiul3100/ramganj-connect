@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 // Animated colorful SVG icons for each service category
 // Border colors matching each icon's theme
-const borderColorMap: Record<string, string> = {
+export const borderColorMap: Record<string, string> = {
   Stethoscope: "hsl(195,80%,70%)",
   Building2: "hsl(160,60%,70%)",
   Pill: "hsl(150,55%,70%)",
@@ -46,9 +46,9 @@ const borderColorMap: Record<string, string> = {
   SearchX: "hsl(20,72%,72%)",
 };
 
-const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
+export const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
   Stethoscope: {
-    bg: "linear-gradient(135deg, hsl(185,75%,92%), hsl(195,80%,86%))",
+    bg: "linear-gradient(135deg, hsl(185,50%,95%), hsl(195,55%,92%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="steth-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(185,70%,50%)"/><stop offset="100%" stopColor="hsl(200,80%,40%)"/></linearGradient></defs>
@@ -62,7 +62,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Building2: {
-    bg: "linear-gradient(135deg, hsl(150,60%,92%), hsl(165,55%,86%))",
+    bg: "linear-gradient(135deg, hsl(150,45%,95%), hsl(165,50%,92%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="bld-g" x1="0" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(150,60%,50%)"/><stop offset="100%" stopColor="hsl(165,65%,38%)"/></linearGradient></defs>
@@ -78,7 +78,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Pill: {
-    bg: "linear-gradient(135deg, hsl(160,60%,92%), hsl(145,55%,86%))",
+    bg: "linear-gradient(135deg, hsl(160,45%,95%), hsl(145,50%,92%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-bounce">
         <defs><linearGradient id="pill-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(160,60%,48%)"/><stop offset="100%" stopColor="hsl(140,55%,40%)"/></linearGradient></defs>
@@ -90,7 +90,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   GraduationCap: {
-    bg: "linear-gradient(135deg, hsl(45,90%,92%), hsl(35,85%,86%))",
+    bg: "linear-gradient(135deg, hsl(45,60%,95%), hsl(35,55%,92%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="grad-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(45,90%,50%)"/><stop offset="100%" stopColor="hsl(30,80%,42%)"/></linearGradient></defs>
@@ -103,7 +103,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Store: {
-    bg: "linear-gradient(135deg, hsl(330,55%,93%), hsl(345,60%,88%))",
+    bg: "linear-gradient(135deg, hsl(330,40%,96%), hsl(345,45%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="store-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(330,60%,55%)"/><stop offset="100%" stopColor="hsl(345,65%,45%)"/></linearGradient></defs>
@@ -116,7 +116,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Briefcase: {
-    bg: "linear-gradient(135deg, hsl(220,60%,93%), hsl(235,55%,88%))",
+    bg: "linear-gradient(135deg, hsl(220,45%,96%), hsl(235,40%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="brief-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(220,60%,55%)"/><stop offset="100%" stopColor="hsl(240,55%,45%)"/></linearGradient></defs>
@@ -128,7 +128,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   MapPin: {
-    bg: "linear-gradient(135deg, hsl(0,65%,94%), hsl(350,70%,90%))",
+    bg: "linear-gradient(135deg, hsl(0,45%,96%), hsl(350,50%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-bounce">
         <defs><linearGradient id="pin-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(0,75%,58%)"/><stop offset="100%" stopColor="hsl(350,70%,45%)"/></linearGradient></defs>
@@ -139,7 +139,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Calendar: {
-    bg: "linear-gradient(135deg, hsl(270,60%,93%), hsl(285,55%,88%))",
+    bg: "linear-gradient(135deg, hsl(270,45%,96%), hsl(285,40%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="cal-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(270,65%,55%)"/><stop offset="100%" stopColor="hsl(290,60%,45%)"/></linearGradient></defs>
@@ -153,7 +153,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Globe: {
-    bg: "linear-gradient(135deg, hsl(195,75%,92%), hsl(210,70%,86%))",
+    bg: "linear-gradient(135deg, hsl(195,50%,95%), hsl(210,45%,92%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-spin-slow">
         <defs><linearGradient id="globe-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(195,75%,52%)"/><stop offset="100%" stopColor="hsl(215,70%,42%)"/></linearGradient></defs>
@@ -166,7 +166,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Ambulance: {
-    bg: "linear-gradient(135deg, hsl(0,70%,94%), hsl(355,65%,90%))",
+    bg: "linear-gradient(135deg, hsl(0,50%,96%), hsl(355,45%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="amb-g" x1="0" y1="0" x2="1" y2="0.5"><stop offset="0%" stopColor="hsl(0,75%,55%)"/><stop offset="100%" stopColor="hsl(350,70%,48%)"/></linearGradient></defs>
@@ -179,7 +179,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Shield: {
-    bg: "linear-gradient(135deg, hsl(225,50%,93%), hsl(240,45%,88%))",
+    bg: "linear-gradient(135deg, hsl(225,35%,96%), hsl(240,30%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="shield-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(225,55%,55%)"/><stop offset="100%" stopColor="hsl(240,50%,42%)"/></linearGradient></defs>
@@ -189,7 +189,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Flame: {
-    bg: "linear-gradient(135deg, hsl(20,85%,93%), hsl(10,80%,88%))",
+    bg: "linear-gradient(135deg, hsl(20,55%,96%), hsl(10,50%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="flame-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(40,95%,55%)"/><stop offset="50%" stopColor="hsl(20,90%,50%)"/><stop offset="100%" stopColor="hsl(5,80%,45%)"/></linearGradient></defs>
@@ -199,7 +199,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Bus: {
-    bg: "linear-gradient(135deg, hsl(210,50%,93%), hsl(220,45%,88%))",
+    bg: "linear-gradient(135deg, hsl(210,35%,96%), hsl(220,30%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="bus-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(210,55%,52%)"/><stop offset="100%" stopColor="hsl(225,50%,42%)"/></linearGradient></defs>
@@ -215,7 +215,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Zap: {
-    bg: "linear-gradient(135deg, hsl(50,85%,92%), hsl(40,80%,86%))",
+    bg: "linear-gradient(135deg, hsl(50,55%,95%), hsl(40,50%,92%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-pulse">
         <defs><linearGradient id="zap-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(50,95%,55%)"/><stop offset="100%" stopColor="hsl(35,90%,45%)"/></linearGradient></defs>
@@ -226,7 +226,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Scale: {
-    bg: "linear-gradient(135deg, hsl(225,35%,93%), hsl(235,30%,88%))",
+    bg: "linear-gradient(135deg, hsl(225,25%,96%), hsl(235,20%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="scale-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(225,40%,50%)"/><stop offset="100%" stopColor="hsl(240,35%,42%)"/></linearGradient></defs>
@@ -239,7 +239,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Landmark: {
-    bg: "linear-gradient(135deg, hsl(170,60%,92%), hsl(185,55%,86%))",
+    bg: "linear-gradient(135deg, hsl(170,45%,95%), hsl(185,40%,92%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="land-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(170,60%,48%)"/><stop offset="100%" stopColor="hsl(185,55%,38%)"/></linearGradient></defs>
@@ -253,7 +253,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Users: {
-    bg: "linear-gradient(135deg, hsl(210,55%,93%), hsl(225,50%,88%))",
+    bg: "linear-gradient(135deg, hsl(210,40%,96%), hsl(225,35%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="users-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(210,55%,55%)"/><stop offset="100%" stopColor="hsl(230,50%,45%)"/></linearGradient></defs>
@@ -265,7 +265,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Package: {
-    bg: "linear-gradient(135deg, hsl(30,65%,93%), hsl(20,60%,88%))",
+    bg: "linear-gradient(135deg, hsl(30,45%,96%), hsl(20,40%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="pkg-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(30,65%,52%)"/><stop offset="100%" stopColor="hsl(15,60%,42%)"/></linearGradient></defs>
@@ -277,7 +277,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Sprout: {
-    bg: "linear-gradient(135deg, hsl(100,55%,92%), hsl(115,50%,86%))",
+    bg: "linear-gradient(135deg, hsl(100,40%,95%), hsl(115,35%,92%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="sprout-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(110,55%,48%)"/><stop offset="100%" stopColor="hsl(130,50%,38%)"/></linearGradient></defs>
@@ -289,7 +289,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Home: {
-    bg: "linear-gradient(135deg, hsl(25,85%,93%), hsl(15,80%,88%))",
+    bg: "linear-gradient(135deg, hsl(25,55%,96%), hsl(15,50%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="home-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(25,85%,52%)"/><stop offset="100%" stopColor="hsl(15,80%,42%)"/></linearGradient></defs>
@@ -302,7 +302,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   BookOpenCheck: {
-    bg: "linear-gradient(135deg, hsl(170,55%,92%), hsl(185,50%,86%))",
+    bg: "linear-gradient(135deg, hsl(170,40%,95%), hsl(185,35%,92%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="book-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(170,55%,48%)"/><stop offset="100%" stopColor="hsl(190,50%,38%)"/></linearGradient></defs>
@@ -313,7 +313,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   UtensilsCrossed: {
-    bg: "linear-gradient(135deg, hsl(30,80%,93%), hsl(20,75%,88%))",
+    bg: "linear-gradient(135deg, hsl(30,55%,96%), hsl(20,50%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="food-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(30,80%,50%)"/><stop offset="100%" stopColor="hsl(15,75%,42%)"/></linearGradient></defs>
@@ -325,7 +325,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Wrench: {
-    bg: "linear-gradient(135deg, hsl(220,35%,93%), hsl(210,30%,88%))",
+    bg: "linear-gradient(135deg, hsl(220,25%,96%), hsl(210,20%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="wrench-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(220,35%,52%)"/><stop offset="100%" stopColor="hsl(210,30%,40%)"/></linearGradient></defs>
@@ -335,7 +335,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Heart: {
-    bg: "linear-gradient(135deg, hsl(340,75%,93%), hsl(355,70%,88%))",
+    bg: "linear-gradient(135deg, hsl(340,50%,96%), hsl(355,45%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-pulse">
         <defs><linearGradient id="heart-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(340,75%,60%)"/><stop offset="100%" stopColor="hsl(355,70%,48%)"/></linearGradient></defs>
@@ -345,7 +345,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Newspaper: {
-    bg: "linear-gradient(135deg, hsl(0,70%,93%), hsl(350,65%,88%))",
+    bg: "linear-gradient(135deg, hsl(0,50%,96%), hsl(350,45%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="news-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(0,70%,55%)"/><stop offset="100%" stopColor="hsl(350,65%,45%)"/></linearGradient></defs>
@@ -358,7 +358,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Activity: {
-    bg: "linear-gradient(135deg, hsl(190,65%,92%), hsl(205,60%,86%))",
+    bg: "linear-gradient(135deg, hsl(190,45%,95%), hsl(205,40%,92%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="act-g" x1="0" y1="0.5" x2="1" y2="0.5"><stop offset="0%" stopColor="hsl(190,65%,48%)"/><stop offset="100%" stopColor="hsl(210,60%,42%)"/></linearGradient></defs>
@@ -368,7 +368,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Car: {
-    bg: "linear-gradient(135deg, hsl(160,60%,92%), hsl(175,55%,86%))",
+    bg: "linear-gradient(135deg, hsl(160,45%,95%), hsl(175,40%,92%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="car-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(160,60%,48%)"/><stop offset="100%" stopColor="hsl(175,55%,38%)"/></linearGradient></defs>
@@ -381,7 +381,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Building: {
-    bg: "linear-gradient(135deg, hsl(210,40%,93%), hsl(225,35%,88%))",
+    bg: "linear-gradient(135deg, hsl(210,30%,96%), hsl(225,25%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="bldg-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(210,45%,55%)"/><stop offset="100%" stopColor="hsl(225,40%,42%)"/></linearGradient></defs>
@@ -395,7 +395,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   TrendingUp: {
-    bg: "linear-gradient(135deg, hsl(140,55%,92%), hsl(155,50%,86%))",
+    bg: "linear-gradient(135deg, hsl(140,40%,95%), hsl(155,35%,92%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="trend-g" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stopColor="hsl(140,55%,48%)"/><stop offset="100%" stopColor="hsl(160,50%,40%)"/></linearGradient></defs>
@@ -407,7 +407,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   BedDouble: {
-    bg: "linear-gradient(135deg, hsl(35,75%,93%), hsl(25,70%,88%))",
+    bg: "linear-gradient(135deg, hsl(35,50%,96%), hsl(25,45%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="bed-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(35,75%,52%)"/><stop offset="100%" stopColor="hsl(20,70%,42%)"/></linearGradient></defs>
@@ -420,7 +420,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Coffee: {
-    bg: "linear-gradient(135deg, hsl(20,75%,93%), hsl(10,70%,88%))",
+    bg: "linear-gradient(135deg, hsl(20,50%,96%), hsl(10,45%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="cof-g" x1="0" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(20,75%,52%)"/><stop offset="100%" stopColor="hsl(10,70%,40%)"/></linearGradient></defs>
@@ -432,7 +432,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Video: {
-    bg: "linear-gradient(135deg, hsl(0,63%,93%), hsl(350,58%,88%))",
+    bg: "linear-gradient(135deg, hsl(0,45%,96%), hsl(350,40%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="vid-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(0,65%,55%)"/><stop offset="100%" stopColor="hsl(350,60%,45%)"/></linearGradient></defs>
@@ -444,7 +444,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   TreePine: {
-    bg: "linear-gradient(135deg, hsl(130,55%,92%), hsl(145,50%,86%))",
+    bg: "linear-gradient(135deg, hsl(130,40%,95%), hsl(145,35%,92%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="tree-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(130,55%,48%)"/><stop offset="100%" stopColor="hsl(150,50%,35%)"/></linearGradient></defs>
@@ -455,7 +455,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Tag: {
-    bg: "linear-gradient(135deg, hsl(210,65%,93%), hsl(225,60%,88%))",
+    bg: "linear-gradient(135deg, hsl(210,45%,96%), hsl(225,40%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="tag-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(210,70%,55%)"/><stop offset="100%" stopColor="hsl(230,65%,45%)"/></linearGradient></defs>
@@ -465,7 +465,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   PenTool: {
-    bg: "linear-gradient(135deg, hsl(250,45%,93%), hsl(265,40%,88%))",
+    bg: "linear-gradient(135deg, hsl(250,30%,96%), hsl(265,25%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="pen-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(250,45%,55%)"/><stop offset="100%" stopColor="hsl(270,40%,45%)"/></linearGradient></defs>
@@ -477,7 +477,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   Umbrella: {
-    bg: "linear-gradient(135deg, hsl(200,65%,92%), hsl(215,60%,86%))",
+    bg: "linear-gradient(135deg, hsl(200,45%,95%), hsl(215,40%,92%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="umb-g" x1="0.5" y1="0" x2="0.5" y2="0.6"><stop offset="0%" stopColor="hsl(200,65%,55%)"/><stop offset="100%" stopColor="hsl(220,60%,45%)"/></linearGradient></defs>
@@ -490,7 +490,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   ShoppingBag: {
-    bg: "linear-gradient(135deg, hsl(330,60%,93%), hsl(345,55%,88%))",
+    bg: "linear-gradient(135deg, hsl(330,42%,96%), hsl(345,38%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="shop-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(330,65%,55%)"/><stop offset="100%" stopColor="hsl(345,60%,45%)"/></linearGradient></defs>
@@ -502,7 +502,7 @@ const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
     ),
   },
   SearchX: {
-    bg: "linear-gradient(135deg, hsl(25,75%,93%), hsl(15,70%,88%))",
+    bg: "linear-gradient(135deg, hsl(25,50%,96%), hsl(15,45%,93%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
         <defs><linearGradient id="sx-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(25,75%,52%)"/><stop offset="100%" stopColor="hsl(10,70%,42%)"/></linearGradient></defs>

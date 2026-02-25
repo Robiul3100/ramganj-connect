@@ -4,57 +4,7 @@ import { Search, Eye, LayoutGrid, List, Megaphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
 import BottomNav from "@/components/BottomNav";
-import {
-  Stethoscope, Building2, Pill, GraduationCap, Store, Tag, Briefcase, MapPin,
-  Calendar, Globe, Ambulance, Shield, Flame, Bus, Zap, Scale, Landmark, Users,
-  Umbrella, Package, Sprout, Home, BookOpenCheck, UtensilsCrossed, Wrench, PenTool, Heart,
-  Activity, Car, Building, TrendingUp, BedDouble, Coffee, Video, TreePine
-} from "lucide-react";
-
-const iconMap: Record<string, any> = {
-  Stethoscope, Building2, Pill, GraduationCap, Store, Tag, Briefcase, MapPin,
-  Calendar, Globe, Ambulance, Shield, Flame, Bus, Zap, Scale, Landmark, Users,
-  Umbrella, Package, Sprout, Home, BookOpenCheck, UtensilsCrossed, Wrench, PenTool, Heart,
-  Activity, Car, Building, TrendingUp, BedDouble, Coffee, Video, TreePine,
-};
-
-const colorMap: Record<string, { color: string; bg: string; border: string }> = {
-  Stethoscope: { color: "hsl(195,80%,40%)", bg: "hsl(185,75%,93%)", border: "hsl(195,80%,70%)" },
-  Building2: { color: "hsl(165,65%,38%)", bg: "hsl(150,60%,93%)", border: "hsl(160,60%,70%)" },
-  Pill: { color: "hsl(145,60%,40%)", bg: "hsl(160,60%,93%)", border: "hsl(150,55%,70%)" },
-  GraduationCap: { color: "hsl(30,80%,42%)", bg: "hsl(45,90%,93%)", border: "hsl(40,85%,72%)" },
-  Store: { color: "hsl(345,65%,45%)", bg: "hsl(330,55%,93%)", border: "hsl(340,60%,75%)" },
-  Tag: { color: "hsl(230,65%,45%)", bg: "hsl(210,65%,93%)", border: "hsl(220,62%,72%)" },
-  Briefcase: { color: "hsl(240,55%,45%)", bg: "hsl(220,60%,93%)", border: "hsl(230,55%,72%)" },
-  MapPin: { color: "hsl(350,70%,45%)", bg: "hsl(0,65%,94%)", border: "hsl(0,70%,75%)" },
-  Calendar: { color: "hsl(290,60%,45%)", bg: "hsl(270,60%,93%)", border: "hsl(280,58%,75%)" },
-  Globe: { color: "hsl(215,70%,42%)", bg: "hsl(195,75%,93%)", border: "hsl(205,70%,70%)" },
-  Ambulance: { color: "hsl(350,70%,48%)", bg: "hsl(0,70%,94%)", border: "hsl(355,68%,75%)" },
-  Shield: { color: "hsl(240,50%,42%)", bg: "hsl(225,50%,93%)", border: "hsl(235,48%,72%)" },
-  Flame: { color: "hsl(5,80%,45%)", bg: "hsl(20,85%,93%)", border: "hsl(15,82%,72%)" },
-  Bus: { color: "hsl(225,50%,42%)", bg: "hsl(210,50%,93%)", border: "hsl(218,48%,72%)" },
-  Zap: { color: "hsl(35,90%,45%)", bg: "hsl(50,85%,93%)", border: "hsl(45,88%,68%)" },
-  Scale: { color: "hsl(240,35%,42%)", bg: "hsl(225,35%,93%)", border: "hsl(230,35%,72%)" },
-  Landmark: { color: "hsl(185,55%,38%)", bg: "hsl(170,60%,93%)", border: "hsl(178,55%,68%)" },
-  Users: { color: "hsl(230,50%,45%)", bg: "hsl(210,55%,93%)", border: "hsl(220,52%,72%)" },
-  Umbrella: { color: "hsl(220,60%,45%)", bg: "hsl(200,65%,93%)", border: "hsl(210,62%,70%)" },
-  Package: { color: "hsl(15,60%,42%)", bg: "hsl(30,65%,93%)", border: "hsl(25,62%,72%)" },
-  Sprout: { color: "hsl(130,50%,38%)", bg: "hsl(100,55%,93%)", border: "hsl(115,50%,68%)" },
-  Home: { color: "hsl(15,80%,42%)", bg: "hsl(25,85%,93%)", border: "hsl(22,82%,72%)" },
-  BookOpenCheck: { color: "hsl(190,50%,38%)", bg: "hsl(170,55%,93%)", border: "hsl(180,52%,68%)" },
-  UtensilsCrossed: { color: "hsl(15,75%,42%)", bg: "hsl(30,80%,93%)", border: "hsl(25,78%,72%)" },
-  Wrench: { color: "hsl(210,30%,40%)", bg: "hsl(220,35%,93%)", border: "hsl(215,32%,70%)" },
-  PenTool: { color: "hsl(270,40%,45%)", bg: "hsl(250,45%,93%)", border: "hsl(260,42%,75%)" },
-  Heart: { color: "hsl(355,70%,48%)", bg: "hsl(340,75%,93%)", border: "hsl(348,72%,75%)" },
-  Activity: { color: "hsl(210,60%,42%)", bg: "hsl(190,65%,93%)", border: "hsl(200,62%,70%)" },
-  Car: { color: "hsl(175,55%,38%)", bg: "hsl(160,60%,93%)", border: "hsl(168,58%,68%)" },
-  Building: { color: "hsl(225,40%,42%)", bg: "hsl(210,40%,93%)", border: "hsl(218,42%,72%)" },
-  TrendingUp: { color: "hsl(160,50%,40%)", bg: "hsl(140,55%,93%)", border: "hsl(150,52%,68%)" },
-  BedDouble: { color: "hsl(20,70%,42%)", bg: "hsl(35,75%,93%)", border: "hsl(30,72%,72%)" },
-  Coffee: { color: "hsl(10,70%,40%)", bg: "hsl(20,75%,93%)", border: "hsl(15,72%,72%)" },
-  Video: { color: "hsl(350,60%,45%)", bg: "hsl(0,63%,93%)", border: "hsl(355,62%,75%)" },
-  TreePine: { color: "hsl(150,50%,35%)", bg: "hsl(130,55%,93%)", border: "hsl(140,52%,68%)" },
-};
+import { SvgIcons, borderColorMap } from "@/components/ServiceGrid";
 
 interface Category {
   id: string;
@@ -94,15 +44,44 @@ const DynamicAdCard = ({ ad }: { ad?: Ad }) => {
   return ad.link_url ? <a href={ad.link_url} target="_blank" rel="noopener noreferrer">{content}</a> : content;
 };
 
+const GridSkeleton = () => (
+  <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+    {Array.from({ length: 18 }).map((_, i) => (
+      <div key={i} className="bg-card rounded-2xl flex flex-col items-center gap-1.5 py-4 px-1.5" style={{ border: "0.8px solid hsl(220,15%,88%)" }}>
+        <div className="w-12 h-12 rounded-xl skeleton-shimmer" />
+        <div className="w-16 h-3 rounded-md skeleton-shimmer" />
+        <div className="w-10 h-2 rounded skeleton-shimmer" />
+      </div>
+    ))}
+  </div>
+);
+
+const CardSkeleton = () => (
+  <div className="flex flex-col gap-2.5">
+    {Array.from({ length: 8 }).map((_, i) => (
+      <div key={i} className="bg-card rounded-2xl flex items-center gap-3.5 p-3.5" style={{ border: "0.8px solid hsl(220,15%,88%)" }}>
+        <div className="w-11 h-11 rounded-xl skeleton-shimmer shrink-0" />
+        <div className="flex-1 space-y-2">
+          <div className="w-3/4 h-3.5 rounded-md skeleton-shimmer" />
+          <div className="w-1/2 h-2.5 rounded skeleton-shimmer" />
+        </div>
+        <div className="w-12 h-5 rounded-full skeleton-shimmer shrink-0" />
+      </div>
+    ))}
+  </div>
+);
+
 const Services = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
   const [ads, setAds] = useState<Ad[]>([]);
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "card">("grid");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const [catRes, adRes] = await Promise.all([
         supabase.from("service_categories").select("*").eq("is_active", true).order("sort_order"),
         (supabase.from as any)("advertisements").select("*").eq("is_active", true).order("sort_order"),
@@ -110,6 +89,7 @@ const Services = () => {
       setCategories((catRes.data as Category[]) || []);
       const now = new Date().toISOString();
       setAds(((adRes.data as Ad[]) || []).filter((a: any) => !a.expire_at || a.expire_at > now));
+      setLoading(false);
     };
     fetchData();
   }, []);
@@ -138,7 +118,7 @@ const Services = () => {
           <input type="text" placeholder="সেবা খুঁজুন..." className="search-input pl-12" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <div className="flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">{filtered.length} টি ক্যাটাগরি</p>
+          <p className="text-xs text-muted-foreground">{loading ? "লোড হচ্ছে..." : `${filtered.length} টি ক্যাটাগরি`}</p>
           <div className="flex items-center gap-1 bg-muted rounded-full p-0.5">
             <button
               onClick={() => handleViewModeChange("grid")}
@@ -155,17 +135,19 @@ const Services = () => {
           </div>
         </div>
 
-        {viewMode === "grid" ? (
+        {loading ? (
+          viewMode === "grid" ? <GridSkeleton /> : <CardSkeleton />
+        ) : viewMode === "grid" ? (
           <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
             {filtered.map((cat) => {
-              const Icon = iconMap[cat.icon] || Tag;
-              const colors = colorMap[cat.icon] || { color: "hsl(210,85%,55%)", bg: "hsl(210,85%,93%)", border: "hsl(210,60%,72%)" };
+              const iconData = SvgIcons[cat.icon] || SvgIcons["Tag"];
+              const bColor = borderColorMap[cat.icon] || "hsl(210,60%,72%)";
               return (
                 <button key={cat.id} onClick={() => handleNavigate(cat)}
                   className="relative bg-card rounded-2xl flex flex-col items-center gap-1.5 py-4 px-1.5 transition-all duration-200 hover:shadow-md hover:scale-105 active:scale-95"
-                  style={{ border: `0.8px solid ${colors.border}` }}>
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: colors.bg, color: colors.color }}>
-                    <Icon className="w-6 h-6" />
+                  style={{ border: `0.8px solid ${bColor}` }}>
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm" style={{ background: iconData.bg }}>
+                    {iconData.svg}
                   </div>
                   <span className="text-[11px] font-semibold text-foreground text-center leading-tight line-clamp-2">{cat.name}</span>
                   <span className="flex items-center gap-0.5 text-[9px] text-muted-foreground">
@@ -178,15 +160,15 @@ const Services = () => {
         ) : (
           <div className="flex flex-col gap-2.5">
             {filtered.map((cat, index) => {
-              const Icon = iconMap[cat.icon] || Tag;
-              const colors = colorMap[cat.icon] || { color: "hsl(210,85%,55%)", bg: "hsl(210,85%,93%)", border: "hsl(210,60%,72%)" };
+              const iconData = SvgIcons[cat.icon] || SvgIcons["Tag"];
+              const bColor = borderColorMap[cat.icon] || "hsl(210,60%,72%)";
               return (
                 <div key={cat.id}>
                   <button onClick={() => handleNavigate(cat)}
                     className="bg-card rounded-2xl flex items-center gap-3.5 p-3.5 w-full text-left transition-all duration-200 hover:shadow-md hover:scale-[1.01] active:scale-[0.98]"
-                    style={{ border: `0.8px solid ${colors.border}` }}>
-                    <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: colors.bg, color: colors.color }}>
-                      <Icon className="w-5 h-5" />
+                    style={{ border: `0.8px solid ${bColor}` }}>
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow-sm" style={{ background: iconData.bg }}>
+                      {iconData.svg}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm font-bold text-foreground leading-tight">{cat.name}</h3>
