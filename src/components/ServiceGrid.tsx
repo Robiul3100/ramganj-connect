@@ -4,6 +4,48 @@ import { Eye, Megaphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 // Animated colorful SVG icons for each service category
+// Border colors matching each icon's theme
+const borderColorMap: Record<string, string> = {
+  Stethoscope: "hsl(195,80%,70%)",
+  Building2: "hsl(160,60%,70%)",
+  Pill: "hsl(150,55%,70%)",
+  GraduationCap: "hsl(40,85%,72%)",
+  Store: "hsl(340,60%,75%)",
+  Briefcase: "hsl(230,55%,72%)",
+  MapPin: "hsl(0,70%,75%)",
+  Calendar: "hsl(280,58%,75%)",
+  Globe: "hsl(205,70%,70%)",
+  Ambulance: "hsl(355,68%,75%)",
+  Shield: "hsl(235,48%,72%)",
+  Flame: "hsl(15,82%,72%)",
+  Bus: "hsl(218,48%,72%)",
+  Zap: "hsl(45,88%,68%)",
+  Scale: "hsl(230,35%,72%)",
+  Landmark: "hsl(178,55%,68%)",
+  Users: "hsl(220,52%,72%)",
+  Package: "hsl(25,62%,72%)",
+  Sprout: "hsl(115,50%,68%)",
+  Home: "hsl(22,82%,72%)",
+  BookOpenCheck: "hsl(180,52%,68%)",
+  UtensilsCrossed: "hsl(25,78%,72%)",
+  Wrench: "hsl(215,32%,70%)",
+  Heart: "hsl(348,72%,75%)",
+  Newspaper: "hsl(355,68%,75%)",
+  Activity: "hsl(200,62%,70%)",
+  Car: "hsl(168,58%,68%)",
+  Building: "hsl(218,42%,72%)",
+  TrendingUp: "hsl(150,52%,68%)",
+  BedDouble: "hsl(30,72%,72%)",
+  Coffee: "hsl(15,72%,72%)",
+  Video: "hsl(355,62%,75%)",
+  TreePine: "hsl(140,52%,68%)",
+  Tag: "hsl(220,62%,72%)",
+  PenTool: "hsl(260,42%,75%)",
+  Umbrella: "hsl(210,62%,70%)",
+  ShoppingBag: "hsl(338,58%,75%)",
+  SearchX: "hsl(20,72%,72%)",
+};
+
 const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
   Stethoscope: {
     bg: "linear-gradient(135deg, hsl(185,80%,85%), hsl(195,85%,75%))",
@@ -579,11 +621,13 @@ const ServiceGrid = () => {
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
           {allItems.map((cat) => {
             const iconData = SvgIcons[cat.icon] || SvgIcons["Tag"];
+            const bColor = borderColorMap[cat.icon] || "hsl(210,60%,72%)";
             return (
               <button
                 key={cat.id}
                 onClick={() => handleNavigate(cat)}
-                className="relative bg-card rounded-2xl border border-border/60 flex flex-col items-center gap-1.5 py-4 px-1.5 h-full transition-all duration-200 hover:shadow-md hover:scale-105 active:scale-95 hover:border-primary/30"
+                className="relative bg-card rounded-2xl flex flex-col items-center gap-1.5 py-4 px-1.5 h-full transition-all duration-200 hover:shadow-md hover:scale-105 active:scale-95"
+                style={{ border: `1.5px solid ${bColor}` }}
               >
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm"
@@ -605,11 +649,13 @@ const ServiceGrid = () => {
         <div className="flex flex-col gap-2.5">
           {allItems.map((cat, index) => {
             const iconData = SvgIcons[cat.icon] || SvgIcons["Tag"];
+            const bColor = borderColorMap[cat.icon] || "hsl(210,60%,72%)";
             return (
               <div key={cat.id}>
                 <button
                   onClick={() => handleNavigate(cat)}
-                  className="bg-card rounded-2xl border border-border/60 flex items-center gap-3.5 p-3.5 w-full text-left transition-all duration-200 hover:shadow-md hover:scale-[1.01] active:scale-[0.98] hover:border-primary/30"
+                  className="bg-card rounded-2xl flex items-center gap-3.5 p-3.5 w-full text-left transition-all duration-200 hover:shadow-md hover:scale-[1.01] active:scale-[0.98]"
+                  style={{ border: `1.5px solid ${bColor}` }}
                 >
                   <div
                     className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
