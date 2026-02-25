@@ -239,3 +239,12 @@
   display: inline-block;
   animation: marquee-text 15s linear infinite;
 }
+
+/* Ad shine animation */
+@keyframes ad-shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.ad-shine {
+  animation: ad-shine 3s ease-in-out infinite;
+}
