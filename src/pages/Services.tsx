@@ -18,42 +18,42 @@ const iconMap: Record<string, any> = {
   Activity, Car, Building, TrendingUp, BedDouble, Coffee, Video, TreePine,
 };
 
-const colorMap: Record<string, { color: string; bg: string }> = {
-  Stethoscope: { color: "hsl(195,80%,40%)", bg: "hsl(185,80%,88%)" },
-  Building2: { color: "hsl(165,65%,38%)", bg: "hsl(150,65%,88%)" },
-  Pill: { color: "hsl(145,60%,40%)", bg: "hsl(160,65%,88%)" },
-  GraduationCap: { color: "hsl(30,80%,42%)", bg: "hsl(45,95%,88%)" },
-  Store: { color: "hsl(345,65%,45%)", bg: "hsl(330,60%,90%)" },
-  Tag: { color: "hsl(230,65%,45%)", bg: "hsl(210,70%,90%)" },
-  Briefcase: { color: "hsl(240,55%,45%)", bg: "hsl(220,65%,90%)" },
-  MapPin: { color: "hsl(350,70%,45%)", bg: "hsl(0,70%,92%)" },
-  Calendar: { color: "hsl(290,60%,45%)", bg: "hsl(270,65%,90%)" },
-  Globe: { color: "hsl(215,70%,42%)", bg: "hsl(195,80%,88%)" },
-  Ambulance: { color: "hsl(350,70%,48%)", bg: "hsl(0,75%,92%)" },
-  Shield: { color: "hsl(240,50%,42%)", bg: "hsl(225,55%,90%)" },
-  Flame: { color: "hsl(5,80%,45%)", bg: "hsl(20,90%,90%)" },
-  Bus: { color: "hsl(225,50%,42%)", bg: "hsl(210,55%,90%)" },
-  Zap: { color: "hsl(35,90%,45%)", bg: "hsl(50,90%,88%)" },
-  Scale: { color: "hsl(240,35%,42%)", bg: "hsl(225,40%,90%)" },
-  Landmark: { color: "hsl(185,55%,38%)", bg: "hsl(170,65%,88%)" },
-  Users: { color: "hsl(230,50%,45%)", bg: "hsl(210,60%,90%)" },
-  Umbrella: { color: "hsl(220,60%,45%)", bg: "hsl(200,70%,88%)" },
-  Package: { color: "hsl(15,60%,42%)", bg: "hsl(30,70%,90%)" },
-  Sprout: { color: "hsl(130,50%,38%)", bg: "hsl(100,60%,88%)" },
-  Home: { color: "hsl(15,80%,42%)", bg: "hsl(25,90%,90%)" },
-  BookOpenCheck: { color: "hsl(190,50%,38%)", bg: "hsl(170,60%,88%)" },
-  UtensilsCrossed: { color: "hsl(15,75%,42%)", bg: "hsl(30,85%,90%)" },
-  Wrench: { color: "hsl(210,30%,40%)", bg: "hsl(220,40%,90%)" },
-  PenTool: { color: "hsl(270,40%,45%)", bg: "hsl(250,50%,90%)" },
-  Heart: { color: "hsl(355,70%,48%)", bg: "hsl(340,80%,90%)" },
-  Activity: { color: "hsl(210,60%,42%)", bg: "hsl(190,70%,88%)" },
-  Car: { color: "hsl(175,55%,38%)", bg: "hsl(160,65%,88%)" },
-  Building: { color: "hsl(225,40%,42%)", bg: "hsl(210,45%,90%)" },
-  TrendingUp: { color: "hsl(160,50%,40%)", bg: "hsl(140,60%,88%)" },
-  BedDouble: { color: "hsl(20,70%,42%)", bg: "hsl(35,80%,90%)" },
-  Coffee: { color: "hsl(10,70%,40%)", bg: "hsl(20,80%,90%)" },
-  Video: { color: "hsl(350,60%,45%)", bg: "hsl(0,68%,90%)" },
-  TreePine: { color: "hsl(150,50%,35%)", bg: "hsl(130,60%,88%)" },
+const colorMap: Record<string, { color: string; bg: string; border: string }> = {
+  Stethoscope: { color: "hsl(195,80%,40%)", bg: "hsl(185,75%,93%)", border: "hsl(195,80%,70%)" },
+  Building2: { color: "hsl(165,65%,38%)", bg: "hsl(150,60%,93%)", border: "hsl(160,60%,70%)" },
+  Pill: { color: "hsl(145,60%,40%)", bg: "hsl(160,60%,93%)", border: "hsl(150,55%,70%)" },
+  GraduationCap: { color: "hsl(30,80%,42%)", bg: "hsl(45,90%,93%)", border: "hsl(40,85%,72%)" },
+  Store: { color: "hsl(345,65%,45%)", bg: "hsl(330,55%,93%)", border: "hsl(340,60%,75%)" },
+  Tag: { color: "hsl(230,65%,45%)", bg: "hsl(210,65%,93%)", border: "hsl(220,62%,72%)" },
+  Briefcase: { color: "hsl(240,55%,45%)", bg: "hsl(220,60%,93%)", border: "hsl(230,55%,72%)" },
+  MapPin: { color: "hsl(350,70%,45%)", bg: "hsl(0,65%,94%)", border: "hsl(0,70%,75%)" },
+  Calendar: { color: "hsl(290,60%,45%)", bg: "hsl(270,60%,93%)", border: "hsl(280,58%,75%)" },
+  Globe: { color: "hsl(215,70%,42%)", bg: "hsl(195,75%,93%)", border: "hsl(205,70%,70%)" },
+  Ambulance: { color: "hsl(350,70%,48%)", bg: "hsl(0,70%,94%)", border: "hsl(355,68%,75%)" },
+  Shield: { color: "hsl(240,50%,42%)", bg: "hsl(225,50%,93%)", border: "hsl(235,48%,72%)" },
+  Flame: { color: "hsl(5,80%,45%)", bg: "hsl(20,85%,93%)", border: "hsl(15,82%,72%)" },
+  Bus: { color: "hsl(225,50%,42%)", bg: "hsl(210,50%,93%)", border: "hsl(218,48%,72%)" },
+  Zap: { color: "hsl(35,90%,45%)", bg: "hsl(50,85%,93%)", border: "hsl(45,88%,68%)" },
+  Scale: { color: "hsl(240,35%,42%)", bg: "hsl(225,35%,93%)", border: "hsl(230,35%,72%)" },
+  Landmark: { color: "hsl(185,55%,38%)", bg: "hsl(170,60%,93%)", border: "hsl(178,55%,68%)" },
+  Users: { color: "hsl(230,50%,45%)", bg: "hsl(210,55%,93%)", border: "hsl(220,52%,72%)" },
+  Umbrella: { color: "hsl(220,60%,45%)", bg: "hsl(200,65%,93%)", border: "hsl(210,62%,70%)" },
+  Package: { color: "hsl(15,60%,42%)", bg: "hsl(30,65%,93%)", border: "hsl(25,62%,72%)" },
+  Sprout: { color: "hsl(130,50%,38%)", bg: "hsl(100,55%,93%)", border: "hsl(115,50%,68%)" },
+  Home: { color: "hsl(15,80%,42%)", bg: "hsl(25,85%,93%)", border: "hsl(22,82%,72%)" },
+  BookOpenCheck: { color: "hsl(190,50%,38%)", bg: "hsl(170,55%,93%)", border: "hsl(180,52%,68%)" },
+  UtensilsCrossed: { color: "hsl(15,75%,42%)", bg: "hsl(30,80%,93%)", border: "hsl(25,78%,72%)" },
+  Wrench: { color: "hsl(210,30%,40%)", bg: "hsl(220,35%,93%)", border: "hsl(215,32%,70%)" },
+  PenTool: { color: "hsl(270,40%,45%)", bg: "hsl(250,45%,93%)", border: "hsl(260,42%,75%)" },
+  Heart: { color: "hsl(355,70%,48%)", bg: "hsl(340,75%,93%)", border: "hsl(348,72%,75%)" },
+  Activity: { color: "hsl(210,60%,42%)", bg: "hsl(190,65%,93%)", border: "hsl(200,62%,70%)" },
+  Car: { color: "hsl(175,55%,38%)", bg: "hsl(160,60%,93%)", border: "hsl(168,58%,68%)" },
+  Building: { color: "hsl(225,40%,42%)", bg: "hsl(210,40%,93%)", border: "hsl(218,42%,72%)" },
+  TrendingUp: { color: "hsl(160,50%,40%)", bg: "hsl(140,55%,93%)", border: "hsl(150,52%,68%)" },
+  BedDouble: { color: "hsl(20,70%,42%)", bg: "hsl(35,75%,93%)", border: "hsl(30,72%,72%)" },
+  Coffee: { color: "hsl(10,70%,40%)", bg: "hsl(20,75%,93%)", border: "hsl(15,72%,72%)" },
+  Video: { color: "hsl(350,60%,45%)", bg: "hsl(0,63%,93%)", border: "hsl(355,62%,75%)" },
+  TreePine: { color: "hsl(150,50%,35%)", bg: "hsl(130,55%,93%)", border: "hsl(140,52%,68%)" },
 };
 
 interface Category {
@@ -159,10 +159,11 @@ const Services = () => {
           <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
             {filtered.map((cat) => {
               const Icon = iconMap[cat.icon] || Tag;
-              const colors = colorMap[cat.icon] || { color: "hsl(210,85%,55%)", bg: "hsl(210,85%,93%)" };
+              const colors = colorMap[cat.icon] || { color: "hsl(210,85%,55%)", bg: "hsl(210,85%,93%)", border: "hsl(210,60%,72%)" };
               return (
                 <button key={cat.id} onClick={() => handleNavigate(cat)}
-                  className="relative bg-card rounded-2xl border border-border/60 flex flex-col items-center gap-1.5 py-4 px-1.5 transition-all duration-200 hover:shadow-md hover:scale-105 active:scale-95 hover:border-primary/30">
+                  className="relative bg-card rounded-2xl flex flex-col items-center gap-1.5 py-4 px-1.5 transition-all duration-200 hover:shadow-md hover:scale-105 active:scale-95"
+                  style={{ border: `0.8px solid ${colors.border}` }}>
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: colors.bg, color: colors.color }}>
                     <Icon className="w-6 h-6" />
                   </div>
@@ -178,11 +179,12 @@ const Services = () => {
           <div className="flex flex-col gap-2.5">
             {filtered.map((cat, index) => {
               const Icon = iconMap[cat.icon] || Tag;
-              const colors = colorMap[cat.icon] || { color: "hsl(210,85%,55%)", bg: "hsl(210,85%,93%)" };
+              const colors = colorMap[cat.icon] || { color: "hsl(210,85%,55%)", bg: "hsl(210,85%,93%)", border: "hsl(210,60%,72%)" };
               return (
                 <div key={cat.id}>
                   <button onClick={() => handleNavigate(cat)}
-                    className="bg-card rounded-2xl border border-border/60 flex items-center gap-3.5 p-3.5 w-full text-left transition-all duration-200 hover:shadow-md hover:scale-[1.01] active:scale-[0.98] hover:border-primary/30">
+                    className="bg-card rounded-2xl flex items-center gap-3.5 p-3.5 w-full text-left transition-all duration-200 hover:shadow-md hover:scale-[1.01] active:scale-[0.98]"
+                    style={{ border: `0.8px solid ${colors.border}` }}>
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: colors.bg, color: colors.color }}>
                       <Icon className="w-5 h-5" />
                     </div>
