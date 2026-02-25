@@ -188,6 +188,11 @@ const AdminDashboard = () => {
   const [aboutForm, setAboutForm] = useState({ article_title: "", article_body: "", meta_description: "" });
   const [aboutLoaded, setAboutLoaded] = useState(false);
   const [aboutSaving, setAboutSaving] = useState(false);
+  // Gallery management
+  const [galleryItems, setGalleryItems] = useState<any[]>([]);
+  const [galleryForm, setGalleryForm] = useState({ image_url: "", caption: "", sort_order: 0 });
+  const [galleryEditId, setGalleryEditId] = useState<string | null>(null);
+  const [galleryUploading, setGalleryUploading] = useState(false);
 
   // --- All business logic remains exactly the same ---
   useEffect(() => {
@@ -290,15 +295,22 @@ const AdminDashboard = () => {
     if (legacyTabs[activeTab]) {
       fetchLegacyData(activeTab);
     }
-    if (activeTab === "about" && !aboutLoaded) {
-      const fetchAbout = async () => {
-        const { data } = await (supabase.from as any)("about_content").select("*").limit(1).single();
-        if (data) {
-          setAboutForm({ article_title: data.article_title || "", article_body: data.article_body || "", meta_description: data.meta_description || "" });
-          setAboutLoaded(true);
-        }
+    if (activeTab === "about") {
+      if (!aboutLoaded) {
+        const fetchAbout = async () => {
+          const { data } = await (supabase.from as any)("about_content").select("*").limit(1).single();
+          if (data) {
+            setAboutForm({ article_title: data.article_title || "", article_body: data.article_body || "", meta_description: data.meta_description || "" });
+            setAboutLoaded(true);
+          }
+        };
+        fetchAbout();
+      }
+      const fetchGallery = async () => {
+        const { data } = await (supabase.from as any)("about_gallery").select("*").order("sort_order");
+        setGalleryItems(data || []);
       };
-      fetchAbout();
+      fetchGallery();
     }
     if (activeTab === "news") {
       const fetchNews = async () => {
@@ -1101,6 +1113,54 @@ const AdminDashboard = () => {
     setAboutSaving(false);
   };
 
+  const refreshGallery = async () => {
+    const { data } = await (supabase.from as any)("about_gallery").select("*").order("sort_order");
+    setGalleryItems(data || []);
+  };
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setGalleryUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `about/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("media").upload(path, file);
+    if (error) { toast({ title: "আপলোড ব্যর্থ", variant: "destructive" }); setGalleryUploading(false); return; }
+    const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+    setGalleryForm({ ...galleryForm, image_url: urlData.publicUrl });
+    setGalleryUploading(false);
+  };
+
+  const saveGalleryItem = async () => {
+    if (!galleryForm.image_url.trim()) { toast({ title: "ছবি দিন", variant: "destructive" }); return; }
+    if (galleryEditId) {
+      await (supabase.from as any)("about_gallery").update({ image_url: galleryForm.image_url, caption: galleryForm.caption || null, sort_order: galleryForm.sort_order }).eq("id", galleryEditId);
+      await logActivity("edited", "about_gallery", galleryEditId, galleryForm.caption || "gallery image");
+      toast({ title: "গ্যালারি আপডেট হয়েছে ✅" });
+    } else {
+      await (supabase.from as any)("about_gallery").insert({ image_url: galleryForm.image_url, caption: galleryForm.caption || null, sort_order: galleryForm.sort_order });
+      await logActivity("created", "about_gallery", undefined, galleryForm.caption || "gallery image");
+      toast({ title: "গ্যালারিতে যোগ হয়েছে ✅" });
+    }
+    setGalleryForm({ image_url: "", caption: "", sort_order: 0 });
+    setGalleryEditId(null);
+    refreshGallery();
+  };
+
+  const deleteGalleryItem = async (id: string, caption: string) => {
+    if (!confirm("এই ছবি মুছে ফেলতে চান?")) return;
+    await (supabase.from as any)("about_gallery").delete().eq("id", id);
+    await logActivity("deleted", "about_gallery", id, caption || "gallery image");
+    toast({ title: "মুছে ফেলা হয়েছে" });
+    setGalleryItems(galleryItems.filter(g => g.id !== id));
+  };
+
+  const toggleGalleryActive = async (id: string, current: boolean) => {
+    await (supabase.from as any)("about_gallery").update({ is_active: !current }).eq("id", id);
+    setGalleryItems(galleryItems.map(g => g.id === id ? { ...g, is_active: !current } : g));
+    toast({ title: !current ? "সক্রিয় করা হয়েছে" : "নিষ্ক্রিয় করা হয়েছে" });
+  };
+
   const renderAbout = () => (
     <div className="space-y-6">
       {/* Article Editor */}
@@ -1116,39 +1176,97 @@ const AdminDashboard = () => {
         </div>
         <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">আর্টিকেল শিরোনাম</label>
-          <input
-            className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
-            placeholder="যেমন: রামগঞ্জ সম্পর্কে"
-            value={aboutForm.article_title}
-            onChange={(e) => setAboutForm({ ...aboutForm, article_title: e.target.value })}
-          />
+          <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" placeholder="যেমন: রামগঞ্জ সম্পর্কে" value={aboutForm.article_title} onChange={(e) => setAboutForm({ ...aboutForm, article_title: e.target.value })} />
         </div>
         <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">মেটা বিবরণ (SEO)</label>
-          <input
-            className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
-            placeholder="সার্চ ইঞ্জিনে দেখানো হবে (ঐচ্ছিক)"
-            value={aboutForm.meta_description}
-            onChange={(e) => setAboutForm({ ...aboutForm, meta_description: e.target.value })}
-          />
+          <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" placeholder="সার্চ ইঞ্জিনে দেখানো হবে (ঐচ্ছিক)" value={aboutForm.meta_description} onChange={(e) => setAboutForm({ ...aboutForm, meta_description: e.target.value })} />
         </div>
         <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">আর্টিকেল বডি</label>
-          <textarea
-            className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none min-h-[250px] focus:border-primary/40 focus:ring-2 focus:ring-primary/10 font-mono transition-all resize-y"
-            placeholder="রামগঞ্জ সম্পর্কে বিস্তারিত লিখুন..."
-            value={aboutForm.article_body}
-            onChange={(e) => setAboutForm({ ...aboutForm, article_body: e.target.value })}
-          />
+          <textarea className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none min-h-[250px] focus:border-primary/40 focus:ring-2 focus:ring-primary/10 font-mono transition-all resize-y" placeholder="রামগঞ্জ সম্পর্কে বিস্তারিত লিখুন..." value={aboutForm.article_body} onChange={(e) => setAboutForm({ ...aboutForm, article_body: e.target.value })} />
           <p className="text-[10px] text-muted-foreground mt-1">নতুন লাইনে লিখলে নতুন প্যারাগ্রাফ তৈরি হবে</p>
         </div>
-        <button
-          onClick={saveAboutContent}
-          disabled={aboutSaving}
-          className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
-        >
+        <button onClick={saveAboutContent} disabled={aboutSaving} className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50">
           <Save className="w-4 h-4" /> {aboutSaving ? "সেভ হচ্ছে..." : "আর্টিকেল সেভ করুন"}
         </button>
+      </div>
+
+      {/* Gallery Management */}
+      <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
+            <ImageIcon className="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <h2 className="text-sm font-bold text-foreground">গ্যালারি ম্যানেজমেন্ট</h2>
+            <p className="text-[10px] text-muted-foreground">About পেজের ইমেজ স্লাইডার</p>
+          </div>
+        </div>
+
+        {/* Gallery Form */}
+        <div className="space-y-3 bg-muted/30 rounded-xl p-4 border border-border/50">
+          <div>
+            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">ছবি</label>
+            <input className="w-full bg-background rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 transition-all" placeholder="ছবির লিংক (URL)" value={galleryForm.image_url} onChange={(e) => setGalleryForm({ ...galleryForm, image_url: e.target.value })} />
+            <div className="flex items-center gap-3 mt-2">
+              <label className="inline-flex items-center gap-2 text-xs text-primary font-semibold cursor-pointer bg-primary/10 px-4 py-2.5 rounded-xl hover:bg-primary/15 transition-colors">
+                <ImageIcon className="w-4 h-4" /> {galleryUploading ? "আপলোড হচ্ছে..." : "ছবি আপলোড"}
+                <input type="file" accept="image/*" className="hidden" onChange={handleGalleryUpload} disabled={galleryUploading} />
+              </label>
+              {galleryForm.image_url && <img src={galleryForm.image_url} alt="preview" className="w-16 h-12 rounded-xl object-cover border border-border" />}
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">ক্যাপশন (ঐচ্ছিক)</label>
+            <input className="w-full bg-background rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 transition-all" placeholder="ছবির ক্যাপশন" value={galleryForm.caption} onChange={(e) => setGalleryForm({ ...galleryForm, caption: e.target.value })} />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">ক্রম</label>
+            <input type="number" className="w-full bg-background rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 transition-all" placeholder="0" value={galleryForm.sort_order} onChange={(e) => setGalleryForm({ ...galleryForm, sort_order: parseInt(e.target.value) || 0 })} />
+          </div>
+          <div className="flex gap-2">
+            <button onClick={saveGalleryItem} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+              <Save className="w-4 h-4" /> {galleryEditId ? "আপডেট" : "যোগ করুন"}
+            </button>
+            {galleryEditId && (
+              <button onClick={() => { setGalleryEditId(null); setGalleryForm({ image_url: "", caption: "", sort_order: 0 }); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
+                বাতিল
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Gallery List */}
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> {galleryItems.length}টি ছবি</span>
+        </div>
+        {galleryItems.length === 0 ? (
+          <p className="text-xs text-muted-foreground text-center py-6">কোন গ্যালারি ছবি নেই</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            {galleryItems.map((item: any) => (
+              <div key={item.id} className="bg-muted/30 rounded-xl overflow-hidden border border-border/50 group">
+                <div className="aspect-[16/10] relative">
+                  <img src={item.image_url} alt={item.caption || ""} className="w-full h-full object-cover" />
+                  <div className="absolute top-1.5 right-1.5 flex gap-1">
+                    <button onClick={() => toggleGalleryActive(item.id, item.is_active)} className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] ${item.is_active ? "bg-emerald-500 text-white" : "bg-muted text-muted-foreground"}`}>
+                      {item.is_active ? "✅" : "⏸"}
+                    </button>
+                  </div>
+                </div>
+                <div className="p-2.5">
+                  {item.caption && <p className="text-[11px] text-foreground font-medium line-clamp-1">{item.caption}</p>}
+                  <p className="text-[10px] text-muted-foreground">ক্রম: {item.sort_order}</p>
+                  <div className="flex gap-1.5 mt-2">
+                    <ActionBtn variant="info" onClick={() => { setGalleryEditId(item.id); setGalleryForm({ image_url: item.image_url, caption: item.caption || "", sort_order: item.sort_order }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
+                    <ActionBtn variant="danger" onClick={() => deleteGalleryItem(item.id, item.caption || "")} icon={<Trash2 className="w-3 h-3" />} label="মুছুন" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Timeline Management Section */}
@@ -1163,17 +1281,11 @@ const AdminDashboard = () => {
               <p className="text-[10px] text-muted-foreground">ঐতিহাসিক ইভেন্ট যোগ/এডিট করুন</p>
             </div>
           </div>
-          <button
-            onClick={() => { setActiveTab("timeline"); }}
-            className="text-xs text-primary font-semibold flex items-center gap-1 hover:underline"
-          >
+          <button onClick={() => { setActiveTab("timeline"); }} className="text-xs text-primary font-semibold flex items-center gap-1 hover:underline">
             সব দেখুন <ChevronRight className="w-3 h-3" />
           </button>
         </div>
-        <button
-          onClick={() => { setActiveTab("timeline"); setShowLegacyForm(true); }}
-          className="w-full py-3 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors"
-        >
+        <button onClick={() => { setActiveTab("timeline"); setShowLegacyForm(true); }} className="w-full py-3 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors">
           <Plus className="w-4 h-4" /> নতুন টাইমলাইন ইভেন্ট যোগ করুন
         </button>
       </div>
