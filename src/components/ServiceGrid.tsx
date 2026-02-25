@@ -561,9 +561,11 @@ const ServiceGrid = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [ads, setAds] = useState<Ad[]>([]);
   const [viewMode, setViewMode] = useState<"grid" | "card">("grid");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const [catRes, adRes] = await Promise.all([
         supabase.from("service_categories").select("*").eq("is_active", true).order("sort_order"),
         (supabase.from as any)("advertisements").select("*").eq("is_active", true).order("sort_order"),
@@ -571,6 +573,7 @@ const ServiceGrid = () => {
       setCategories((catRes.data as Category[]) || []);
       const now = new Date().toISOString();
       setAds(((adRes.data as Ad[]) || []).filter((a: any) => !a.expire_at || a.expire_at > now));
+      setLoading(false);
     };
     fetchData();
   }, []);
@@ -617,7 +620,32 @@ const ServiceGrid = () => {
         </div>
       </div>
 
-      {viewMode === "grid" ? (
+      {loading ? (
+        viewMode === "grid" ? (
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={i} className="bg-card rounded-2xl flex flex-col items-center gap-1.5 py-4 px-1.5" style={{ border: "0.8px solid hsl(220,15%,88%)" }}>
+                <div className="w-12 h-12 rounded-xl skeleton-shimmer" />
+                <div className="w-16 h-3 rounded-md skeleton-shimmer" />
+                <div className="w-10 h-2 rounded skeleton-shimmer" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2.5">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-card rounded-2xl flex items-center gap-3.5 p-3.5" style={{ border: "0.8px solid hsl(220,15%,88%)" }}>
+                <div className="w-11 h-11 rounded-xl skeleton-shimmer shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="w-3/4 h-3.5 rounded-md skeleton-shimmer" />
+                  <div className="w-1/2 h-2.5 rounded skeleton-shimmer" />
+                </div>
+                <div className="w-12 h-5 rounded-full skeleton-shimmer shrink-0" />
+              </div>
+            ))}
+          </div>
+        )
+      ) : viewMode === "grid" ? (
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
           {allItems.map((cat) => {
             const iconData = SvgIcons[cat.icon] || SvgIcons["Tag"];
@@ -627,7 +655,7 @@ const ServiceGrid = () => {
                 key={cat.id}
                 onClick={() => handleNavigate(cat)}
                 className="relative bg-card rounded-2xl flex flex-col items-center gap-1.5 py-4 px-1.5 h-full transition-all duration-200 hover:shadow-md hover:scale-105 active:scale-95"
-                style={{ border: `1.5px solid ${bColor}` }}
+                style={{ border: `0.8px solid ${bColor}` }}
               >
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm"
@@ -655,7 +683,7 @@ const ServiceGrid = () => {
                 <button
                   onClick={() => handleNavigate(cat)}
                   className="bg-card rounded-2xl flex items-center gap-3.5 p-3.5 w-full text-left transition-all duration-200 hover:shadow-md hover:scale-[1.01] active:scale-[0.98]"
-                  style={{ border: `1.5px solid ${bColor}` }}
+                  style={{ border: `0.8px solid ${bColor}` }}
                 >
                   <div
                     className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
