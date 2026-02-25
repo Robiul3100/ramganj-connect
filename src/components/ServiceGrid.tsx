@@ -458,19 +458,15 @@ interface Ad {
 const AdCard = ({ ad }: { ad?: Ad }) => {
   if (!ad) return null;
   const content = (
-    <div className="rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-3 flex items-center gap-3 overflow-hidden">
+    <div className="rounded-2xl overflow-hidden border border-border/40 shadow-sm">
       {ad.image_url ? (
-        <img src={ad.image_url} alt={ad.title} className="w-14 h-14 rounded-xl object-cover shrink-0" />
+        <img src={ad.image_url} alt={ad.title} className="w-full h-auto object-cover" />
       ) : (
-        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+        <div className="w-full h-24 bg-primary/5 flex items-center justify-center gap-2">
           <Megaphone className="w-5 h-5 text-primary" />
+          <p className="text-sm font-bold text-primary">{ad.title}</p>
         </div>
       )}
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-bold text-primary truncate">{ad.title}</p>
-        {ad.description && <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{ad.description}</p>}
-      </div>
-      <span className="text-[10px] font-semibold text-primary/60 bg-primary/10 px-2 py-0.5 rounded-full shrink-0">AD</span>
     </div>
   );
   return ad.link_url ? <a href={ad.link_url} target="_blank" rel="noopener noreferrer">{content}</a> : content;
@@ -502,7 +498,8 @@ const ServiceGrid = () => {
 
   const handleNavigate = async (cat: Category) => {
     if (cat.id !== "news-static") {
-      supabase.rpc("increment_category_view", { cat_id: cat.id });
+      await supabase.rpc("increment_category_view", { cat_id: cat.id });
+      setCategories(prev => prev.map(c => c.id === cat.id ? { ...c, view_count: (c.view_count ?? 0) + 1 } : c));
     }
     const route = staticRoutes[cat.slug] || `/service/${cat.slug}`;
     navigate(route);
