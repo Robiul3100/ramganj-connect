@@ -458,7 +458,7 @@ interface Ad {
 const AdCard = ({ ad }: { ad?: Ad }) => {
   if (!ad) return null;
   const content = (
-    <div className="rounded-xl overflow-hidden">
+    <div className="rounded-xl overflow-hidden relative group">
       {ad.image_url ? (
         <img src={ad.image_url} alt={ad.title} className="w-full aspect-[6/1] object-cover" />
       ) : (
@@ -467,6 +467,7 @@ const AdCard = ({ ad }: { ad?: Ad }) => {
           <p className="text-sm font-bold text-primary">{ad.title}</p>
         </div>
       )}
+      <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out pointer-events-none ad-shine" />
     </div>
   );
   return ad.link_url ? <a href={ad.link_url} target="_blank" rel="noopener noreferrer">{content}</a> : content;
@@ -584,7 +585,7 @@ const ServiceGrid = () => {
                     <Eye className="w-3 h-3" /> {cat.view_count ?? 0}
                   </span>
                 </button>
-                {(index + 1) % 5 === 0 && ads.length > 0 && <div className="mt-2.5"><AdCard ad={ads[Math.floor(index / 5) % ads.length]} /></div>}
+                {(index + 1) % 5 === 0 && ads.length > 0 && <div className="mt-2.5"><AdCard ad={ads[Math.floor((index + 1) / 5 - 1) % ads.length]} /></div>}
               </div>
             );
           })}
