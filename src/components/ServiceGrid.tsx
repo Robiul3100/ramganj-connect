@@ -457,8 +457,11 @@ interface Ad {
 
 const AdCard = ({ ad }: { ad?: Ad }) => {
   if (!ad) return null;
+  const handleAdClick = () => {
+    supabase.rpc("increment_ad_click", { ad_id: ad.id });
+  };
   const content = (
-    <div className="rounded-xl overflow-hidden relative group">
+    <div className="rounded-xl overflow-hidden relative group" onClick={handleAdClick}>
       {ad.image_url ? (
         <img src={ad.image_url} alt={ad.title} className="w-full aspect-[6/1] object-cover" />
       ) : (
