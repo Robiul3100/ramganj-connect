@@ -76,11 +76,11 @@ interface Ad {
 const DynamicAdCard = ({ ad }: { ad?: Ad }) => {
   if (!ad) return null;
   const content = (
-    <div className="rounded-2xl overflow-hidden border border-border/40 shadow-sm">
+    <div className="rounded-xl overflow-hidden">
       {ad.image_url ? (
-        <img src={ad.image_url} alt={ad.title} className="w-full h-auto object-cover" />
+        <img src={ad.image_url} alt={ad.title} className="w-full aspect-[6/1] object-cover" />
       ) : (
-        <div className="w-full h-24 bg-primary/5 flex items-center justify-center gap-2">
+        <div className="w-full aspect-[6/1] bg-primary/5 flex items-center justify-center gap-2">
           <Megaphone className="w-5 h-5 text-primary" />
           <p className="text-sm font-bold text-primary">{ad.title}</p>
         </div>
