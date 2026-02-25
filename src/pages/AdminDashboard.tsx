@@ -375,11 +375,43 @@ const AdminDashboard = () => {
 
   const startEdit = (item: any) => {
     setEditingId(item.id);
-    setEditData({ title: item.title, description: item.description || "", phone: item.phone || "", whatsapp: item.whatsapp || "", address: item.address || "", area: item.area || "", category_id: item.category_id || "", image_url: item.image_url || "" });
+    const meta = item.metadata || {};
+    setEditData({
+      title: item.title, description: item.description || "", phone: item.phone || "",
+      whatsapp: item.whatsapp || "", address: item.address || "", area: item.area || "",
+      category_id: item.category_id || "", image_url: item.image_url || "",
+      meta_degrees: (meta.degrees || []).join(", "),
+      meta_specialty: meta.specialty || "",
+      meta_hospital_name: meta.hospital_name || "",
+      meta_shop_category: meta.shop_category || "",
+      meta_owner_name: meta.owner_name || "",
+      meta_edu_category: meta.edu_category || "",
+      meta_established_year: meta.established_year || "",
+      meta_principal_name: meta.principal_name || "",
+      meta_company: meta.company || "",
+      meta_job_category: meta.job_category || "",
+      meta_salary_range: meta.salary_range || "",
+      meta_deadline: meta.deadline || "",
+    });
   };
 
   const saveEdit = async (id: string) => {
-    await supabase.from("services").update(editData).eq("id", id);
+    const metadata: Record<string, any> = {};
+    if (editData.meta_degrees) metadata.degrees = editData.meta_degrees.split(",").map((d: string) => d.trim()).filter(Boolean);
+    if (editData.meta_specialty) metadata.specialty = editData.meta_specialty;
+    if (editData.meta_hospital_name) metadata.hospital_name = editData.meta_hospital_name;
+    if (editData.meta_shop_category) metadata.shop_category = editData.meta_shop_category;
+    if (editData.meta_owner_name) metadata.owner_name = editData.meta_owner_name;
+    if (editData.meta_edu_category) metadata.edu_category = editData.meta_edu_category;
+    if (editData.meta_established_year) metadata.established_year = editData.meta_established_year;
+    if (editData.meta_principal_name) metadata.principal_name = editData.meta_principal_name;
+    if (editData.meta_company) metadata.company = editData.meta_company;
+    if (editData.meta_job_category) metadata.job_category = editData.meta_job_category;
+    if (editData.meta_salary_range) metadata.salary_range = editData.meta_salary_range;
+    if (editData.meta_deadline) metadata.deadline = editData.meta_deadline;
+
+    const { meta_degrees, meta_specialty, meta_hospital_name, meta_shop_category, meta_owner_name, meta_edu_category, meta_established_year, meta_principal_name, meta_company, meta_job_category, meta_salary_range, meta_deadline, ...baseData } = editData;
+    await supabase.from("services").update({ ...baseData, metadata }).eq("id", id);
     await logActivity("edited", "services", id, editData.title);
     setEditingId(null);
     toast({ title: "আপডেট হয়েছে ✅" });
@@ -758,6 +790,17 @@ const AdminDashboard = () => {
                       </label>
                       {editData.image_url && <img src={editData.image_url} alt="" className="w-10 h-10 rounded-xl object-cover border border-border" />}
                     </div>
+                  </div>
+                  {/* ── Metadata Fields ── */}
+                  <div className="border border-primary/20 rounded-xl p-3 space-y-2.5 bg-primary/5">
+                    <p className="text-xs font-bold text-primary flex items-center gap-1.5"><Stethoscope className="w-3.5 h-3.5" /> অতিরিক্ত তথ্য (Metadata)</p>
+                    <input className="w-full bg-card rounded-xl px-4 py-2.5 text-sm border border-border focus:border-primary/40 outline-none" value={editData.meta_degrees || ""} onChange={(e) => setEditData({ ...editData, meta_degrees: e.target.value })} placeholder="🎓 ডিগ্রি (কমা দিয়ে, যেমন: এম,বি,বি,এস, এফ,সি,পি,এস)" />
+                    <input className="w-full bg-card rounded-xl px-4 py-2.5 text-sm border border-border focus:border-primary/40 outline-none" value={editData.meta_specialty || ""} onChange={(e) => setEditData({ ...editData, meta_specialty: e.target.value })} placeholder="🏥 বিশেষত্ব (যেমন: নাক, কান, গলা)" />
+                    <input className="w-full bg-card rounded-xl px-4 py-2.5 text-sm border border-border focus:border-primary/40 outline-none" value={editData.meta_hospital_name || ""} onChange={(e) => setEditData({ ...editData, meta_hospital_name: e.target.value })} placeholder="🏨 হাসপাতাল / চেম্বার" />
+                    <input className="w-full bg-card rounded-xl px-4 py-2.5 text-sm border border-border focus:border-primary/40 outline-none" value={editData.meta_shop_category || ""} onChange={(e) => setEditData({ ...editData, meta_shop_category: e.target.value })} placeholder="🏪 দোকানের ধরন" />
+                    <input className="w-full bg-card rounded-xl px-4 py-2.5 text-sm border border-border focus:border-primary/40 outline-none" value={editData.meta_owner_name || ""} onChange={(e) => setEditData({ ...editData, meta_owner_name: e.target.value })} placeholder="👤 মালিক / দায়িত্বশীলের নাম" />
+                    <input className="w-full bg-card rounded-xl px-4 py-2.5 text-sm border border-border focus:border-primary/40 outline-none" value={editData.meta_company || ""} onChange={(e) => setEditData({ ...editData, meta_company: e.target.value })} placeholder="🏢 প্রতিষ্ঠান / কোম্পানি" />
+                    <input className="w-full bg-card rounded-xl px-4 py-2.5 text-sm border border-border focus:border-primary/40 outline-none" value={editData.meta_salary_range || ""} onChange={(e) => setEditData({ ...editData, meta_salary_range: e.target.value })} placeholder="💵 বেতন সীমা" />
                   </div>
                   <div className="flex gap-2 pt-1">
                     <button onClick={() => saveEdit(item.id)} className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
