@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, Eye, LayoutGrid, List } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
 import BottomNav from "@/components/BottomNav";
@@ -61,12 +61,15 @@ interface Category {
   name: string;
   slug: string;
   icon: string;
+  description?: string | null;
+  view_count?: number;
 }
 
 const Services = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
   const [search, setSearch] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "card">("grid");
 
   useEffect(() => {
     const fetchCats = async () => {
@@ -78,6 +81,11 @@ const Services = () => {
 
   const filtered = categories.filter(c => c.name.toLowerCase().includes(search.toLowerCase()));
 
+  const handleNavigate = async (cat: Category) => {
+    supabase.rpc("increment_category_view", { cat_id: cat.id });
+    navigate(`/service/${cat.slug}`);
+  };
+
   return (
     <div className="min-h-screen bg-background max-w-4xl mx-auto pb-20">
       <PageHeader title="সকল সেবাসমূহ" />
@@ -86,22 +94,70 @@ const Services = () => {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <input type="text" placeholder="সেবা খুঁজুন..." className="search-input pl-12" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        <p className="text-xs text-muted-foreground">{filtered.length} টি ক্যাটাগরি</p>
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          {filtered.map((cat) => {
-            const Icon = iconMap[cat.icon] || Tag;
-            const colors = colorMap[cat.icon] || { color: "hsl(210,85%,55%)", bg: "hsl(210,85%,93%)" };
-            return (
-              <button key={cat.id} onClick={() => navigate(`/service/${cat.slug}`)}
-                className="glass-card-hover flex flex-col items-center gap-2 py-5 px-2">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ backgroundColor: colors.bg, color: colors.color }}>
-                  <Icon className="w-6 h-6" />
-                </div>
-                <span className="text-xs font-medium text-foreground text-center leading-tight">{cat.name}</span>
-              </button>
-            );
-          })}
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">{filtered.length} টি ক্যাটাগরি</p>
+          <div className="flex items-center gap-2 bg-muted rounded-full p-0.5">
+            <button
+              onClick={() => setViewMode("grid")}
+              className={`p-1.5 rounded-full transition-all ${viewMode === "grid" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"}`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => setViewMode("card")}
+              className={`p-1.5 rounded-full transition-all ${viewMode === "card" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"}`}
+            >
+              <List className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
+
+        {viewMode === "grid" ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            {filtered.map((cat) => {
+              const Icon = iconMap[cat.icon] || Tag;
+              const colors = colorMap[cat.icon] || { color: "hsl(210,85%,55%)", bg: "hsl(210,85%,93%)" };
+              return (
+                <button key={cat.id} onClick={() => handleNavigate(cat)}
+                  className="glass-card-hover flex flex-col items-center gap-2 py-5 px-2">
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ backgroundColor: colors.bg, color: colors.color }}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <span className="text-xs font-medium text-foreground text-center leading-tight">{cat.name}</span>
+                  {(cat.view_count ?? 0) > 0 && (
+                    <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                      <Eye className="w-3 h-3" /> {cat.view_count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2.5">
+            {filtered.map((cat) => {
+              const Icon = iconMap[cat.icon] || Tag;
+              const colors = colorMap[cat.icon] || { color: "hsl(210,85%,55%)", bg: "hsl(210,85%,93%)" };
+              return (
+                <button key={cat.id} onClick={() => handleNavigate(cat)}
+                  className="glass-card-hover flex items-center gap-4 p-4 w-full text-left transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: colors.bg, color: colors.color }}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-bold text-foreground leading-tight">{cat.name}</h3>
+                    {cat.description && (
+                      <p className="text-xs text-muted-foreground mt-0.5 truncate">{cat.description}</p>
+                    )}
+                  </div>
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+                    <Eye className="w-3.5 h-3.5" /> {cat.view_count ?? 0}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
       <BottomNav />
     </div>

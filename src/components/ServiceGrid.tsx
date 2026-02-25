@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 // Beautiful custom SVG icons for each service category
@@ -440,13 +441,16 @@ interface Category {
   icon: string;
   sort_order: number;
   is_active: boolean;
+  description?: string | null;
+  view_count?: number;
 }
 
-const newsItem = { id: "news-static", name: "খবর ও সংবাদ", slug: "news", icon: "Newspaper", sort_order: -1 };
+const newsItem = { id: "news-static", name: "খবর ও সংবাদ", slug: "news", icon: "Newspaper", sort_order: -1, description: "সকল খবর ও সংবাদ", view_count: 0 };
 
 const ServiceGrid = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [viewMode, setViewMode] = useState<"grid" | "card">("grid");
 
   useEffect(() => {
     const fetch = async () => {
@@ -462,36 +466,93 @@ const ServiceGrid = () => {
     news: "/news",
   };
 
+  const handleNavigate = async (cat: Category) => {
+    // Increment view count for real categories
+    if (cat.id !== "news-static") {
+      supabase.rpc("increment_category_view", { cat_id: cat.id });
+    }
+    const route = staticRoutes[cat.slug] || `/service/${cat.slug}`;
+    navigate(route);
+  };
+
   return (
     <section className="px-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-foreground">সেবাসমূহ</h2>
-        <span className="text-sm font-semibold text-primary">{allItems.length} টি</span>
+        <div className="flex items-center gap-2 bg-muted rounded-full p-0.5">
+          <button
+            onClick={() => setViewMode("grid")}
+            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${viewMode === "grid" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"}`}
+          >
+            গ্রিড
+          </button>
+          <button
+            onClick={() => setViewMode("card")}
+            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${viewMode === "card" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"}`}
+          >
+            কার্ড
+          </button>
+        </div>
       </div>
-      <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-        {allItems.map((cat) => {
-          const iconData = SvgIcons[cat.icon] || SvgIcons["Tag"];
-          const route = staticRoutes[cat.slug] || `/service/${cat.slug}`;
 
-          return (
-            <button
-              key={cat.id}
-              onClick={() => navigate(route)}
-              className="glass-card-hover flex flex-col items-center gap-2 py-4 px-1 h-full transition-transform duration-200 hover:scale-105 active:scale-95"
-            >
-              <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-200"
-                style={{ backgroundColor: iconData.bg }}
+      {viewMode === "grid" ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {allItems.map((cat) => {
+            const iconData = SvgIcons[cat.icon] || SvgIcons["Tag"];
+            return (
+              <button
+                key={cat.id}
+                onClick={() => handleNavigate(cat)}
+                className="glass-card-hover flex flex-col items-center gap-2 py-5 px-2 h-full transition-transform duration-200 hover:scale-105 active:scale-95"
               >
-                {iconData.svg}
-              </div>
-              <span className="text-xs font-medium text-foreground text-center leading-tight">
-                {cat.name}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                  style={{ backgroundColor: iconData.bg }}
+                >
+                  {iconData.svg}
+                </div>
+                <span className="text-xs font-medium text-foreground text-center leading-tight">
+                  {cat.name}
+                </span>
+                {(cat.view_count ?? 0) > 0 && (
+                  <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                    <Eye className="w-3 h-3" /> {cat.view_count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2.5">
+          {allItems.map((cat) => {
+            const iconData = SvgIcons[cat.icon] || SvgIcons["Tag"];
+            return (
+              <button
+                key={cat.id}
+                onClick={() => handleNavigate(cat)}
+                className="glass-card-hover flex items-center gap-4 p-4 w-full text-left transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: iconData.bg }}
+                >
+                  {iconData.svg}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-bold text-foreground leading-tight">{cat.name}</h3>
+                  {cat.description && (
+                    <p className="text-xs text-muted-foreground mt-0.5 truncate">{cat.description}</p>
+                  )}
+                </div>
+                <span className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+                  <Eye className="w-3.5 h-3.5" /> {cat.view_count ?? 0}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 };
