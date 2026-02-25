@@ -175,39 +175,38 @@ const buildMetadata = (slug: string, data: Record<string, string>) => {
   return meta;
 };
 
-// ──── Doctor Card (matches reference image exactly) ────
+// ──── Doctor Card (matches reference image) ────
 const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: string; bg: string; gradient: string }; onShare: () => void }) => {
   const m = s.metadata || {};
   const degrees: string[] = m.degrees || [];
   const specialty = m.specialty || "";
   const hospital = m.hospital_name || "";
-  // Combine degrees + specialty into tags
   const allTags = [...degrees, ...(specialty ? [specialty] : [])];
 
   return (
-    <div className={`rounded-[20px] overflow-hidden transition-shadow hover:shadow-xl ${s.is_featured ? "ring-2 ring-amber-400/40" : ""}`} style={{ border: `2px solid ${colors.accent}44` }}>
+    <div className="rounded-2xl overflow-hidden bg-card shadow-md hover:shadow-xl transition-all duration-300" style={{ border: `1.5px solid ${colors.accent}30` }}>
       {s.is_featured && (
-        <div className="flex items-center gap-1 px-4 pt-3 pb-0">
+        <div className="flex items-center gap-1.5 px-4 pt-3">
           <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-          <span className="text-xs font-bold text-amber-600">ফিচার্ড</span>
+          <span className="text-[11px] font-bold text-amber-600">ফিচার্ড</span>
         </div>
       )}
 
-      {/* ── Top: Photo + Name + Degree Tags ── */}
-      <div className="px-4 pt-4 pb-3 flex items-start gap-4" style={{ background: `linear-gradient(160deg, hsl(170,50%,94%), hsl(200,40%,96%), hsl(0,0%,100%))` }}>
+      {/* ── Top: Profile Photo + Name + Tags ── */}
+      <div className="px-5 pt-5 pb-4 flex items-center gap-4" style={{ background: `linear-gradient(160deg, hsl(170,45%,95%), hsl(200,35%,97%), hsl(0,0%,100%))` }}>
         {s.image_url ? (
-          <img src={s.image_url} alt={s.title} className="w-[80px] h-[80px] rounded-full object-cover shrink-0 shadow-lg" style={{ border: `3px solid ${colors.accent}30` }} />
+          <img src={s.image_url} alt={s.title} className="w-[72px] h-[72px] rounded-full object-cover shrink-0 shadow-md ring-[3px] ring-white" style={{ border: `2.5px solid ${colors.accent}40` }} />
         ) : (
-          <div className="w-[80px] h-[80px] rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: `linear-gradient(135deg, ${colors.bg}, hsl(0,0%,95%))`, border: `3px solid ${colors.accent}30` }}>
-            <User className="w-9 h-9" style={{ color: colors.accent }} />
+          <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center shrink-0 shadow-md ring-[3px] ring-white" style={{ background: `linear-gradient(135deg, ${colors.bg}, hsl(0,0%,96%))`, border: `2.5px solid ${colors.accent}40` }}>
+            <User className="w-8 h-8" style={{ color: colors.accent }} />
           </div>
         )}
-        <div className="flex-1 min-w-0 pt-1">
-          <h3 className="font-extrabold text-foreground text-base leading-snug">{s.title}</h3>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-extrabold text-foreground text-[15px] leading-snug tracking-tight">{s.title}</h3>
           {allTags.length > 0 && (
-            <div className="flex gap-1.5 mt-2.5 flex-wrap">
+            <div className="flex gap-1.5 mt-2 flex-wrap">
               {allTags.map((tag, i) => (
-                <span key={i} className="text-[10px] font-bold px-3 py-1 rounded-full" style={{ background: tagColors[i % tagColors.length].bg, color: tagColors[i % tagColors.length].text }}>
+                <span key={i} className="text-[10px] font-bold px-2.5 py-[3px] rounded-full" style={{ background: tagColors[i % tagColors.length].bg, color: tagColors[i % tagColors.length].text }}>
                   {tag}
                 </span>
               ))}
@@ -216,47 +215,44 @@ const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: stri
         </div>
       </div>
 
-      {/* ── Middle: Hospital Name + Address ── */}
-      {(hospital || s.address) && (
-        <div className="px-4 py-3 bg-card border-t border-border/40">
-          {hospital && (
-            <div className="flex items-center gap-2 flex-wrap">
-              <h4 className="font-extrabold text-foreground text-[15px]">{hospital}</h4>
-              {s.address && (
-                <span className="text-xs text-muted-foreground italic">{s.address}{s.area ? `, ${s.area}` : ""}</span>
-              )}
-            </div>
-          )}
-          {!hospital && s.address && (
-            <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 shrink-0" /> {s.address}{s.area ? `, ${s.area}` : ""}
-            </p>
-          )}
-          {s.description && (
-            <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">{s.description}</p>
-          )}
-        </div>
-      )}
+      {/* ── Info Section ── */}
+      <div className="px-5 py-3 space-y-2 border-t" style={{ borderColor: `${colors.accent}20` }}>
+        {hospital && (
+          <div className="flex items-start gap-2">
+            <Building2 className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color: colors.accent }} />
+            <p className="text-[13px] font-bold text-foreground leading-snug">{hospital}</p>
+          </div>
+        )}
+        {s.address && (
+          <div className="flex items-start gap-2">
+            <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 text-muted-foreground" />
+            <p className="text-xs text-muted-foreground leading-snug">{s.address}{s.area ? `, ${s.area}` : ""}</p>
+          </div>
+        )}
+        {s.description && (
+          <p className="text-xs text-muted-foreground line-clamp-2 pl-[22px]">{s.description}</p>
+        )}
+      </div>
 
-      {/* ── Contact Label ── */}
+      {/* ── Contact Badge ── */}
       {(s.phone || s.whatsapp) && (
-        <div className="px-4 py-2.5 border-t border-border/30">
-          <p className="text-[13px] font-bold text-center rounded-full py-1.5 px-4 mx-auto w-fit" style={{ background: "hsl(45,70%,90%)", color: "hsl(35,60%,30%)" }}>
+        <div className="px-5 py-2">
+          <p className="text-[11px] font-bold text-center rounded-full py-1.5 mx-auto w-fit px-5" style={{ background: "hsl(45,65%,92%)", color: "hsl(35,55%,32%)" }}>
             সিরিয়ালের জন্য যোগাযোগ করুন
           </p>
         </div>
       )}
 
-      {/* ── Call + WhatsApp Buttons ── */}
-      <div className="flex border-t border-border/30">
+      {/* ── CTA Buttons: কল করুন + হোয়াটসঅ্যাপ ── */}
+      <div className="flex gap-2.5 px-4 pb-4 pt-1">
         {s.phone && (
-          <a href={`tel:${s.phone}`} className="flex-1 py-3.5 text-[15px] font-extrabold flex items-center justify-center gap-2 text-white rounded-none active:opacity-80 transition-opacity" style={{ background: "linear-gradient(135deg, hsl(140,65%,42%), hsl(145,70%,48%))" }}>
-            <Phone className="w-4.5 h-4.5" /> কল করুন
+          <a href={`tel:${s.phone}`} className="flex-1 py-3 rounded-xl text-[13px] font-extrabold flex items-center justify-center gap-2 text-white shadow-sm active:scale-[0.97] transition-transform" style={{ background: "linear-gradient(135deg, hsl(142,62%,42%), hsl(152,65%,48%))" }}>
+            <Phone className="w-4 h-4" /> কল করুন
           </a>
         )}
         {s.whatsapp && (
-          <a href={`https://wa.me/88${s.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex-1 py-3.5 text-[15px] font-extrabold flex items-center justify-center gap-2 text-white rounded-none active:opacity-80 transition-opacity" style={{ background: "linear-gradient(135deg, hsl(145,60%,38%), hsl(155,65%,44%))" }}>
-            <MessageCircle className="w-4.5 h-4.5" /> হোয়াটসঅ্যাপ
+          <a href={`https://wa.me/88${s.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex-1 py-3 rounded-xl text-[13px] font-extrabold flex items-center justify-center gap-2 text-white shadow-sm active:scale-[0.97] transition-transform" style={{ background: "linear-gradient(135deg, hsl(148,58%,36%), hsl(158,62%,42%))" }}>
+            <MessageCircle className="w-4 h-4" /> হোয়াটসঅ্যাপ
           </a>
         )}
       </div>
