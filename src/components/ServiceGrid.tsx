@@ -6,444 +6,467 @@ import { supabase } from "@/integrations/supabase/client";
 // Animated colorful SVG icons for each service category
 const SvgIcons: Record<string, { svg: React.ReactNode; bg: string }> = {
   Stethoscope: {
-    bg: "linear-gradient(135deg, hsl(185,70%,88%), hsl(195,75%,82%))",
+    bg: "linear-gradient(135deg, hsl(185,80%,85%), hsl(195,85%,75%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <circle cx="34" cy="34" r="7" fill="hsl(185,65%,45%)" opacity="0.2"><animate attributeName="r" values="7;8;7" dur="2s" repeatCount="indefinite"/></circle>
-        <circle cx="34" cy="34" r="4" fill="hsl(185,65%,45%)"/>
-        <path d="M14 8C14 8 10 8 10 14V24C10 31.732 16.268 38 24 38" stroke="hsl(185,65%,40%)" strokeWidth="3" strokeLinecap="round"/>
-        <path d="M34 8C34 8 38 8 38 14V24C38 28 36 31.5 33 33.5" stroke="hsl(185,65%,40%)" strokeWidth="3" strokeLinecap="round"/>
-        <circle cx="14" cy="8" r="3" fill="hsl(185,65%,50%)" stroke="hsl(185,65%,40%)" strokeWidth="1.5"><animate attributeName="fill-opacity" values="0.8;1;0.8" dur="1.5s" repeatCount="indefinite"/></circle>
-        <circle cx="34" cy="8" r="3" fill="hsl(185,65%,50%)" stroke="hsl(185,65%,40%)" strokeWidth="1.5"/>
-        <path d="M24 38C27.866 38 31 34.866 31 31" stroke="hsl(185,65%,40%)" strokeWidth="2.5" strokeLinecap="round"/>
+        <defs><linearGradient id="steth-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(185,70%,50%)"/><stop offset="100%" stopColor="hsl(200,80%,40%)"/></linearGradient></defs>
+        <path d="M14 8C14 8 9 8 9 15V25C9 33 16 39 24 39" stroke="url(#steth-g)" strokeWidth="3" strokeLinecap="round" fill="none"/>
+        <path d="M34 8C34 8 39 8 39 15V25C39 29 37 32 34 34" stroke="url(#steth-g)" strokeWidth="3" strokeLinecap="round" fill="none"/>
+        <circle cx="14" cy="8" r="3.5" fill="hsl(185,70%,55%)" stroke="hsl(185,80%,40%)" strokeWidth="1.5"><animate attributeName="r" values="3.5;4;3.5" dur="2s" repeatCount="indefinite"/></circle>
+        <circle cx="34" cy="8" r="3.5" fill="hsl(185,70%,55%)" stroke="hsl(185,80%,40%)" strokeWidth="1.5"/>
+        <circle cx="34" cy="35" r="6" fill="hsl(340,75%,58%)" opacity="0.9"><animate attributeName="r" values="6;7;6" dur="1.5s" repeatCount="indefinite"/></circle>
+        <circle cx="34" cy="35" r="3" fill="hsl(340,85%,65%)"/>
       </svg>
     ),
   },
   Building2: {
-    bg: "linear-gradient(135deg, hsl(150,60%,88%), hsl(160,55%,80%))",
+    bg: "linear-gradient(135deg, hsl(150,65%,85%), hsl(165,60%,75%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <rect x="8" y="14" width="22" height="30" rx="2" fill="hsl(150,55%,45%)" opacity="0.15"/>
-        <rect x="8" y="14" width="22" height="30" rx="2" stroke="hsl(150,55%,40%)" strokeWidth="2.5"/>
-        <rect x="30" y="22" width="12" height="22" rx="2" fill="hsl(150,55%,55%)" opacity="0.25"/>
-        <rect x="30" y="22" width="12" height="22" rx="2" stroke="hsl(150,55%,40%)" strokeWidth="2.5"/>
-        <rect x="13" y="20" width="5" height="5" rx="1" fill="hsl(50,80%,55%)"><animate attributeName="fill-opacity" values="0.7;1;0.7" dur="2s" begin="0s" repeatCount="indefinite"/></rect>
-        <rect x="21" y="20" width="5" height="5" rx="1" fill="hsl(50,80%,55%)"><animate attributeName="fill-opacity" values="0.7;1;0.7" dur="2s" begin="0.5s" repeatCount="indefinite"/></rect>
-        <rect x="13" y="29" width="5" height="5" rx="1" fill="hsl(50,80%,55%)"><animate attributeName="fill-opacity" values="0.7;1;0.7" dur="2s" begin="1s" repeatCount="indefinite"/></rect>
-        <rect x="21" y="29" width="5" height="5" rx="1" fill="hsl(50,80%,55%)"><animate attributeName="fill-opacity" values="0.7;1;0.7" dur="2s" begin="1.5s" repeatCount="indefinite"/></rect>
-        <rect x="17" y="36" width="6" height="8" rx="1" fill="hsl(150,55%,50%)"/>
-        <path d="M4 44H44" stroke="hsl(150,55%,40%)" strokeWidth="2.5" strokeLinecap="round"/>
+        <defs><linearGradient id="bld-g" x1="0" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(150,60%,50%)"/><stop offset="100%" stopColor="hsl(165,65%,38%)"/></linearGradient></defs>
+        <rect x="8" y="12" width="20" height="32" rx="2" fill="url(#bld-g)" opacity="0.2" stroke="url(#bld-g)" strokeWidth="2.5"/>
+        <rect x="28" y="20" width="14" height="24" rx="2" fill="hsl(150,55%,55%)" opacity="0.15" stroke="url(#bld-g)" strokeWidth="2.5"/>
+        <rect x="13" y="18" width="4" height="4" rx="1" fill="hsl(50,90%,60%)"><animate attributeName="fill-opacity" values="0.5;1;0.5" dur="2.5s" begin="0s" repeatCount="indefinite"/></rect>
+        <rect x="21" y="18" width="4" height="4" rx="1" fill="hsl(50,90%,60%)"><animate attributeName="fill-opacity" values="0.5;1;0.5" dur="2.5s" begin="0.6s" repeatCount="indefinite"/></rect>
+        <rect x="13" y="26" width="4" height="4" rx="1" fill="hsl(50,90%,60%)"><animate attributeName="fill-opacity" values="0.5;1;0.5" dur="2.5s" begin="1.2s" repeatCount="indefinite"/></rect>
+        <rect x="21" y="26" width="4" height="4" rx="1" fill="hsl(50,90%,60%)"><animate attributeName="fill-opacity" values="0.5;1;0.5" dur="2.5s" begin="1.8s" repeatCount="indefinite"/></rect>
+        <rect x="16" y="36" width="6" height="8" rx="1.5" fill="hsl(150,55%,50%)" opacity="0.6"/>
+        <path d="M4 44H44" stroke="url(#bld-g)" strokeWidth="2.5" strokeLinecap="round"/>
       </svg>
     ),
   },
   Pill: {
-    bg: "linear-gradient(135deg, hsl(160,60%,88%), hsl(140,55%,82%))",
+    bg: "linear-gradient(135deg, hsl(160,65%,85%), hsl(145,60%,78%))",
     svg: (
-      <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <rect x="10" y="18" width="28" height="12" rx="6" fill="hsl(160,55%,50%)" opacity="0.2"/>
-        <rect x="10" y="18" width="28" height="12" rx="6" stroke="hsl(160,55%,42%)" strokeWidth="2.5"/>
-        <rect x="10" y="18" width="14" height="12" rx="6" fill="hsl(160,55%,50%)" opacity="0.5"/>
-        <line x1="24" y1="18" x2="24" y2="30" stroke="hsl(160,55%,42%)" strokeWidth="2"/>
-        <circle cx="36" cy="12" r="5" fill="hsl(340,65%,60%)" opacity="0.8"><animate attributeName="r" values="5;6;5" dur="1.5s" repeatCount="indefinite"/></circle>
-        <path d="M33.5 12H38.5M36 9.5V14.5" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+      <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-bounce">
+        <defs><linearGradient id="pill-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(160,60%,48%)"/><stop offset="100%" stopColor="hsl(140,55%,40%)"/></linearGradient></defs>
+        <rect x="6" y="16" width="36" height="16" rx="8" fill="url(#pill-g)" opacity="0.15" stroke="url(#pill-g)" strokeWidth="2.5" transform="rotate(-30 24 24)"/>
+        <rect x="6" y="16" width="18" height="16" rx="8" fill="url(#pill-g)" opacity="0.4" transform="rotate(-30 24 24)"/>
+        <circle cx="38" cy="10" r="6" fill="hsl(340,70%,58%)"><animate attributeName="r" values="5.5;6.5;5.5" dur="1.5s" repeatCount="indefinite"/></circle>
+        <path d="M35.5 10H40.5M38 7.5V12.5" stroke="white" strokeWidth="2" strokeLinecap="round"/>
       </svg>
     ),
   },
   GraduationCap: {
-    bg: "linear-gradient(135deg, hsl(45,90%,88%), hsl(35,85%,82%))",
+    bg: "linear-gradient(135deg, hsl(45,95%,85%), hsl(35,90%,78%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M24 10L4 20L24 30L44 20L24 10Z" fill="hsl(45,90%,52%)" opacity="0.4"/>
-        <path d="M24 10L4 20L24 30L44 20L24 10Z" stroke="hsl(25,70%,40%)" strokeWidth="2.5" strokeLinejoin="round"/>
-        <path d="M12 25V35C12 35 17 41 24 41C31 41 36 35 36 35V25" stroke="hsl(25,70%,40%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M40 20V30" stroke="hsl(25,70%,40%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <circle cx="40" cy="32" r="3" fill="hsl(340,70%,55%)"><animate attributeName="fill-opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/></circle>
-        <path d="M16 27L24 31L32 27" stroke="hsl(45,90%,50%)" strokeWidth="2" strokeLinecap="round"/>
+        <defs><linearGradient id="grad-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(45,90%,50%)"/><stop offset="100%" stopColor="hsl(30,80%,42%)"/></linearGradient></defs>
+        <path d="M24 8L2 20L24 32L46 20L24 8Z" fill="url(#grad-g)" opacity="0.35" stroke="url(#grad-g)" strokeWidth="2.5" strokeLinejoin="round"/>
+        <path d="M12 26V36C12 36 17 42 24 42C31 42 36 36 36 36V26" stroke="url(#grad-g)" strokeWidth="2.5" strokeLinecap="round"/>
+        <path d="M42 20V32" stroke="url(#grad-g)" strokeWidth="2.5" strokeLinecap="round"/>
+        <circle cx="42" cy="34" r="3" fill="hsl(0,70%,55%)"><animate attributeName="fill-opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/></circle>
+        <path d="M15 28L24 33L33 28" stroke="hsl(45,90%,55%)" strokeWidth="2" strokeLinecap="round" opacity="0.7"/>
       </svg>
     ),
   },
   Store: {
-    bg: "linear-gradient(135deg, hsl(330,55%,90%), hsl(340,60%,85%))",
+    bg: "linear-gradient(135deg, hsl(330,60%,88%), hsl(345,65%,82%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M6 18L10 8H38L42 18" stroke="hsl(330,55%,48%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M6 18C6 21.314 8.686 24 12 24C15.314 24 18 21.314 18 18" stroke="hsl(330,55%,48%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M18 18C18 21.314 20.686 24 24 24C27.314 24 30 21.314 30 18" stroke="hsl(330,55%,48%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M30 18C30 21.314 32.686 24 36 24C39.314 24 42 21.314 42 18" stroke="hsl(330,55%,48%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <rect x="6" y="24" width="36" height="18" rx="1" fill="hsl(330,55%,55%)" opacity="0.15"/>
-        <rect x="6" y="24" width="36" height="18" rx="1" stroke="hsl(330,55%,48%)" strokeWidth="2.5"/>
-        <rect x="20" y="30" width="8" height="12" rx="1" fill="hsl(330,55%,55%)" opacity="0.4"/>
-        <rect x="12" y="30" width="6" height="6" rx="1" fill="hsl(50,80%,55%)" opacity="0.5"><animate attributeName="fill-opacity" values="0.5;0.9;0.5" dur="2s" repeatCount="indefinite"/></rect>
+        <defs><linearGradient id="store-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(330,60%,55%)"/><stop offset="100%" stopColor="hsl(345,65%,45%)"/></linearGradient></defs>
+        <path d="M6 18L10 8H38L42 18" stroke="url(#store-g)" strokeWidth="2.5" strokeLinecap="round"/>
+        <path d="M6 18C6 21.3 8.7 24 12 24C15.3 24 18 21.3 18 18C18 21.3 20.7 24 24 24C27.3 24 30 21.3 30 18C30 21.3 32.7 24 36 24C39.3 24 42 21.3 42 18" stroke="url(#store-g)" strokeWidth="2.5"/>
+        <rect x="6" y="24" width="36" height="18" rx="1" fill="hsl(330,55%,55%)" opacity="0.1" stroke="url(#store-g)" strokeWidth="2.5"/>
+        <rect x="20" y="30" width="8" height="12" rx="1.5" fill="hsl(330,55%,55%)" opacity="0.3"/>
+        <rect x="11" y="29" width="7" height="7" rx="1" fill="hsl(50,85%,58%)" opacity="0.6"><animate attributeName="fill-opacity" values="0.4;0.8;0.4" dur="2s" repeatCount="indefinite"/></rect>
       </svg>
     ),
   },
   Briefcase: {
-    bg: "linear-gradient(135deg, hsl(210,60%,90%), hsl(220,55%,85%))",
+    bg: "linear-gradient(135deg, hsl(220,65%,88%), hsl(235,60%,82%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <rect x="6" y="18" width="36" height="24" rx="3" fill="hsl(210,55%,50%)" opacity="0.2"/>
-        <rect x="6" y="18" width="36" height="24" rx="3" stroke="hsl(210,55%,42%)" strokeWidth="2.5"/>
-        <path d="M16 18V14C16 12.343 17.343 11 19 11H29C30.657 11 32 12.343 32 14V18" stroke="hsl(210,55%,42%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M6 28H42" stroke="hsl(210,55%,42%)" strokeWidth="2" strokeLinecap="round"/>
-        <rect x="20" y="25" width="8" height="6" rx="1" fill="hsl(45,90%,55%)" opacity="0.7"><animate attributeName="fill-opacity" values="0.5;0.9;0.5" dur="2s" repeatCount="indefinite"/></rect>
+        <defs><linearGradient id="brief-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(220,60%,55%)"/><stop offset="100%" stopColor="hsl(240,55%,45%)"/></linearGradient></defs>
+        <rect x="5" y="16" width="38" height="26" rx="4" fill="url(#brief-g)" opacity="0.15" stroke="url(#brief-g)" strokeWidth="2.5"/>
+        <path d="M16 16V12C16 10.3 17.3 9 19 9H29C30.7 9 32 10.3 32 12V16" stroke="url(#brief-g)" strokeWidth="2.5" strokeLinecap="round"/>
+        <path d="M5 28H43" stroke="url(#brief-g)" strokeWidth="2"/>
+        <rect x="19" y="24" width="10" height="8" rx="2" fill="hsl(45,90%,55%)" opacity="0.8"><animate attributeName="fill-opacity" values="0.5;0.9;0.5" dur="2s" repeatCount="indefinite"/></rect>
       </svg>
     ),
   },
   MapPin: {
-    bg: "linear-gradient(135deg, hsl(130,55%,88%), hsl(140,50%,82%))",
+    bg: "linear-gradient(135deg, hsl(0,70%,90%), hsl(350,75%,84%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-bounce">
-        <path d="M24 6C17.373 6 12 11.373 12 18C12 26 24 42 24 42C24 42 36 26 36 18C36 11.373 30.627 6 24 6Z" fill="hsl(130,55%,50%)" opacity="0.25"/>
-        <path d="M24 6C17.373 6 12 11.373 12 18C12 26 24 42 24 42C24 42 36 26 36 18C36 11.373 30.627 6 24 6Z" stroke="hsl(130,55%,40%)" strokeWidth="2.5" strokeLinejoin="round"/>
-        <circle cx="24" cy="18" r="5" fill="hsl(0,65%,55%)" stroke="white" strokeWidth="2"><animate attributeName="r" values="5;6;5" dur="2s" repeatCount="indefinite"/></circle>
+        <defs><linearGradient id="pin-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(0,75%,58%)"/><stop offset="100%" stopColor="hsl(350,70%,45%)"/></linearGradient></defs>
+        <path d="M24 4C16.3 4 10 10.3 10 18C10 28 24 44 24 44C24 44 38 28 38 18C38 10.3 31.7 4 24 4Z" fill="url(#pin-g)" opacity="0.2" stroke="url(#pin-g)" strokeWidth="2.5"/>
+        <circle cx="24" cy="18" r="6" fill="hsl(0,75%,58%)" stroke="white" strokeWidth="2.5"><animate attributeName="r" values="5.5;6.5;5.5" dur="2s" repeatCount="indefinite"/></circle>
+        <circle cx="24" cy="18" r="2.5" fill="white"/>
       </svg>
     ),
   },
   Calendar: {
-    bg: "linear-gradient(135deg, hsl(270,60%,90%), hsl(280,55%,85%))",
+    bg: "linear-gradient(135deg, hsl(270,65%,88%), hsl(285,60%,82%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <rect x="6" y="12" width="36" height="30" rx="3" fill="hsl(270,60%,58%)" opacity="0.15"/>
-        <rect x="6" y="12" width="36" height="30" rx="3" stroke="hsl(270,60%,50%)" strokeWidth="2.5"/>
-        <path d="M6 22H42" stroke="hsl(270,60%,50%)" strokeWidth="2.5"/>
-        <path d="M16 7V12" stroke="hsl(270,60%,50%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M32 7V12" stroke="hsl(270,60%,50%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <rect x="14" y="28" width="6" height="6" rx="1.5" fill="hsl(340,70%,55%)"><animate attributeName="fill-opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/></rect>
-        <rect x="24" y="28" width="6" height="6" rx="1.5" fill="hsl(270,60%,58%)" opacity="0.5"/>
+        <defs><linearGradient id="cal-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(270,65%,55%)"/><stop offset="100%" stopColor="hsl(290,60%,45%)"/></linearGradient></defs>
+        <rect x="6" y="10" width="36" height="32" rx="4" fill="url(#cal-g)" opacity="0.12" stroke="url(#cal-g)" strokeWidth="2.5"/>
+        <rect x="6" y="10" width="36" height="10" rx="4" fill="url(#cal-g)" opacity="0.3"/>
+        <path d="M16 5V12M32 5V12" stroke="url(#cal-g)" strokeWidth="3" strokeLinecap="round"/>
+        <rect x="14" y="26" width="7" height="7" rx="2" fill="hsl(340,75%,58%)"><animate attributeName="fill-opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/></rect>
+        <rect x="27" y="26" width="7" height="7" rx="2" fill="hsl(270,60%,58%)" opacity="0.4"/>
+        <rect x="14" y="35" width="7" height="3" rx="1" fill="hsl(270,60%,55%)" opacity="0.25"/>
       </svg>
     ),
   },
   Globe: {
-    bg: "linear-gradient(135deg, hsl(195,75%,88%), hsl(205,70%,82%))",
+    bg: "linear-gradient(135deg, hsl(195,80%,85%), hsl(210,75%,78%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-spin-slow">
-        <circle cx="24" cy="24" r="16" fill="hsl(195,70%,55%)" opacity="0.15"/>
-        <circle cx="24" cy="24" r="16" stroke="hsl(195,70%,45%)" strokeWidth="2.5"/>
-        <ellipse cx="24" cy="24" rx="7" ry="16" stroke="hsl(195,70%,45%)" strokeWidth="2"/>
-        <path d="M8 24H40" stroke="hsl(195,70%,45%)" strokeWidth="2"/>
-        <path d="M10 16H38M10 32H38" stroke="hsl(195,70%,45%)" strokeWidth="1.5" strokeLinecap="round"/>
+        <defs><linearGradient id="globe-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(195,75%,52%)"/><stop offset="100%" stopColor="hsl(215,70%,42%)"/></linearGradient></defs>
+        <circle cx="24" cy="24" r="17" fill="url(#globe-g)" opacity="0.12" stroke="url(#globe-g)" strokeWidth="2.5"/>
+        <ellipse cx="24" cy="24" rx="7" ry="17" stroke="url(#globe-g)" strokeWidth="2" fill="none"/>
+        <path d="M7 24H41" stroke="url(#globe-g)" strokeWidth="2"/>
+        <path d="M9 15H39M9 33H39" stroke="url(#globe-g)" strokeWidth="1.5" opacity="0.5"/>
+        <circle cx="24" cy="24" r="3" fill="hsl(45,90%,55%)"><animate attributeName="fill-opacity" values="0.4;0.9;0.4" dur="3s" repeatCount="indefinite"/></circle>
       </svg>
     ),
   },
   Ambulance: {
-    bg: "linear-gradient(135deg, hsl(0,70%,92%), hsl(350,65%,88%))",
+    bg: "linear-gradient(135deg, hsl(0,75%,90%), hsl(355,70%,85%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <rect x="4" y="18" width="30" height="18" rx="2" fill="hsl(0,70%,55%)" opacity="0.2"/>
-        <rect x="4" y="18" width="30" height="18" rx="2" stroke="hsl(0,70%,48%)" strokeWidth="2.5"/>
-        <path d="M34 26H40L44 30V36H34" stroke="hsl(0,70%,48%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <circle cx="12" cy="38" r="4" fill="hsl(220,20%,40%)" stroke="white" strokeWidth="2"/>
-        <circle cx="36" cy="38" r="4" fill="hsl(220,20%,40%)" stroke="white" strokeWidth="2"/>
-        <path d="M16 24H22M19 21V27" stroke="hsl(0,70%,48%)" strokeWidth="2.5" strokeLinecap="round"><animate attributeName="stroke-opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite"/></path>
+        <defs><linearGradient id="amb-g" x1="0" y1="0" x2="1" y2="0.5"><stop offset="0%" stopColor="hsl(0,75%,55%)"/><stop offset="100%" stopColor="hsl(350,70%,48%)"/></linearGradient></defs>
+        <rect x="4" y="16" width="30" height="20" rx="3" fill="url(#amb-g)" opacity="0.15" stroke="url(#amb-g)" strokeWidth="2.5"/>
+        <path d="M34 24H40L44 29V36H34" stroke="url(#amb-g)" strokeWidth="2.5" strokeLinejoin="round"/>
+        <circle cx="13" cy="38" r="4" fill="hsl(220,25%,35%)" stroke="white" strokeWidth="2.5"/>
+        <circle cx="38" cy="38" r="4" fill="hsl(220,25%,35%)" stroke="white" strokeWidth="2.5"/>
+        <path d="M16 23H22M19 20V26" stroke="white" strokeWidth="3" strokeLinecap="round"><animate attributeName="stroke-opacity" values="0.6;1;0.6" dur="1s" repeatCount="indefinite"/></path>
       </svg>
     ),
   },
   Shield: {
-    bg: "linear-gradient(135deg, hsl(220,50%,90%), hsl(230,48%,85%))",
+    bg: "linear-gradient(135deg, hsl(225,55%,88%), hsl(240,50%,82%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M24 6L8 13V25C8 34.389 15.19 43.182 24 45C32.81 43.182 40 34.389 40 25V13L24 6Z" fill="hsl(220,50%,55%)" opacity="0.2"/>
-        <path d="M24 6L8 13V25C8 34.389 15.19 43.182 24 45C32.81 43.182 40 34.389 40 25V13L24 6Z" stroke="hsl(220,50%,45%)" strokeWidth="2.5" strokeLinejoin="round"/>
-        <path d="M17 24L22 29L32 19" stroke="hsl(140,55%,42%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><animate attributeName="stroke-opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/></path>
+        <defs><linearGradient id="shield-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(225,55%,55%)"/><stop offset="100%" stopColor="hsl(240,50%,42%)"/></linearGradient></defs>
+        <path d="M24 4L6 12V26C6 36 14 44 24 46C34 44 42 36 42 26V12L24 4Z" fill="url(#shield-g)" opacity="0.15" stroke="url(#shield-g)" strokeWidth="2.5" strokeLinejoin="round"/>
+        <path d="M16 24L22 30L32 18" stroke="hsl(140,60%,45%)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><animate attributeName="stroke-opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/></path>
       </svg>
     ),
   },
   Flame: {
-    bg: "linear-gradient(135deg, hsl(15,85%,90%), hsl(25,80%,85%))",
+    bg: "linear-gradient(135deg, hsl(20,90%,88%), hsl(10,85%,82%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M24 6C24 6 30 14 30 20C30 20 34 16 32 10C38 16 40 22 38 30C36 38 30 42 24 42C18 42 10 38 10 30C10 22 16 14 24 6Z" fill="hsl(15,80%,55%)" opacity="0.3"/>
-        <path d="M24 6C24 6 30 14 30 20C30 20 34 16 32 10C38 16 40 22 38 30C36 38 30 42 24 42C18 42 10 38 10 30C10 22 16 14 24 6Z" stroke="hsl(15,80%,48%)" strokeWidth="2.5" strokeLinejoin="round"/>
-        <path d="M24 42C20 42 16 38 18 32C19.5 28 24 26 24 26C24 26 28.5 28 30 32C32 38 28 42 24 42Z" fill="hsl(40,90%,55%)" opacity="0.8"><animate attributeName="fill-opacity" values="0.6;1;0.6" dur="0.8s" repeatCount="indefinite"/></path>
+        <defs><linearGradient id="flame-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(40,95%,55%)"/><stop offset="50%" stopColor="hsl(20,90%,50%)"/><stop offset="100%" stopColor="hsl(5,80%,45%)"/></linearGradient></defs>
+        <path d="M24 4C24 4 32 14 32 22C32 22 37 17 34 10C40 16 42 23 40 31C38 39 31 43 24 43C17 43 9 39 9 31C9 23 15 14 24 4Z" fill="url(#flame-g)" opacity="0.25" stroke="url(#flame-g)" strokeWidth="2.5" strokeLinejoin="round"/>
+        <path d="M24 43C20 43 16 39 18 33C19.5 29 24 27 24 27C24 27 28.5 29 30 33C32 39 28 43 24 43Z" fill="hsl(45,95%,58%)" opacity="0.9"><animate attributeName="fill-opacity" values="0.6;1;0.6" dur="0.7s" repeatCount="indefinite"/></path>
       </svg>
     ),
   },
   Bus: {
-    bg: "linear-gradient(135deg, hsl(200,55%,90%), hsl(210,50%,84%))",
+    bg: "linear-gradient(135deg, hsl(210,55%,88%), hsl(220,50%,82%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <rect x="6" y="10" width="36" height="26" rx="3" fill="hsl(200,50%,50%)" opacity="0.15"/>
-        <rect x="6" y="10" width="36" height="26" rx="3" stroke="hsl(200,50%,42%)" strokeWidth="2.5"/>
-        <path d="M6 22H42" stroke="hsl(200,50%,42%)" strokeWidth="2"/>
-        <rect x="10" y="14" width="8" height="6" rx="1" fill="hsl(195,60%,60%)" opacity="0.7"/>
-        <rect x="20" y="14" width="8" height="6" rx="1" fill="hsl(195,60%,60%)" opacity="0.7"/>
-        <rect x="30" y="14" width="8" height="6" rx="1" fill="hsl(195,60%,60%)" opacity="0.7"/>
-        <circle cx="14" cy="38" r="4" fill="hsl(220,25%,35%)" stroke="white" strokeWidth="2"><animate attributeName="r" values="3.5;4;3.5" dur="1s" repeatCount="indefinite"/></circle>
-        <circle cx="34" cy="38" r="4" fill="hsl(220,25%,35%)" stroke="white" strokeWidth="2"><animate attributeName="r" values="3.5;4;3.5" dur="1s" repeatCount="indefinite"/></circle>
+        <defs><linearGradient id="bus-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(210,55%,52%)"/><stop offset="100%" stopColor="hsl(225,50%,42%)"/></linearGradient></defs>
+        <rect x="8" y="8" width="32" height="28" rx="4" fill="url(#bus-g)" opacity="0.12" stroke="url(#bus-g)" strokeWidth="2.5"/>
+        <rect x="8" y="8" width="32" height="10" rx="4" fill="url(#bus-g)" opacity="0.2"/>
+        <rect x="12" y="12" width="8" height="6" rx="1.5" fill="hsl(195,70%,65%)" opacity="0.8"/>
+        <rect x="22" y="12" width="8" height="6" rx="1.5" fill="hsl(195,70%,65%)" opacity="0.8"/>
+        <rect x="32" y="12" width="6" height="6" rx="1.5" fill="hsl(195,70%,65%)" opacity="0.8"/>
+        <path d="M8 24H40" stroke="url(#bus-g)" strokeWidth="2"/>
+        <circle cx="15" cy="40" r="4" fill="hsl(220,30%,30%)" stroke="hsl(0,0%,90%)" strokeWidth="2"><animate attributeName="r" values="3.5;4.2;3.5" dur="0.8s" repeatCount="indefinite"/></circle>
+        <circle cx="33" cy="40" r="4" fill="hsl(220,30%,30%)" stroke="hsl(0,0%,90%)" strokeWidth="2"><animate attributeName="r" values="3.5;4.2;3.5" dur="0.8s" repeatCount="indefinite"/></circle>
       </svg>
     ),
   },
   Zap: {
-    bg: "linear-gradient(135deg, hsl(50,85%,88%), hsl(40,80%,82%))",
+    bg: "linear-gradient(135deg, hsl(50,90%,85%), hsl(40,85%,78%))",
     svg: (
-      <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M28 6L10 28H24L20 42L38 20H24L28 6Z" fill="hsl(45,90%,52%)" opacity="0.4"/>
-        <path d="M28 6L10 28H24L20 42L38 20H24L28 6Z" stroke="hsl(45,85%,42%)" strokeWidth="2.5" strokeLinejoin="round"/>
-        <circle cx="38" cy="10" r="4" fill="hsl(45,90%,55%)"><animate attributeName="fill-opacity" values="0.3;0.8;0.3" dur="1.2s" repeatCount="indefinite"/></circle>
+      <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-pulse">
+        <defs><linearGradient id="zap-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(50,95%,55%)"/><stop offset="100%" stopColor="hsl(35,90%,45%)"/></linearGradient></defs>
+        <path d="M28 4L8 26H24L20 44L40 22H24L28 4Z" fill="url(#zap-g)" opacity="0.3" stroke="url(#zap-g)" strokeWidth="2.5" strokeLinejoin="round"/>
+        <path d="M28 4L8 26H24L20 44L40 22H24L28 4Z" fill="url(#zap-g)" opacity="0.15"/>
+        <circle cx="14" cy="18" r="4" fill="hsl(50,95%,60%)" opacity="0.6"><animate attributeName="fill-opacity" values="0.2;0.7;0.2" dur="1s" repeatCount="indefinite"/></circle>
       </svg>
     ),
   },
   Scale: {
-    bg: "linear-gradient(135deg, hsl(220,35%,90%), hsl(230,30%,86%))",
+    bg: "linear-gradient(135deg, hsl(225,40%,88%), hsl(235,35%,82%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M24 8V40" stroke="hsl(220,30%,45%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M12 40H36" stroke="hsl(220,30%,45%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M8 16H24H40" stroke="hsl(220,30%,45%)" strokeWidth="2"/>
-        <path d="M8 16L4 26H12L8 16Z" fill="hsl(220,30%,50%)" opacity="0.4" stroke="hsl(220,30%,45%)" strokeWidth="2" strokeLinejoin="round"/>
-        <path d="M40 16L36 26H44L40 16Z" fill="hsl(50,80%,50%)" opacity="0.5" stroke="hsl(220,30%,45%)" strokeWidth="2" strokeLinejoin="round"/>
+        <defs><linearGradient id="scale-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(225,40%,50%)"/><stop offset="100%" stopColor="hsl(240,35%,42%)"/></linearGradient></defs>
+        <path d="M24 6V42" stroke="url(#scale-g)" strokeWidth="3" strokeLinecap="round"/>
+        <path d="M14 42H34" stroke="url(#scale-g)" strokeWidth="3" strokeLinecap="round"/>
+        <path d="M6 16H24H42" stroke="url(#scale-g)" strokeWidth="2.5"/>
+        <path d="M6 16L2 28H10L6 16Z" fill="hsl(50,85%,55%)" opacity="0.5" stroke="url(#scale-g)" strokeWidth="2" strokeLinejoin="round"><animate attributeName="fill-opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite"/></path>
+        <path d="M42 16L38 28H46L42 16Z" fill="hsl(225,40%,55%)" opacity="0.35" stroke="url(#scale-g)" strokeWidth="2" strokeLinejoin="round"/>
       </svg>
     ),
   },
   Landmark: {
-    bg: "linear-gradient(135deg, hsl(170,60%,88%), hsl(180,55%,82%))",
+    bg: "linear-gradient(135deg, hsl(170,65%,85%), hsl(185,60%,78%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M6 42H42" stroke="hsl(170,55%,40%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M8 22H40" stroke="hsl(170,55%,40%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M24 8L6 18H42L24 8Z" fill="hsl(170,55%,48%)" opacity="0.3" stroke="hsl(170,55%,40%)" strokeWidth="2.5" strokeLinejoin="round"/>
-        <rect x="10" y="22" width="5" height="20" fill="hsl(170,55%,48%)" opacity="0.3" stroke="hsl(170,55%,40%)" strokeWidth="2"/>
-        <rect x="19" y="22" width="10" height="20" fill="hsl(170,55%,48%)" opacity="0.2" stroke="hsl(170,55%,40%)" strokeWidth="2"/>
-        <rect x="33" y="22" width="5" height="20" fill="hsl(170,55%,48%)" opacity="0.3" stroke="hsl(170,55%,40%)" strokeWidth="2"/>
+        <defs><linearGradient id="land-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(170,60%,48%)"/><stop offset="100%" stopColor="hsl(185,55%,38%)"/></linearGradient></defs>
+        <path d="M24 6L4 18H44L24 6Z" fill="url(#land-g)" opacity="0.25" stroke="url(#land-g)" strokeWidth="2.5" strokeLinejoin="round"/>
+        <rect x="9" y="20" width="6" height="20" rx="1" fill="url(#land-g)" opacity="0.2" stroke="url(#land-g)" strokeWidth="2"/>
+        <rect x="21" y="20" width="6" height="20" rx="1" fill="url(#land-g)" opacity="0.2" stroke="url(#land-g)" strokeWidth="2"/>
+        <rect x="33" y="20" width="6" height="20" rx="1" fill="url(#land-g)" opacity="0.2" stroke="url(#land-g)" strokeWidth="2"/>
+        <path d="M4 42H44" stroke="url(#land-g)" strokeWidth="3" strokeLinecap="round"/>
+        <circle cx="24" cy="12" r="2" fill="hsl(45,90%,55%)"><animate attributeName="fill-opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite"/></circle>
       </svg>
     ),
   },
   Users: {
-    bg: "linear-gradient(135deg, hsl(210,55%,89%), hsl(220,50%,84%))",
+    bg: "linear-gradient(135deg, hsl(210,60%,87%), hsl(225,55%,80%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <circle cx="18" cy="16" r="7" fill="hsl(210,50%,55%)" opacity="0.25"/>
-        <circle cx="18" cy="16" r="7" stroke="hsl(210,50%,48%)" strokeWidth="2.5"/>
-        <path d="M6 40C6 33.373 11.373 28 18 28C24.627 28 30 33.373 30 40" stroke="hsl(210,50%,48%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <circle cx="34" cy="18" r="5" fill="hsl(340,60%,60%)" opacity="0.4" stroke="hsl(210,50%,48%)" strokeWidth="2"><animate attributeName="fill-opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite"/></circle>
-        <path d="M32 30C35.866 30 42 32.239 42 40" stroke="hsl(210,50%,48%)" strokeWidth="2.5" strokeLinecap="round"/>
+        <defs><linearGradient id="users-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(210,55%,55%)"/><stop offset="100%" stopColor="hsl(230,50%,45%)"/></linearGradient></defs>
+        <circle cx="18" cy="14" r="8" fill="url(#users-g)" opacity="0.15" stroke="url(#users-g)" strokeWidth="2.5"/>
+        <path d="M4 42C4 33 10 26 18 26C26 26 32 33 32 42" stroke="url(#users-g)" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+        <circle cx="35" cy="17" r="6" fill="hsl(340,65%,60%)" opacity="0.3" stroke="url(#users-g)" strokeWidth="2"><animate attributeName="fill-opacity" values="0.2;0.5;0.2" dur="2.5s" repeatCount="indefinite"/></circle>
+        <path d="M34 28C38 28 44 31 44 42" stroke="url(#users-g)" strokeWidth="2.5" strokeLinecap="round"/>
       </svg>
     ),
   },
   Package: {
-    bg: "linear-gradient(135deg, hsl(30,65%,89%), hsl(20,60%,84%))",
+    bg: "linear-gradient(135deg, hsl(30,70%,87%), hsl(20,65%,80%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M24 6L42 16V32L24 42L6 32V16L24 6Z" fill="hsl(30,60%,55%)" opacity="0.2"/>
-        <path d="M24 6L42 16V32L24 42L6 32V16L24 6Z" stroke="hsl(30,60%,45%)" strokeWidth="2.5" strokeLinejoin="round"/>
-        <path d="M24 6V42M6 16L24 26L42 16" stroke="hsl(30,60%,45%)" strokeWidth="2" strokeLinecap="round"/>
-        <path d="M15 11L33 21" stroke="hsl(30,60%,45%)" strokeWidth="1.5" strokeLinecap="round"/>
+        <defs><linearGradient id="pkg-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(30,65%,52%)"/><stop offset="100%" stopColor="hsl(15,60%,42%)"/></linearGradient></defs>
+        <path d="M24 4L44 14V34L24 44L4 34V14L24 4Z" fill="url(#pkg-g)" opacity="0.12" stroke="url(#pkg-g)" strokeWidth="2.5" strokeLinejoin="round"/>
+        <path d="M4 14L24 24L44 14" stroke="url(#pkg-g)" strokeWidth="2" strokeLinecap="round"/>
+        <path d="M24 24V44" stroke="url(#pkg-g)" strokeWidth="2"/>
+        <path d="M14 9L34 19" stroke="hsl(45,90%,55%)" strokeWidth="2" strokeLinecap="round" opacity="0.6"/>
       </svg>
     ),
   },
   Sprout: {
-    bg: "linear-gradient(135deg, hsl(100,55%,88%), hsl(110,50%,82%))",
+    bg: "linear-gradient(135deg, hsl(100,60%,85%), hsl(115,55%,78%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M24 38V22" stroke="hsl(100,50%,38%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M24 22C24 22 12 22 12 10C12 10 22 10 24 22Z" fill="hsl(100,50%,48%)" opacity="0.5" stroke="hsl(100,50%,38%)" strokeWidth="2" strokeLinejoin="round"><animate attributeName="fill-opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite"/></path>
-        <path d="M24 30C24 30 36 30 36 18C36 18 26 18 24 30Z" fill="hsl(120,50%,45%)" opacity="0.5" stroke="hsl(100,50%,38%)" strokeWidth="2" strokeLinejoin="round"><animate attributeName="fill-opacity" values="0.3;0.6;0.3" dur="3s" begin="1s" repeatCount="indefinite"/></path>
-        <path d="M16 42H32" stroke="hsl(100,50%,38%)" strokeWidth="2.5" strokeLinecap="round"/>
+        <defs><linearGradient id="sprout-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(110,55%,48%)"/><stop offset="100%" stopColor="hsl(130,50%,38%)"/></linearGradient></defs>
+        <path d="M24 40V20" stroke="url(#sprout-g)" strokeWidth="3" strokeLinecap="round"/>
+        <path d="M24 20C24 20 10 20 10 8C10 8 22 8 24 20Z" fill="hsl(110,55%,48%)" opacity="0.4" stroke="url(#sprout-g)" strokeWidth="2.5" strokeLinejoin="round"><animate attributeName="fill-opacity" values="0.25;0.5;0.25" dur="3s" repeatCount="indefinite"/></path>
+        <path d="M24 28C24 28 38 28 38 16C38 16 26 16 24 28Z" fill="hsl(130,50%,45%)" opacity="0.4" stroke="url(#sprout-g)" strokeWidth="2.5" strokeLinejoin="round"><animate attributeName="fill-opacity" values="0.25;0.5;0.25" dur="3s" begin="1s" repeatCount="indefinite"/></path>
+        <path d="M16 44H32" stroke="url(#sprout-g)" strokeWidth="2.5" strokeLinecap="round"/>
       </svg>
     ),
   },
   Home: {
-    bg: "linear-gradient(135deg, hsl(25,85%,89%), hsl(15,80%,84%))",
+    bg: "linear-gradient(135deg, hsl(25,90%,87%), hsl(15,85%,80%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M6 22L24 8L42 22" stroke="hsl(25,80%,48%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M10 20V40H38V20" stroke="hsl(25,80%,48%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <rect x="10" y="20" width="28" height="20" rx="1" fill="hsl(25,80%,55%)" opacity="0.15"/>
-        <rect x="20" y="28" width="8" height="12" rx="1" fill="hsl(25,80%,55%)" opacity="0.5" stroke="hsl(25,80%,48%)" strokeWidth="1.5"/>
-        <rect x="13" y="26" width="7" height="7" rx="1" fill="hsl(195,60%,60%)" opacity="0.7"><animate attributeName="fill-opacity" values="0.5;0.9;0.5" dur="2s" repeatCount="indefinite"/></rect>
+        <defs><linearGradient id="home-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(25,85%,52%)"/><stop offset="100%" stopColor="hsl(15,80%,42%)"/></linearGradient></defs>
+        <path d="M4 22L24 6L44 22" stroke="url(#home-g)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M10 20V42H38V20" stroke="url(#home-g)" strokeWidth="2.5" fill="url(#home-g)" fillOpacity="0.08"/>
+        <rect x="20" y="28" width="8" height="14" rx="2" fill="hsl(25,80%,55%)" opacity="0.4" stroke="url(#home-g)" strokeWidth="1.5"/>
+        <rect x="12" y="24" width="7" height="7" rx="1.5" fill="hsl(195,70%,60%)" opacity="0.7"><animate attributeName="fill-opacity" values="0.5;0.9;0.5" dur="2.5s" repeatCount="indefinite"/></rect>
+        <rect x="29" y="24" width="7" height="7" rx="1.5" fill="hsl(195,70%,60%)" opacity="0.7"><animate attributeName="fill-opacity" values="0.5;0.9;0.5" dur="2.5s" begin="0.8s" repeatCount="indefinite"/></rect>
       </svg>
     ),
   },
   BookOpenCheck: {
-    bg: "linear-gradient(135deg, hsl(170,55%,88%), hsl(180,50%,82%))",
+    bg: "linear-gradient(135deg, hsl(170,60%,85%), hsl(185,55%,78%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M24 10C24 10 14 8 6 12V40C14 36 24 38 24 38" stroke="hsl(170,50%,42%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M24 10C24 10 34 8 42 12V40C34 36 24 38 24 38" stroke="hsl(170,50%,42%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M24 10V38" stroke="hsl(170,50%,42%)" strokeWidth="2"/>
-        <path d="M30 20L33 23L40 16" stroke="hsl(140,60%,42%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><animate attributeName="stroke-opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/></path>
+        <defs><linearGradient id="book-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(170,55%,48%)"/><stop offset="100%" stopColor="hsl(190,50%,38%)"/></linearGradient></defs>
+        <path d="M24 8C24 8 14 6 4 10V40C14 36 24 38 24 38C24 38 34 36 44 40V10C34 6 24 8 24 8Z" fill="url(#book-g)" opacity="0.1" stroke="url(#book-g)" strokeWidth="2.5"/>
+        <path d="M24 8V38" stroke="url(#book-g)" strokeWidth="2"/>
+        <path d="M30 18L33 21L40 14" stroke="hsl(140,65%,42%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><animate attributeName="stroke-opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite"/></path>
       </svg>
     ),
   },
   UtensilsCrossed: {
-    bg: "linear-gradient(135deg, hsl(30,80%,89%), hsl(20,75%,84%))",
+    bg: "linear-gradient(135deg, hsl(30,85%,87%), hsl(20,80%,80%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M16 8V20C16 23.314 13.314 26 10 26" stroke="hsl(30,75%,48%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M10 8V26" stroke="hsl(30,75%,48%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M13 26V40" stroke="hsl(30,75%,48%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M34 8C34 8 38 14 38 20C38 24 35 27 32 28V40" stroke="hsl(30,75%,48%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <circle cx="13" cy="16" r="2" fill="hsl(45,90%,55%)" opacity="0.7"><animate attributeName="fill-opacity" values="0.4;0.9;0.4" dur="2s" repeatCount="indefinite"/></circle>
+        <defs><linearGradient id="food-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(30,80%,50%)"/><stop offset="100%" stopColor="hsl(15,75%,42%)"/></linearGradient></defs>
+        <path d="M16 6V18C16 22 13 24 10 24V6" stroke="url(#food-g)" strokeWidth="2.5" strokeLinecap="round"/>
+        <path d="M13 6V24M13 24V42" stroke="url(#food-g)" strokeWidth="2.5" strokeLinecap="round"/>
+        <path d="M34 6C34 6 40 12 40 20C40 25 36 28 34 28V42" stroke="url(#food-g)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <circle cx="13" cy="15" r="2.5" fill="hsl(45,95%,58%)" opacity="0.7"><animate attributeName="fill-opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/></circle>
       </svg>
     ),
   },
   Wrench: {
-    bg: "linear-gradient(135deg, hsl(220,35%,89%), hsl(210,30%,84%))",
+    bg: "linear-gradient(135deg, hsl(220,40%,87%), hsl(210,35%,80%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M36 8C32 8 28 11 28 15C28 16 28.3 17 28.8 17.8L10 36L12 40L14 42L32 24C32.8 24.5 34 25 35 25C39 25 42 21 42 17C42 16 41.8 15 41.4 14.1L37 19L33 15L37.5 10.5C36.7 9.2 36 8.5 36 8Z" fill="hsl(220,30%,50%)" opacity="0.25"/>
-        <path d="M36 8C32 8 28 11 28 15C28 16 28.3 17 28.8 17.8L10 36L12 40L14 42L32 24C32.8 24.5 34 25 35 25C39 25 42 21 42 17C42 16 41.8 15 41.4 14.1L37 19L33 15L37.5 10.5C36.7 9.2 36 8.5 36 8Z" stroke="hsl(220,30%,42%)" strokeWidth="2.5" strokeLinejoin="round"/>
+        <defs><linearGradient id="wrench-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(220,35%,52%)"/><stop offset="100%" stopColor="hsl(210,30%,40%)"/></linearGradient></defs>
+        <path d="M37 7C33 7 29 10.5 29 15C29 16.2 29.3 17.3 29.8 18.2L10 37L14 43L33 24C33.8 24.5 35 25 36 25C40 25 43 21.5 43 17.5C43 16.3 42.7 15 42 13.8L38 18L34 14L38.5 9.5C38 8.5 37.5 7.5 37 7Z" fill="url(#wrench-g)" opacity="0.2" stroke="url(#wrench-g)" strokeWidth="2.5" strokeLinejoin="round"/>
+        <circle cx="12" cy="40" r="3" fill="hsl(45,90%,55%)" opacity="0.6"><animate attributeName="fill-opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/></circle>
       </svg>
     ),
   },
   Heart: {
-    bg: "linear-gradient(135deg, hsl(340,75%,90%), hsl(350,70%,86%))",
+    bg: "linear-gradient(135deg, hsl(340,80%,88%), hsl(355,75%,82%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-pulse">
-        <path d="M24 40C24 40 8 30 8 18C8 12.477 12.477 8 18 8C21.164 8 24 10 24 10C24 10 26.836 8 30 8C35.523 8 40 12.477 40 18C40 30 24 40 24 40Z" fill="hsl(340,70%,60%)" opacity="0.35"/>
-        <path d="M24 40C24 40 8 30 8 18C8 12.477 12.477 8 18 8C21.164 8 24 10 24 10C24 10 26.836 8 30 8C35.523 8 40 12.477 40 18C40 30 24 40 24 40Z" stroke="hsl(340,70%,50%)" strokeWidth="2.5" strokeLinejoin="round"/>
-        <path d="M15 22L20 27L28 19" stroke="hsl(340,70%,50%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <defs><linearGradient id="heart-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(340,75%,60%)"/><stop offset="100%" stopColor="hsl(355,70%,48%)"/></linearGradient></defs>
+        <path d="M24 42C24 42 6 30 6 17C6 10.5 11 6 17 6C20.5 6 24 8.5 24 8.5C24 8.5 27.5 6 31 6C37 6 42 10.5 42 17C42 30 24 42 24 42Z" fill="url(#heart-g)" opacity="0.25" stroke="url(#heart-g)" strokeWidth="2.5" strokeLinejoin="round"/>
+        <path d="M16 22L21 27L30 18" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.8"><animate attributeName="stroke-opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/></path>
       </svg>
     ),
   },
   Newspaper: {
-    bg: "linear-gradient(135deg, hsl(0,70%,90%), hsl(350,65%,86%))",
+    bg: "linear-gradient(135deg, hsl(0,75%,88%), hsl(350,70%,82%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <rect x="6" y="10" width="30" height="30" rx="2" fill="hsl(0,70%,55%)" opacity="0.15"/>
-        <rect x="6" y="10" width="30" height="30" rx="2" stroke="hsl(0,70%,48%)" strokeWidth="2.5"/>
-        <rect x="12" y="16" width="18" height="8" rx="1" fill="hsl(0,70%,55%)" opacity="0.3"/>
-        <path d="M12 28H30M12 33H24" stroke="hsl(0,70%,48%)" strokeWidth="2" strokeLinecap="round"/>
-        <rect x="32" y="10" width="10" height="18" rx="1" fill="hsl(0,70%,48%)" opacity="0.15" stroke="hsl(0,70%,48%)" strokeWidth="2"/>
+        <defs><linearGradient id="news-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(0,70%,55%)"/><stop offset="100%" stopColor="hsl(350,65%,45%)"/></linearGradient></defs>
+        <rect x="4" y="8" width="32" height="32" rx="3" fill="url(#news-g)" opacity="0.12" stroke="url(#news-g)" strokeWidth="2.5"/>
+        <rect x="10" y="14" width="20" height="10" rx="2" fill="url(#news-g)" opacity="0.2"/>
+        <path d="M10 28H30M10 34H22" stroke="url(#news-g)" strokeWidth="2" strokeLinecap="round"/>
+        <path d="M36 14V36C36 38.2 37.8 40 40 40C42.2 40 44 38.2 44 36V14" stroke="url(#news-g)" strokeWidth="2.5" strokeLinecap="round"/>
+        <circle cx="40" cy="12" r="3" fill="hsl(45,90%,55%)"><animate attributeName="fill-opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite"/></circle>
       </svg>
     ),
   },
   Activity: {
-    bg: "linear-gradient(135deg, hsl(190,65%,88%), hsl(200,60%,82%))",
+    bg: "linear-gradient(135deg, hsl(190,70%,85%), hsl(205,65%,78%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M4 24H14L18 12L24 36L30 20L34 28H44" stroke="hsl(190,60%,42%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><animate attributeName="stroke-dashoffset" values="100;0" dur="3s" repeatCount="indefinite"/></path>
-        <circle cx="24" cy="24" r="16" stroke="hsl(190,60%,42%)" strokeWidth="1" strokeDasharray="2 3" opacity="0.4"/>
+        <defs><linearGradient id="act-g" x1="0" y1="0.5" x2="1" y2="0.5"><stop offset="0%" stopColor="hsl(190,65%,48%)"/><stop offset="100%" stopColor="hsl(210,60%,42%)"/></linearGradient></defs>
+        <circle cx="24" cy="24" r="18" fill="url(#act-g)" opacity="0.08" stroke="url(#act-g)" strokeWidth="1.5" strokeDasharray="3 4"/>
+        <path d="M4 24H12L16 10L24 38L32 18L36 28H44" stroke="url(#act-g)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><animate attributeName="stroke-dashoffset" from="120" to="0" dur="3s" repeatCount="indefinite"/></path>
       </svg>
     ),
   },
   Car: {
-    bg: "linear-gradient(135deg, hsl(160,60%,88%), hsl(170,55%,82%))",
+    bg: "linear-gradient(135deg, hsl(160,65%,85%), hsl(175,60%,78%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M8 26L12 16H36L40 26" stroke="hsl(160,55%,40%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <rect x="4" y="26" width="40" height="12" rx="2" fill="hsl(160,55%,48%)" opacity="0.2"/>
-        <rect x="4" y="26" width="40" height="12" rx="2" stroke="hsl(160,55%,40%)" strokeWidth="2.5"/>
-        <rect x="14" y="18" width="20" height="8" rx="1" fill="hsl(195,65%,65%)" opacity="0.5"/>
-        <circle cx="13" cy="40" r="4" fill="hsl(220,25%,35%)" stroke="white" strokeWidth="2"><animate attributeName="r" values="3.5;4;3.5" dur="1s" repeatCount="indefinite"/></circle>
-        <circle cx="35" cy="40" r="4" fill="hsl(220,25%,35%)" stroke="white" strokeWidth="2"><animate attributeName="r" values="3.5;4;3.5" dur="1s" repeatCount="indefinite"/></circle>
+        <defs><linearGradient id="car-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(160,60%,48%)"/><stop offset="100%" stopColor="hsl(175,55%,38%)"/></linearGradient></defs>
+        <path d="M8 26L13 14H35L40 26" stroke="url(#car-g)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <rect x="4" y="26" width="40" height="12" rx="3" fill="url(#car-g)" opacity="0.12" stroke="url(#car-g)" strokeWidth="2.5"/>
+        <rect x="15" y="16" width="18" height="9" rx="2" fill="hsl(195,70%,65%)" opacity="0.6"/>
+        <circle cx="13" cy="40" r="4" fill="hsl(220,30%,30%)" stroke="hsl(0,0%,92%)" strokeWidth="2.5"><animate attributeName="r" values="3.5;4.2;3.5" dur="0.8s" repeatCount="indefinite"/></circle>
+        <circle cx="35" cy="40" r="4" fill="hsl(220,30%,30%)" stroke="hsl(0,0%,92%)" strokeWidth="2.5"><animate attributeName="r" values="3.5;4.2;3.5" dur="0.8s" repeatCount="indefinite"/></circle>
+      </svg>
+    ),
+  },
+  Building: {
+    bg: "linear-gradient(135deg, hsl(210,45%,88%), hsl(225,40%,82%))",
+    svg: (
+      <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
+        <defs><linearGradient id="bldg-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(210,45%,55%)"/><stop offset="100%" stopColor="hsl(225,40%,42%)"/></linearGradient></defs>
+        <rect x="10" y="6" width="28" height="38" rx="3" fill="url(#bldg-g)" opacity="0.12" stroke="url(#bldg-g)" strokeWidth="2.5"/>
+        <rect x="16" y="12" width="5" height="5" rx="1" fill="hsl(50,90%,60%)"><animate attributeName="fill-opacity" values="0.4;0.9;0.4" dur="3s" begin="0s" repeatCount="indefinite"/></rect>
+        <rect x="27" y="12" width="5" height="5" rx="1" fill="hsl(50,90%,60%)"><animate attributeName="fill-opacity" values="0.4;0.9;0.4" dur="3s" begin="0.8s" repeatCount="indefinite"/></rect>
+        <rect x="16" y="22" width="5" height="5" rx="1" fill="hsl(50,90%,60%)"><animate attributeName="fill-opacity" values="0.4;0.9;0.4" dur="3s" begin="1.6s" repeatCount="indefinite"/></rect>
+        <rect x="27" y="22" width="5" height="5" rx="1" fill="hsl(50,90%,60%)"><animate attributeName="fill-opacity" values="0.4;0.9;0.4" dur="3s" begin="2.4s" repeatCount="indefinite"/></rect>
+        <rect x="20" y="34" width="8" height="10" rx="2" fill="url(#bldg-g)" opacity="0.35"/>
       </svg>
     ),
   },
   TrendingUp: {
-    bg: "linear-gradient(135deg, hsl(140,55%,88%), hsl(150,50%,82%))",
+    bg: "linear-gradient(135deg, hsl(140,60%,85%), hsl(155,55%,78%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M6 36L18 22L26 30L38 16" stroke="hsl(140,50%,42%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M32 16H38V22" stroke="hsl(140,50%,42%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M6 42H42" stroke="hsl(140,50%,42%)" strokeWidth="2" strokeLinecap="round"/>
-        <circle cx="38" cy="16" r="3" fill="hsl(140,50%,55%)"><animate attributeName="fill-opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/></circle>
-        <circle cx="26" cy="30" r="3" fill="hsl(140,50%,55%)"/>
+        <defs><linearGradient id="trend-g" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stopColor="hsl(140,55%,48%)"/><stop offset="100%" stopColor="hsl(160,50%,40%)"/></linearGradient></defs>
+        <path d="M4 38L16 24L26 32L40 14" stroke="url(#trend-g)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M34 14H40V20" stroke="url(#trend-g)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M4 44H44" stroke="url(#trend-g)" strokeWidth="2" strokeLinecap="round"/>
+        <circle cx="40" cy="14" r="4" fill="hsl(140,55%,52%)"><animate attributeName="fill-opacity" values="0.4;1;0.4" dur="1.5s" repeatCount="indefinite"/></circle>
       </svg>
     ),
   },
   BedDouble: {
-    bg: "linear-gradient(135deg, hsl(35,75%,89%), hsl(25,70%,84%))",
+    bg: "linear-gradient(135deg, hsl(35,80%,87%), hsl(25,75%,80%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M6 32V18H42V32" stroke="hsl(35,70%,48%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <rect x="6" y="28" width="36" height="10" rx="2" fill="hsl(35,70%,55%)" opacity="0.2" stroke="hsl(35,70%,48%)" strokeWidth="2.5"/>
-        <rect x="10" y="20" width="12" height="8" rx="2" fill="hsl(195,60%,65%)" opacity="0.5" stroke="hsl(35,70%,48%)" strokeWidth="1.5"/>
-        <rect x="26" y="20" width="12" height="8" rx="2" fill="hsl(195,60%,65%)" opacity="0.5" stroke="hsl(35,70%,48%)" strokeWidth="1.5"/>
-        <path d="M6 38V42M42 38V42" stroke="hsl(35,70%,48%)" strokeWidth="2.5" strokeLinecap="round"/>
+        <defs><linearGradient id="bed-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(35,75%,52%)"/><stop offset="100%" stopColor="hsl(20,70%,42%)"/></linearGradient></defs>
+        <path d="M4 32V16H44V32" stroke="url(#bed-g)" strokeWidth="2.5" strokeLinecap="round"/>
+        <rect x="4" y="28" width="40" height="10" rx="3" fill="url(#bed-g)" opacity="0.15" stroke="url(#bed-g)" strokeWidth="2.5"/>
+        <rect x="8" y="18" width="14" height="10" rx="3" fill="hsl(195,65%,65%)" opacity="0.5" stroke="url(#bed-g)" strokeWidth="1.5"/>
+        <rect x="26" y="18" width="14" height="10" rx="3" fill="hsl(195,65%,65%)" opacity="0.5" stroke="url(#bed-g)" strokeWidth="1.5"/>
+        <path d="M4 38V44M44 38V44" stroke="url(#bed-g)" strokeWidth="3" strokeLinecap="round"/>
       </svg>
     ),
   },
   Coffee: {
-    bg: "linear-gradient(135deg, hsl(15,75%,89%), hsl(25,70%,84%))",
+    bg: "linear-gradient(135deg, hsl(20,80%,87%), hsl(10,75%,80%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M8 18H34V36C34 39.314 31.314 42 28 42H14C10.686 42 8 39.314 8 36V18Z" fill="hsl(15,70%,55%)" opacity="0.2"/>
-        <path d="M8 18H34V36C34 39.314 31.314 42 28 42H14C10.686 42 8 39.314 8 36V18Z" stroke="hsl(15,70%,48%)" strokeWidth="2.5"/>
-        <path d="M34 22H38C40.209 22 42 23.791 42 26V28C42 30.209 40.209 32 38 32H34" stroke="hsl(15,70%,48%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M18 10C18 10 16 13 18 16" stroke="hsl(15,70%,48%)" strokeWidth="2" strokeLinecap="round" opacity="0.6"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/></path>
-        <path d="M24 8C24 8 22 12 24 16" stroke="hsl(15,70%,48%)" strokeWidth="2" strokeLinecap="round" opacity="0.6"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" begin="0.5s" repeatCount="indefinite"/></path>
-        <path d="M6 44H40" stroke="hsl(15,70%,48%)" strokeWidth="2" strokeLinecap="round"/>
+        <defs><linearGradient id="cof-g" x1="0" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(20,75%,52%)"/><stop offset="100%" stopColor="hsl(10,70%,40%)"/></linearGradient></defs>
+        <path d="M8 16H34V36C34 40 31 43 27 43H15C11 43 8 40 8 36V16Z" fill="url(#cof-g)" opacity="0.12" stroke="url(#cof-g)" strokeWidth="2.5"/>
+        <path d="M34 22H39C41.8 22 44 24.2 44 27C44 29.8 41.8 32 39 32H34" stroke="url(#cof-g)" strokeWidth="2.5"/>
+        <path d="M17 8C17 8 15 11 17 14" stroke="url(#cof-g)" strokeWidth="2.5" strokeLinecap="round"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/></path>
+        <path d="M24 6C24 6 22 10 24 14" stroke="url(#cof-g)" strokeWidth="2.5" strokeLinecap="round"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" begin="0.6s" repeatCount="indefinite"/></path>
       </svg>
     ),
   },
   Video: {
-    bg: "linear-gradient(135deg, hsl(0,65%,90%), hsl(350,60%,86%))",
+    bg: "linear-gradient(135deg, hsl(0,68%,88%), hsl(350,63%,82%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <rect x="4" y="14" width="28" height="20" rx="3" fill="hsl(0,60%,55%)" opacity="0.2"/>
-        <rect x="4" y="14" width="28" height="20" rx="3" stroke="hsl(0,60%,48%)" strokeWidth="2.5"/>
-        <path d="M32 20L44 14V34L32 28" stroke="hsl(0,60%,48%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <circle cx="18" cy="24" r="5" fill="hsl(0,60%,55%)" opacity="0.3"><animate attributeName="r" values="4;5.5;4" dur="2s" repeatCount="indefinite"/></circle>
-        <path d="M16 22L22 24L16 26Z" fill="white" opacity="0.8"/>
+        <defs><linearGradient id="vid-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(0,65%,55%)"/><stop offset="100%" stopColor="hsl(350,60%,45%)"/></linearGradient></defs>
+        <rect x="4" y="12" width="30" height="24" rx="4" fill="url(#vid-g)" opacity="0.12" stroke="url(#vid-g)" strokeWidth="2.5"/>
+        <path d="M34 20L46 12V36L34 28" stroke="url(#vid-g)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <circle cx="19" cy="24" r="6" fill="url(#vid-g)" opacity="0.15"><animate attributeName="r" values="5;6.5;5" dur="2s" repeatCount="indefinite"/></circle>
+        <path d="M16 21L24 24L16 28Z" fill="white" opacity="0.85"/>
       </svg>
     ),
   },
   TreePine: {
-    bg: "linear-gradient(135deg, hsl(130,55%,88%), hsl(140,50%,82%))",
+    bg: "linear-gradient(135deg, hsl(130,60%,85%), hsl(145,55%,78%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M24 6L10 24H18L8 38H40L30 24H38L24 6Z" fill="hsl(130,50%,45%)" opacity="0.3"/>
-        <path d="M24 6L10 24H18L8 38H40L30 24H38L24 6Z" stroke="hsl(130,50%,38%)" strokeWidth="2.5" strokeLinejoin="round"/>
-        <rect x="20" y="38" width="8" height="6" rx="1" fill="hsl(25,60%,45%)" opacity="0.6" stroke="hsl(25,60%,38%)" strokeWidth="1.5"/>
+        <defs><linearGradient id="tree-g" x1="0.5" y1="0" x2="0.5" y2="1"><stop offset="0%" stopColor="hsl(130,55%,48%)"/><stop offset="100%" stopColor="hsl(150,50%,35%)"/></linearGradient></defs>
+        <path d="M24 4L12 20H18L8 36H40L30 20H36L24 4Z" fill="url(#tree-g)" opacity="0.2" stroke="url(#tree-g)" strokeWidth="2.5" strokeLinejoin="round"/>
+        <rect x="20" y="36" width="8" height="8" rx="2" fill="hsl(25,65%,42%)" opacity="0.6" stroke="hsl(25,60%,35%)" strokeWidth="1.5"/>
+        <circle cx="24" cy="18" r="3" fill="hsl(45,90%,58%)" opacity="0.6"><animate attributeName="fill-opacity" values="0.3;0.8;0.3" dur="2.5s" repeatCount="indefinite"/></circle>
       </svg>
     ),
   },
   Tag: {
-    bg: "linear-gradient(135deg, hsl(210,65%,89%), hsl(220,60%,84%))",
+    bg: "linear-gradient(135deg, hsl(210,70%,87%), hsl(225,65%,80%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M8 8H26L42 24L26 40H8V8Z" fill="hsl(210,65%,58%)" opacity="0.2"/>
-        <path d="M8 8H26L42 24L26 40H8V8Z" stroke="hsl(210,65%,48%)" strokeWidth="2.5" strokeLinejoin="round"/>
-        <circle cx="16" cy="16" r="3" fill="hsl(45,90%,55%)" stroke="hsl(210,65%,40%)" strokeWidth="1.5"><animate attributeName="fill-opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/></circle>
+        <defs><linearGradient id="tag-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(210,70%,55%)"/><stop offset="100%" stopColor="hsl(230,65%,45%)"/></linearGradient></defs>
+        <path d="M6 6H26L44 24L26 42L6 42V6Z" fill="url(#tag-g)" opacity="0.12" stroke="url(#tag-g)" strokeWidth="2.5" strokeLinejoin="round"/>
+        <circle cx="16" cy="16" r="4" fill="hsl(45,95%,58%)" stroke="url(#tag-g)" strokeWidth="1.5"><animate attributeName="fill-opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/></circle>
       </svg>
     ),
   },
   PenTool: {
-    bg: "linear-gradient(135deg, hsl(250,45%,90%), hsl(260,40%,85%))",
+    bg: "linear-gradient(135deg, hsl(250,50%,88%), hsl(265,45%,82%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M34 6L42 14L20 36H12V28L34 6Z" fill="hsl(250,40%,55%)" opacity="0.2"/>
-        <path d="M34 6L42 14L20 36H12V28L34 6Z" stroke="hsl(250,40%,48%)" strokeWidth="2.5" strokeLinejoin="round"/>
-        <path d="M28 12L36 20" stroke="hsl(250,40%,48%)" strokeWidth="2"/>
-        <path d="M8 42L12 36" stroke="hsl(250,40%,48%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <circle cx="38" cy="10" r="2" fill="hsl(45,90%,55%)"><animate attributeName="fill-opacity" values="0.4;1;0.4" dur="1.5s" repeatCount="indefinite"/></circle>
+        <defs><linearGradient id="pen-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(250,45%,55%)"/><stop offset="100%" stopColor="hsl(270,40%,45%)"/></linearGradient></defs>
+        <path d="M34 4L44 14L20 38H10V28L34 4Z" fill="url(#pen-g)" opacity="0.12" stroke="url(#pen-g)" strokeWidth="2.5" strokeLinejoin="round"/>
+        <path d="M28 10L38 20" stroke="url(#pen-g)" strokeWidth="2"/>
+        <path d="M6 44L10 38" stroke="url(#pen-g)" strokeWidth="2.5" strokeLinecap="round"/>
+        <circle cx="40" cy="8" r="3" fill="hsl(45,95%,58%)"><animate attributeName="fill-opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/></circle>
       </svg>
     ),
   },
   Umbrella: {
-    bg: "linear-gradient(135deg, hsl(200,65%,88%), hsl(210,60%,82%))",
+    bg: "linear-gradient(135deg, hsl(200,70%,85%), hsl(215,65%,78%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M24 8C14.059 8 6 16.059 6 26H42C42 16.059 33.941 8 24 8Z" fill="hsl(200,60%,52%)" opacity="0.25"/>
-        <path d="M24 8C14.059 8 6 16.059 6 26H42C42 16.059 33.941 8 24 8Z" stroke="hsl(200,60%,45%)" strokeWidth="2.5"/>
-        <path d="M24 26V38C24 40.209 25.791 42 28 42C30.209 42 32 40.209 32 38" stroke="hsl(200,60%,45%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M14 26C14 22 18 22 18 26C18 22 22 22 22 26" stroke="hsl(200,60%,45%)" strokeWidth="1.5"/>
-        <path d="M26 26C26 22 30 22 30 26C30 22 34 22 34 26" stroke="hsl(200,60%,45%)" strokeWidth="1.5"/>
-        <path d="M24 8V6" stroke="hsl(200,60%,45%)" strokeWidth="2.5" strokeLinecap="round"/>
+        <defs><linearGradient id="umb-g" x1="0.5" y1="0" x2="0.5" y2="0.6"><stop offset="0%" stopColor="hsl(200,65%,55%)"/><stop offset="100%" stopColor="hsl(220,60%,45%)"/></linearGradient></defs>
+        <path d="M24 6C12 6 4 16 4 26H44C44 16 36 6 24 6Z" fill="url(#umb-g)" opacity="0.2" stroke="url(#umb-g)" strokeWidth="2.5"/>
+        <path d="M24 26V40C24 42.2 26 44 28 44C30 44 32 42.2 32 40" stroke="url(#umb-g)" strokeWidth="2.5" strokeLinecap="round"/>
+        <path d="M24 6V4" stroke="url(#umb-g)" strokeWidth="3" strokeLinecap="round"/>
+        <path d="M12 26C12 22 16 22 16 26C16 22 20 22 20 26" stroke="url(#umb-g)" strokeWidth="1.5" opacity="0.6"/>
+        <path d="M28 26C28 22 32 22 32 26C32 22 36 22 36 26" stroke="url(#umb-g)" strokeWidth="1.5" opacity="0.6"/>
       </svg>
     ),
   },
   ShoppingBag: {
-    bg: "linear-gradient(135deg, hsl(330,60%,90%), hsl(340,55%,85%))",
+    bg: "linear-gradient(135deg, hsl(330,65%,88%), hsl(345,60%,82%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <path d="M10 16H38L36 42H12L10 16Z" fill="hsl(330,60%,55%)" opacity="0.2"/>
-        <path d="M10 16H38L36 42H12L10 16Z" stroke="hsl(330,60%,48%)" strokeWidth="2.5" strokeLinejoin="round"/>
-        <path d="M18 16V12C18 8.686 20.686 6 24 6C27.314 6 30 8.686 30 12V16" stroke="hsl(330,60%,48%)" strokeWidth="2.5" strokeLinecap="round"/>
-        <circle cx="20" cy="26" r="2" fill="hsl(330,60%,50%)"/>
-        <circle cx="28" cy="26" r="2" fill="hsl(330,60%,50%)"/>
+        <defs><linearGradient id="shop-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(330,65%,55%)"/><stop offset="100%" stopColor="hsl(345,60%,45%)"/></linearGradient></defs>
+        <path d="M10 14H38L36 44H12L10 14Z" fill="url(#shop-g)" opacity="0.12" stroke="url(#shop-g)" strokeWidth="2.5" strokeLinejoin="round"/>
+        <path d="M18 14V10C18 6.7 20.7 4 24 4C27.3 4 30 6.7 30 10V14" stroke="url(#shop-g)" strokeWidth="2.5" strokeLinecap="round"/>
+        <circle cx="20" cy="24" r="2.5" fill="hsl(330,65%,55%)" opacity="0.5"/>
+        <circle cx="28" cy="24" r="2.5" fill="hsl(330,65%,55%)" opacity="0.5"/>
       </svg>
     ),
   },
   SearchX: {
-    bg: "linear-gradient(135deg, hsl(25,75%,90%), hsl(15,70%,85%))",
+    bg: "linear-gradient(135deg, hsl(25,80%,88%), hsl(15,75%,82%))",
     svg: (
       <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 animate-icon-float">
-        <circle cx="22" cy="22" r="14" fill="hsl(25,70%,55%)" opacity="0.15"/>
-        <circle cx="22" cy="22" r="14" stroke="hsl(25,70%,45%)" strokeWidth="2.5"/>
-        <path d="M32 32L42 42" stroke="hsl(25,70%,45%)" strokeWidth="3" strokeLinecap="round"/>
-        <path d="M17 17L27 27M27 17L17 27" stroke="hsl(0,65%,50%)" strokeWidth="2.5" strokeLinecap="round"><animate attributeName="stroke-opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/></path>
+        <defs><linearGradient id="sx-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="hsl(25,75%,52%)"/><stop offset="100%" stopColor="hsl(10,70%,42%)"/></linearGradient></defs>
+        <circle cx="20" cy="20" r="15" fill="url(#sx-g)" opacity="0.1" stroke="url(#sx-g)" strokeWidth="2.5"/>
+        <path d="M31 31L44 44" stroke="url(#sx-g)" strokeWidth="3.5" strokeLinecap="round"/>
+        <path d="M15 15L25 25M25 15L15 25" stroke="hsl(0,70%,52%)" strokeWidth="2.5" strokeLinecap="round"><animate attributeName="stroke-opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite"/></path>
       </svg>
     ),
   },
