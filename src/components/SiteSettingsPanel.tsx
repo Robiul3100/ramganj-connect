@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Moon, Megaphone, RefreshCw, ToggleLeft, ToggleRight } from "lucide-react";
+import { Megaphone, RefreshCw, ToggleLeft, ToggleRight } from "lucide-react";
 
 interface Setting {
   key: string;
@@ -48,14 +48,6 @@ const SiteSettingsPanel = () => {
       icon: <Megaphone className="w-5 h-5" />,
       color: "from-orange-500/10 to-amber-500/10",
       iconColor: "text-orange-500",
-    },
-    {
-      key: "ramadan_widget_enabled",
-      label: "রমজান উইজেট",
-      description: "হিরো স্লাইডারের নিচে রমজানের সেহরি-ইফতার টাইমার দেখানো হবে",
-      icon: <Moon className="w-5 h-5" />,
-      color: "from-green-500/10 to-emerald-500/10",
-      iconColor: "text-green-600",
     },
   ];
 

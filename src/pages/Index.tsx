@@ -2,7 +2,6 @@ import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSlider from "@/components/HeroSlider";
 import AnnouncementBar from "@/components/AnnouncementBar";
-import RamadanWidget from "@/components/RamadanWidget";
 import ServiceGrid from "@/components/ServiceGrid";
 import FeaturedServices from "@/components/FeaturedServices";
 import LatestNews from "@/components/LatestNews";
@@ -20,7 +19,6 @@ const Index = () => {
 
       <div className="space-y-5 pb-6 mt-2">
         <HeroSlider />
-        <RamadanWidget />
         <AnnouncementBar />
         <ServiceGrid />
         <LatestNews />

@@ -87,6 +87,10 @@ const AdminDashboard = () => {
   const [newsEditId, setNewsEditId] = useState<string | null>(null);
   const [newsUploading, setNewsUploading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sliderItems, setSliderItems] = useState<any[]>([]);
+  const [sliderForm, setSliderForm] = useState({ title: "", image_url: "", sort_order: 0 });
+  const [sliderEditId, setSliderEditId] = useState<string | null>(null);
+  const [sliderUploading, setSliderUploading] = useState(false);
 
   // --- All business logic remains exactly the same ---
   useEffect(() => {
@@ -172,7 +176,7 @@ const AdminDashboard = () => {
     }
     const legacyTabs: Record<string, string> = {
       emergency: "emergency_calls", blood: "blood_donors", donations: "donations",
-      announcements: "announcements", slider: "slider_items", about: "about_content", timeline: "timeline_events",
+      announcements: "announcements", about: "about_content", timeline: "timeline_events",
     };
     if (legacyTabs[activeTab]) {
       const fetch = async () => {
@@ -191,6 +195,15 @@ const AdminDashboard = () => {
         setLoading(false);
       };
       fetchNews();
+    }
+    if (activeTab === "slider") {
+      const fetchSlider = async () => {
+        setLoading(true);
+        const { data } = await (supabase.from as any)("slider_items").select("*").order("sort_order");
+        setSliderItems(data || []);
+        setLoading(false);
+      };
+      fetchSlider();
     }
   }, [activeTab]);
 
@@ -797,6 +810,120 @@ const AdminDashboard = () => {
 
   const renderSiteSettings = () => <SiteSettingsPanel />;
 
+  const refreshSliderItems = async () => {
+    const { data } = await (supabase.from as any)("slider_items").select("*").order("sort_order");
+    setSliderItems(data || []);
+  };
+
+  const handleSliderUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setSliderUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `slider/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("slider-images").upload(path, file);
+    if (error) { toast({ title: "আপলোড ব্যর্থ", variant: "destructive" }); setSliderUploading(false); return; }
+    const { data: urlData } = supabase.storage.from("slider-images").getPublicUrl(path);
+    setSliderForm({ ...sliderForm, image_url: urlData.publicUrl });
+    setSliderUploading(false);
+  };
+
+  const saveSlider = async () => {
+    if (!sliderForm.title.trim() || !sliderForm.image_url.trim()) {
+      toast({ title: "শিরোনাম ও ছবি দিন", variant: "destructive" }); return;
+    }
+    if (sliderEditId) {
+      await (supabase.from as any)("slider_items").update({ title: sliderForm.title, image_url: sliderForm.image_url, sort_order: sliderForm.sort_order }).eq("id", sliderEditId);
+      await logActivity("edited", "slider_items", sliderEditId, sliderForm.title);
+      toast({ title: "স্লাইডার আপডেট হয়েছে ✅" });
+    } else {
+      await (supabase.from as any)("slider_items").insert({ title: sliderForm.title, image_url: sliderForm.image_url, sort_order: sliderForm.sort_order });
+      await logActivity("created", "slider_items", undefined, sliderForm.title);
+      toast({ title: "নতুন স্লাইড যোগ হয়েছে ✅" });
+    }
+    setSliderForm({ title: "", image_url: "", sort_order: 0 });
+    setSliderEditId(null);
+    refreshSliderItems();
+  };
+
+  const deleteSlider = async (id: string, title: string) => {
+    if (!confirm("এই স্লাইড মুছে ফেলতে চান?")) return;
+    await (supabase.from as any)("slider_items").delete().eq("id", id);
+    await logActivity("deleted", "slider_items", id, title);
+    toast({ title: "মুছে ফেলা হয়েছে" });
+    setSliderItems(sliderItems.filter((s) => s.id !== id));
+  };
+
+  const toggleSliderActive = async (id: string, current: boolean) => {
+    await (supabase.from as any)("slider_items").update({ is_active: !current }).eq("id", id);
+    setSliderItems(sliderItems.map((s) => s.id === id ? { ...s, is_active: !current } : s));
+    toast({ title: !current ? "সক্রিয় করা হয়েছে" : "নিষ্ক্রিয় করা হয়েছে" });
+  };
+
+  const renderSlider = () => (
+    <div className="space-y-4">
+      {/* Slider Form */}
+      <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <SlidersHorizontal className="w-4 h-4 text-primary" />
+          </div>
+          <h2 className="text-sm font-bold text-foreground">{sliderEditId ? "স্লাইড এডিট" : "নতুন স্লাইড যোগ করুন"}</h2>
+        </div>
+        <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" placeholder="স্লাইড শিরোনাম" value={sliderForm.title} onChange={(e) => setSliderForm({ ...sliderForm, title: e.target.value })} />
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">ক্রম (Sort Order)</label>
+          <input type="number" className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" placeholder="0" value={sliderForm.sort_order} onChange={(e) => setSliderForm({ ...sliderForm, sort_order: parseInt(e.target.value) || 0 })} />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">ছবি</label>
+          <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all" placeholder="ছবির লিংক (URL)" value={sliderForm.image_url} onChange={(e) => setSliderForm({ ...sliderForm, image_url: e.target.value })} />
+          <div className="flex items-center gap-3 mt-2">
+            <label className="inline-flex items-center gap-2 text-xs text-primary font-semibold cursor-pointer bg-primary/10 px-4 py-2.5 rounded-xl hover:bg-primary/15 transition-colors">
+              <ImageIcon className="w-4 h-4" /> {sliderUploading ? "আপলোড হচ্ছে..." : "ছবি আপলোড"}
+              <input type="file" accept="image/*" className="hidden" onChange={handleSliderUpload} disabled={sliderUploading} />
+            </label>
+            {sliderForm.image_url && <img src={sliderForm.image_url} alt="preview" className="w-20 h-12 rounded-xl object-cover border border-border" />}
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={saveSlider} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+            <Save className="w-4 h-4" /> {sliderEditId ? "আপডেট" : "যোগ করুন"}
+          </button>
+          {sliderEditId && (
+            <button onClick={() => { setSliderEditId(null); setSliderForm({ title: "", image_url: "", sort_order: 0 }); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
+              বাতিল
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Slider List */}
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> {sliderItems.length}টি স্লাইড</span>
+      </div>
+      {loading ? <LoadingState /> : sliderItems.length === 0 ? <EmptyState /> : sliderItems.map((item: any) => (
+        <div key={item.id} className="bg-card border border-border rounded-2xl p-4 flex gap-3 hover:shadow-sm transition-all">
+          <div className="w-24 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
+            <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-foreground text-sm line-clamp-1">{item.title}</h3>
+            <p className="text-[10px] text-muted-foreground mt-0.5">ক্রম: {item.sort_order}</p>
+            <div className="flex gap-1.5 mt-2 flex-wrap">
+              <ActionBtn variant="info" onClick={() => { setSliderEditId(item.id); setSliderForm({ title: item.title, image_url: item.image_url, sort_order: item.sort_order }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
+              <button onClick={() => toggleSliderActive(item.id, item.is_active)}
+                className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-colors ${item.is_active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+                {item.is_active ? "✅ সক্রিয়" : "⏸ নিষ্ক্রিয়"}
+              </button>
+              <ActionBtn variant="danger" onClick={() => deleteSlider(item.id, item.title)} icon={<Trash2 className="w-3 h-3" />} label="মুছুন" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard": return renderDashboard();
@@ -805,6 +932,7 @@ const AdminDashboard = () => {
       case "activity": return renderActivity();
       case "users": return renderUsers();
       case "news": return renderNews();
+      case "slider": return renderSlider();
       case "site_settings": return renderSiteSettings();
       default: return renderLegacy();
     }
