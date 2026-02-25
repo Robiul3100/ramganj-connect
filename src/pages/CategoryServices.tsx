@@ -175,36 +175,40 @@ const buildMetadata = (slug: string, data: Record<string, string>) => {
   return meta;
 };
 
-// ──── Doctor Card ────
+// ──── Doctor Card (matches reference image exactly) ────
 const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: string; bg: string; gradient: string }; onShare: () => void }) => {
   const m = s.metadata || {};
-  const degrees: string[] = m.degrees || (m.specialty ? [m.specialty] : []);
+  const degrees: string[] = m.degrees || [];
+  const specialty = m.specialty || "";
   const hospital = m.hospital_name || "";
+  // Combine degrees + specialty into tags
+  const allTags = [...degrees, ...(specialty ? [specialty] : [])];
 
   return (
-    <div className={`rounded-2xl overflow-hidden border transition-shadow hover:shadow-lg ${s.is_featured ? "ring-2 ring-amber-400/40" : ""}`} style={{ borderColor: colors.accent + "55" }}>
+    <div className={`rounded-[20px] overflow-hidden transition-shadow hover:shadow-xl ${s.is_featured ? "ring-2 ring-amber-400/40" : ""}`} style={{ border: `2px solid ${colors.accent}44` }}>
       {s.is_featured && (
-        <div className="flex items-center gap-1 px-4 pt-3 pb-1">
+        <div className="flex items-center gap-1 px-4 pt-3 pb-0">
           <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
           <span className="text-xs font-bold text-amber-600">ফিচার্ড</span>
         </div>
       )}
-      {/* Top: Photo + Name + Degrees */}
-      <div className="p-4 flex items-start gap-3.5" style={{ background: `linear-gradient(135deg, ${colors.bg}, hsl(0,0%,100%))` }}>
+
+      {/* ── Top: Photo + Name + Degree Tags ── */}
+      <div className="px-4 pt-4 pb-3 flex items-start gap-4" style={{ background: `linear-gradient(160deg, hsl(170,50%,94%), hsl(200,40%,96%), hsl(0,0%,100%))` }}>
         {s.image_url ? (
-          <img src={s.image_url} alt={s.title} className="w-[72px] h-[72px] rounded-full object-cover shrink-0 border-[3px] shadow-md" style={{ borderColor: colors.accent + "40" }} />
+          <img src={s.image_url} alt={s.title} className="w-[80px] h-[80px] rounded-full object-cover shrink-0 shadow-lg" style={{ border: `3px solid ${colors.accent}30` }} />
         ) : (
-          <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center shrink-0 text-2xl font-bold border-[3px] shadow-md" style={{ background: colors.bg, color: colors.accent, borderColor: colors.accent + "40" }}>
-            <User className="w-8 h-8" />
+          <div className="w-[80px] h-[80px] rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: `linear-gradient(135deg, ${colors.bg}, hsl(0,0%,95%))`, border: `3px solid ${colors.accent}30` }}>
+            <User className="w-9 h-9" style={{ color: colors.accent }} />
           </div>
         )}
-        <div className="flex-1 min-w-0">
-          <h3 className="font-extrabold text-foreground text-[15px] leading-tight">{s.title}</h3>
-          {degrees.length > 0 && (
-            <div className="flex gap-1.5 mt-2 flex-wrap">
-              {degrees.map((deg, i) => (
-                <span key={i} className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: tagColors[i % tagColors.length].bg, color: tagColors[i % tagColors.length].text }}>
-                  {deg}
+        <div className="flex-1 min-w-0 pt-1">
+          <h3 className="font-extrabold text-foreground text-base leading-snug">{s.title}</h3>
+          {allTags.length > 0 && (
+            <div className="flex gap-1.5 mt-2.5 flex-wrap">
+              {allTags.map((tag, i) => (
+                <span key={i} className="text-[10px] font-bold px-3 py-1 rounded-full" style={{ background: tagColors[i % tagColors.length].bg, color: tagColors[i % tagColors.length].text }}>
+                  {tag}
                 </span>
               ))}
             </div>
@@ -212,46 +216,49 @@ const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: stri
         </div>
       </div>
 
-      {/* Middle: Hospital + Address */}
-      <div className="px-4 py-3 border-t border-border/50 bg-card">
-        {hospital && (
-          <div className="flex items-center gap-2 mb-1">
-            <Building2 className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
-            <span className="font-bold text-foreground text-sm">{hospital}</span>
-          </div>
-        )}
-        {s.address && (
-          <p className="text-xs text-muted-foreground flex items-center gap-1.5 ml-0.5">
-            <MapPin className="w-3 h-3 shrink-0" /> {s.address}{s.area ? `, ${s.area}` : ""}
-          </p>
-        )}
-        {s.description && (
-          <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{s.description}</p>
-        )}
-      </div>
-
-      {/* Contact label */}
-      {(s.phone || s.whatsapp) && (
-        <div className="px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border-t border-border/30">
-          <p className="text-xs font-semibold text-center" style={{ color: colors.accent }}>সিরিয়ালের জন্য যোগাযোগ করুন</p>
+      {/* ── Middle: Hospital Name + Address ── */}
+      {(hospital || s.address) && (
+        <div className="px-4 py-3 bg-card border-t border-border/40">
+          {hospital && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <h4 className="font-extrabold text-foreground text-[15px]">{hospital}</h4>
+              {s.address && (
+                <span className="text-xs text-muted-foreground italic">{s.address}{s.area ? `, ${s.area}` : ""}</span>
+              )}
+            </div>
+          )}
+          {!hospital && s.address && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 shrink-0" /> {s.address}{s.area ? `, ${s.area}` : ""}
+            </p>
+          )}
+          {s.description && (
+            <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">{s.description}</p>
+          )}
         </div>
       )}
 
-      {/* Buttons */}
-      <div className="flex gap-0 border-t border-border/30">
+      {/* ── Contact Label ── */}
+      {(s.phone || s.whatsapp) && (
+        <div className="px-4 py-2.5 border-t border-border/30">
+          <p className="text-[13px] font-bold text-center rounded-full py-1.5 px-4 mx-auto w-fit" style={{ background: "hsl(45,70%,90%)", color: "hsl(35,60%,30%)" }}>
+            সিরিয়ালের জন্য যোগাযোগ করুন
+          </p>
+        </div>
+      )}
+
+      {/* ── Call + WhatsApp Buttons ── */}
+      <div className="flex border-t border-border/30">
         {s.phone && (
-          <a href={`tel:${s.phone}`} className="flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 text-white transition-opacity active:opacity-80" style={{ background: "linear-gradient(135deg, hsl(140,65%,40%), hsl(150,70%,45%))" }}>
-            <Phone className="w-4 h-4" /> কল করুন
+          <a href={`tel:${s.phone}`} className="flex-1 py-3.5 text-[15px] font-extrabold flex items-center justify-center gap-2 text-white rounded-none active:opacity-80 transition-opacity" style={{ background: "linear-gradient(135deg, hsl(140,65%,42%), hsl(145,70%,48%))" }}>
+            <Phone className="w-4.5 h-4.5" /> কল করুন
           </a>
         )}
         {s.whatsapp && (
-          <a href={`https://wa.me/88${s.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 text-white transition-opacity active:opacity-80" style={{ background: "linear-gradient(135deg, hsl(140,70%,35%), hsl(160,75%,40%))" }}>
-            <MessageCircle className="w-4 h-4" /> হোয়াটসঅ্যাপ
+          <a href={`https://wa.me/88${s.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex-1 py-3.5 text-[15px] font-extrabold flex items-center justify-center gap-2 text-white rounded-none active:opacity-80 transition-opacity" style={{ background: "linear-gradient(135deg, hsl(145,60%,38%), hsl(155,65%,44%))" }}>
+            <MessageCircle className="w-4.5 h-4.5" /> হোয়াটসঅ্যাপ
           </a>
         )}
-        <button onClick={onShare} className="px-4 py-3 bg-muted text-muted-foreground flex items-center justify-center">
-          <Share2 className="w-4 h-4" />
-        </button>
       </div>
     </div>
   );
