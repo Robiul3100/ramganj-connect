@@ -22,6 +22,7 @@ import SiteSettingsPanel from "@/components/SiteSettingsPanel";
 import AnalyticsCharts from "@/components/AnalyticsCharts";
 import AddServiceForm from "@/components/admin/AddServiceForm";
 import VisitorAnalytics from "@/components/admin/VisitorAnalytics";
+import TrendCharts from "@/components/admin/TrendCharts";
 import Navbar from "@/components/Navbar";
 import DrawerMenu from "@/components/DrawerMenu";
 
@@ -728,6 +729,9 @@ const AdminDashboard = () => {
           ))}
         </div>
       </div>
+
+      {/* Trend Charts */}
+      <TrendCharts />
 
       {/* Analytics Charts */}
       <AnalyticsCharts categories={categories} adItems={adItems} />
