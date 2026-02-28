@@ -10,9 +10,14 @@ interface SliderItem {
 const HeroSlider = () => {
   const [slides, setSlides] = useState<SliderItem[]>([]);
   const [current, setCurrent] = useState(0);
+  const [enabled, setEnabled] = useState(true);
 
   useEffect(() => {
     const fetch = async () => {
+      const { data: setting } = await (supabase.from as any)("site_settings")
+        .select("value").eq("key", "hero_slider_enabled").single();
+      if (setting?.value === "false") { setEnabled(false); return; }
+      setEnabled(true);
       const { data } = await (supabase.from as any)("slider_items")
         .select("*")
         .eq("is_active", true)
@@ -37,7 +42,7 @@ const HeroSlider = () => {
     return () => clearInterval(timer);
   }, [next, slides.length]);
 
-  if (slides.length === 0) return null;
+  if (!enabled || slides.length === 0) return null;
 
   return (
     <div className="px-4">

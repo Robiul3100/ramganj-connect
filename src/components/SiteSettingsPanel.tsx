@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Megaphone, RefreshCw, ToggleLeft, ToggleRight, Wrench, Save, Shield } from "lucide-react";
+import { Megaphone, RefreshCw, ToggleLeft, ToggleRight, Wrench, Save, Shield, SlidersHorizontal, Layers, Newspaper, Star } from "lucide-react";
 
 interface Setting {
   key: string;
@@ -64,6 +64,38 @@ const SiteSettingsPanel = () => {
       icon: <Megaphone className="w-5 h-5" />,
       color: "from-orange-500/10 to-amber-500/10",
       iconColor: "text-orange-500",
+    },
+    {
+      key: "hero_slider_enabled",
+      label: "হিরো স্লাইডার",
+      description: "হোমপেজের শীর্ষে ইমেজ স্লাইডার দেখানো হবে",
+      icon: <SlidersHorizontal className="w-5 h-5" />,
+      color: "from-blue-500/10 to-sky-500/10",
+      iconColor: "text-blue-500",
+    },
+    {
+      key: "service_grid_enabled",
+      label: "সার্ভিস গ্রিড",
+      description: "হোমপেজে সেবা ক্যাটাগরি গ্রিড দেখানো হবে",
+      icon: <Layers className="w-5 h-5" />,
+      color: "from-violet-500/10 to-purple-500/10",
+      iconColor: "text-violet-500",
+    },
+    {
+      key: "latest_news_enabled",
+      label: "লেটেস্ট নিউজ",
+      description: "হোমপেজে সর্বশেষ খবরের মার্কি দেখানো হবে",
+      icon: <Newspaper className="w-5 h-5" />,
+      color: "from-emerald-500/10 to-teal-500/10",
+      iconColor: "text-emerald-500",
+    },
+    {
+      key: "featured_services_enabled",
+      label: "ফিচার্ড সেবা",
+      description: "হোমপেজে ফিচার্ড সেবার মার্কি দেখানো হবে",
+      icon: <Star className="w-5 h-5" />,
+      color: "from-amber-500/10 to-yellow-500/10",
+      iconColor: "text-amber-500",
     },
     {
       key: "maintenance_mode",

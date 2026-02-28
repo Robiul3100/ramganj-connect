@@ -14,9 +14,14 @@ interface FeaturedService {
 
 const FeaturedServices = () => {
   const [services, setServices] = useState<FeaturedService[]>([]);
+  const [enabled, setEnabled] = useState(true);
 
   useEffect(() => {
     const fetch = async () => {
+      const { data: setting } = await (supabase.from as any)("site_settings")
+        .select("value").eq("key", "featured_services_enabled").single();
+      if (setting?.value === "false") { setEnabled(false); return; }
+      setEnabled(true);
       const { data } = await supabase
         .from("services")
         .select("id, title, phone, whatsapp, address, description, service_categories(name)")
@@ -32,7 +37,7 @@ const FeaturedServices = () => {
     return () => { supabase.removeChannel(ch); };
   }, []);
 
-  if (services.length === 0) return null;
+  if (!enabled || services.length === 0) return null;
 
   const items = [...services, ...services];
 
