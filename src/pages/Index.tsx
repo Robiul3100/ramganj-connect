@@ -4,7 +4,7 @@ import HeroSlider from "@/components/HeroSlider";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import SmartSearch from "@/components/SmartSearch";
 import ServiceGrid from "@/components/ServiceGrid";
-import { NoticeWidget, EmergencyWidget, DoctorsWidget, OfficesWidget, QuickStatsWidget } from "@/components/DashboardWidgets";
+import { QuickStatsWidget } from "@/components/DashboardWidgets";
 import LatestNews from "@/components/LatestNews";
 import FeaturedServices from "@/components/FeaturedServices";
 import Footer from "@/components/Footer";
@@ -28,15 +28,6 @@ const Index = () => {
           <SmartSearch />
         </div>
 
-        {/* Dashboard Widgets */}
-        <div className="px-4 space-y-3">
-          <EmergencyWidget />
-          <div className="grid grid-cols-1 gap-3">
-            <NoticeWidget />
-            <DoctorsWidget />
-            <OfficesWidget />
-          </div>
-        </div>
 
         <ServiceGrid />
         <QuickStatsWidget />
