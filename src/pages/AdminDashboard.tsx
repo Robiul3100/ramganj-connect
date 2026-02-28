@@ -210,6 +210,8 @@ const AdminDashboard = () => {
   const [galleryForm, setGalleryForm] = useState({ image_url: "", caption: "", sort_order: 0 });
   const [galleryEditId, setGalleryEditId] = useState<string | null>(null);
   const [galleryUploading, setGalleryUploading] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [todayStats, setTodayStats] = useState({ visitors: 0, newSubmissions: 0 });
 
   // --- All business logic remains exactly the same ---
   useEffect(() => {
@@ -376,6 +378,7 @@ const AdminDashboard = () => {
     setShowLegacyForm(false);
     setLegacyForm({});
     setLegacyEditId(null);
+    setSelectedIds(new Set());
   }, [activeTab, fetchLegacyData]);
 
   const logActivity = useCallback(async (action: string, tableName?: string, recordId?: string, details?: string) => {
@@ -385,10 +388,71 @@ const AdminDashboard = () => {
     });
   }, [currentUser]);
 
+  // Fetch today's stats
+  const fetchTodayStats = useCallback(async () => {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const iso = todayStart.toISOString();
+    const [visitorsRes, submissionsRes] = await Promise.all([
+      supabase.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", iso),
+      supabase.from("services").select("*", { count: "exact", head: true }).gte("created_at", iso),
+    ]);
+    setTodayStats({
+      visitors: visitorsRes.count || 0,
+      newSubmissions: submissionsRes.count || 0,
+    });
+  }, []);
+
+  useEffect(() => { fetchTodayStats(); }, [fetchTodayStats]);
+
   const updateServiceStatus = async (id: string, status: string, title: string) => {
     await supabase.from("services").update({ status }).eq("id", id);
     await logActivity(status, "services", id, title);
     toast({ title: status === "approved" ? "অনুমোদিত ✅" : status === "rejected" ? "প্রত্যাখ্যাত ❌" : "পেন্ডিং 🕐" });
+    fetchCounts();
+  };
+
+  // Bulk actions
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredServices.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredServices.map((s: any) => s.id)));
+    }
+  };
+
+  const bulkUpdateStatus = async (status: string) => {
+    if (selectedIds.size === 0) return;
+    const label = status === "approved" ? "অনুমোদন" : "প্রত্যাখ্যান";
+    if (!confirm(`${selectedIds.size}টি সেবা ${label} করতে চান?`)) return;
+    for (const id of selectedIds) {
+      await supabase.from("services").update({ status }).eq("id", id);
+    }
+    await logActivity(`bulk_${status}`, "services", undefined, `${selectedIds.size} items`);
+    toast({ title: `${selectedIds.size}টি সেবা ${label} করা হয়েছে ✅` });
+    setSelectedIds(new Set());
+    fetchServices();
+    fetchCounts();
+  };
+
+  const bulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`${selectedIds.size}টি সেবা মুছে ফেলতে চান? এটি ফিরিয়ে আনা যাবে না!`)) return;
+    for (const id of selectedIds) {
+      await supabase.from("services").delete().eq("id", id);
+    }
+    await logActivity("bulk_deleted", "services", undefined, `${selectedIds.size} items`);
+    toast({ title: `${selectedIds.size}টি সেবা মুছে ফেলা হয়েছে` });
+    setSelectedIds(new Set());
+    fetchServices();
     fetchCounts();
   };
 
@@ -600,6 +664,24 @@ const AdminDashboard = () => {
         </div>
       </div>
 
+      {/* Today's Live Counters */}
+      <div className="grid grid-cols-3 gap-2.5">
+        {[
+          { label: "আজকের ভিজিটর", count: todayStats.visitors, icon: TrendingUp, gradient: "from-cyan-500 to-blue-500" },
+          { label: "নতুন সাবমিশন", count: todayStats.newSubmissions, icon: Plus, gradient: "from-emerald-500 to-green-500" },
+          { label: "পেন্ডিং অ্যাকশন", count: counts.pending, icon: AlertTriangle, gradient: "from-amber-500 to-orange-500" },
+        ].map((s) => (
+          <div key={s.label} className="relative overflow-hidden rounded-2xl bg-card border border-border/60 p-3.5 group hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+            <div className={`absolute top-0 right-0 w-14 h-14 rounded-full bg-gradient-to-br ${s.gradient} opacity-[0.08] -translate-y-1/3 translate-x-1/3 group-hover:opacity-[0.14] transition-opacity`} />
+            <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center mb-2 shadow-sm`}>
+              <s.icon className="w-3.5 h-3.5 text-white" />
+            </div>
+            <p className="text-xl font-extrabold text-foreground tracking-tight">{s.count}</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{s.label}</p>
+          </div>
+        ))}
+      </div>
+
       {/* Pending Alert */}
       {counts.pending > 0 && (
         <button onClick={() => setActiveTab("pending")} className="w-full group">
@@ -804,10 +886,40 @@ const AdminDashboard = () => {
         </div>
       </div>
 
+      {/* Bulk Action Bar */}
+      {selectedIds.size > 0 && (
+        <div className="bg-primary/5 border-2 border-primary/20 rounded-2xl p-3.5 flex items-center gap-2 flex-wrap sticky top-[calc(4rem+6.5rem)] z-30">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full">{selectedIds.size}টি নির্বাচিত</span>
+          </div>
+          <ActionBtn variant="success" onClick={() => bulkUpdateStatus("approved")} icon={<CheckCircle className="w-3.5 h-3.5" />} label="সব অনুমোদন" />
+          <ActionBtn variant="danger" onClick={() => bulkUpdateStatus("rejected")} icon={<XCircle className="w-3.5 h-3.5" />} label="সব প্রত্যাখ্যান" />
+          <ActionBtn variant="danger" onClick={bulkDelete} icon={<Trash2 className="w-3.5 h-3.5" />} label="সব মুছুন" />
+          <button onClick={() => setSelectedIds(new Set())} className="text-xs text-muted-foreground hover:text-foreground px-2 py-1 transition-colors">
+            বাতিল
+          </button>
+        </div>
+      )}
+
       {loading ? <LoadingState /> : filteredServices.length === 0 ? <EmptyState /> : (
         <div className="space-y-3">
+          {/* Select All */}
+          <div className="flex items-center gap-2 px-1">
+            <button
+              onClick={toggleSelectAll}
+              className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
+                selectedIds.size === filteredServices.length && filteredServices.length > 0
+                  ? "bg-primary border-primary" : "border-border hover:border-primary/50"
+              }`}
+            >
+              {selectedIds.size === filteredServices.length && filteredServices.length > 0 && (
+                <CheckCircle className="w-3 h-3 text-primary-foreground" />
+              )}
+            </button>
+            <span className="text-xs text-muted-foreground">সব নির্বাচন করুন</span>
+          </div>
           {filteredServices.map((item: any) => (
-            <div key={item.id} className="bg-card border border-border/60 rounded-2xl overflow-hidden hover:shadow-md transition-all duration-200">
+            <div key={item.id} className={`bg-card border rounded-2xl overflow-hidden hover:shadow-md transition-all duration-200 ${selectedIds.has(item.id) ? "border-primary/40 bg-primary/[0.02]" : "border-border/60"}`}>
               {editingId === item.id ? (
                 <div className="p-4 space-y-3">
                   <div className="flex items-center gap-2 mb-1">
@@ -876,6 +988,14 @@ const AdminDashboard = () => {
               ) : (
                 <div className="p-4">
                   <div className="flex gap-3">
+                    <button
+                      onClick={() => toggleSelect(item.id)}
+                      className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 mt-1 transition-all ${
+                        selectedIds.has(item.id) ? "bg-primary border-primary" : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      {selectedIds.has(item.id) && <CheckCircle className="w-3 h-3 text-primary-foreground" />}
+                    </button>
                     {item.image_url && (
                       <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-muted border border-border/40">
                         <img src={item.image_url} alt="" className="w-full h-full object-cover" />
