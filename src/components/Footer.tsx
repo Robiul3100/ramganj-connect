@@ -1,4 +1,4 @@
-import { Heart, Phone, Mail, MapPin, ExternalLink } from "lucide-react";
+import { Heart, Phone, Mail, MapPin, Facebook, Youtube } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ramganjCityLogo from "@/assets/ramganj-city-logo.png";
 
@@ -67,11 +67,34 @@ const Footer = () => {
         {/* Divider */}
         <div className="h-px bg-border" />
 
+        {/* Social links */}
+        <div className="flex items-center justify-center gap-3">
+          <a
+            href="https://facebook.com/ramganjcity"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+          >
+            <Facebook className="w-4 h-4" />
+          </a>
+          <a
+            href="https://youtube.com/@ramganjcity"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+          >
+            <Youtube className="w-4 h-4" />
+          </a>
+        </div>
+
+        {/* Divider */}
+        <div className="h-px bg-border" />
+
         {/* Bottom credit */}
         <div className="text-center space-y-1.5">
           <p className="text-[11px] text-muted-foreground/70">
             তৈরি করেছে{" "}
-            <span className="font-semibold text-foreground/80">রামগঞ্জ আইটি সলিউশন</span>
+            <span className="font-semibold text-foreground/80">রবিউল ইসলাম ইদরিস</span>
           </p>
           <p className="text-[10px] text-muted-foreground/50 flex items-center justify-center gap-1">
             Made with <Heart className="w-3 h-3 text-accent fill-accent" /> in Ramganj
