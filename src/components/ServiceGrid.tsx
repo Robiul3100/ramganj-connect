@@ -562,10 +562,15 @@ const ServiceGrid = () => {
   const [ads, setAds] = useState<Ad[]>([]);
   const [viewMode, setViewMode] = useState<"grid" | "card">("grid");
   const [loading, setLoading] = useState(true);
+  const [enabled, setEnabled] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      const { data: setting } = await (supabase.from as any)("site_settings")
+        .select("value").eq("key", "service_grid_enabled").single();
+      if (setting?.value === "false") { setEnabled(false); setLoading(false); return; }
+      setEnabled(true);
       const [catRes, adRes] = await Promise.all([
         supabase.from("service_categories").select("*").eq("is_active", true).order("sort_order"),
         (supabase.from as any)("advertisements").select("*").eq("is_active", true).order("sort_order"),
@@ -599,6 +604,8 @@ const ServiceGrid = () => {
       navigator.vibrate(30);
     }
   };
+
+  if (!enabled) return null;
 
   return (
     <section className="px-4">

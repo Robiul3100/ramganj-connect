@@ -12,9 +12,14 @@ interface NewsItem {
 
 const LatestNews = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
+  const [enabled, setEnabled] = useState(true);
 
   useEffect(() => {
     const fetchNews = async () => {
+      const { data: setting } = await (supabase.from as any)("site_settings")
+        .select("value").eq("key", "latest_news_enabled").single();
+      if (setting?.value === "false") { setEnabled(false); return; }
+      setEnabled(true);
       const { data } = await supabase
         .from("news")
         .select("id, title, thumbnail_url, published_at")
@@ -32,7 +37,7 @@ const LatestNews = () => {
     return () => { supabase.removeChannel(ch); };
   }, []);
 
-  if (news.length === 0) return null;
+  if (!enabled || news.length === 0) return null;
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);

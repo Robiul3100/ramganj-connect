@@ -265,10 +265,27 @@ const AdminDashboard = () => {
   }, [activeTab]);
 
   useEffect(() => {
-    const ch = supabase.channel("admin_services_rt").on("postgres_changes", { event: "*", schema: "public", table: "services" }, () => {
+    const ch = supabase.channel("admin_services_rt").on("postgres_changes", { event: "*", schema: "public", table: "services" }, (payload: any) => {
       fetchServices(); fetchCounts();
+      if (payload.eventType === "INSERT" && payload.new?.status === "pending") {
+        toast({ title: "🔔 নতুন সেবা সাবমিশন!", description: payload.new?.title || "একটি নতুন সেবা অনুমোদনের জন্য অপেক্ষা করছে" });
+      }
     }).subscribe();
-    return () => { supabase.removeChannel(ch); };
+    const chNews = supabase.channel("admin_news_rt").on("postgres_changes", { event: "INSERT", schema: "public", table: "news" }, (payload: any) => {
+      toast({ title: "📰 নতুন নিউজ প্রকাশিত!", description: payload.new?.title || "" });
+    }).subscribe();
+    const chBlood = supabase.channel("admin_blood_rt").on("postgres_changes", { event: "INSERT", schema: "public", table: "blood_donors" }, (payload: any) => {
+      toast({ title: "🩸 নতুন রক্তদাতা রেজিস্ট্রেশন!", description: payload.new?.name || "" });
+    }).subscribe();
+    const chDonation = supabase.channel("admin_donation_rt").on("postgres_changes", { event: "INSERT", schema: "public", table: "donations" }, (payload: any) => {
+      toast({ title: "💚 নতুন অনুদান এসেছে!", description: `${payload.new?.donor_name || ""} — ৳${payload.new?.amount || ""}` });
+    }).subscribe();
+    return () => { 
+      supabase.removeChannel(ch); 
+      supabase.removeChannel(chNews);
+      supabase.removeChannel(chBlood);
+      supabase.removeChannel(chDonation);
+    };
   }, [fetchServices, fetchCounts]);
 
   const fetchLegacyData = useCallback(async (tabName: string) => {
