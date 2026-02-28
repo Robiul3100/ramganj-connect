@@ -21,7 +21,7 @@ import SiteSettingsPanel from "@/components/SiteSettingsPanel";
 import AnalyticsCharts from "@/components/AnalyticsCharts";
 import AddServiceForm from "@/components/admin/AddServiceForm";
 
-type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements";
+type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices";
 
 const tabGroups = [
   {
@@ -45,6 +45,7 @@ const tabGroups = [
       { id: "emergency" as Tab, label: "জরুরি কল", icon: Phone },
       { id: "blood" as Tab, label: "রক্তদাতা", icon: Droplets },
       { id: "donations" as Tab, label: "অনুদান", icon: Heart },
+      { id: "offices" as Tab, label: "অফিস", icon: Building2 },
     ],
   },
   {
@@ -104,6 +105,20 @@ const legacyTableConfig: Record<string, { table: string; fields: { name: string;
     fields: [
       { name: "title", label: "শিরোনাম" },
       { name: "year", label: "সাল", type: "number" },
+      { name: "description", label: "বিবরণ" },
+      { name: "sort_order", label: "ক্রম", type: "number" },
+    ],
+  },
+  offices: {
+    table: "offices",
+    nameKey: "name",
+    fields: [
+      { name: "name", label: "অফিসের নাম" },
+      { name: "designation", label: "পদবী" },
+      { name: "phone", label: "ফোন নম্বর" },
+      { name: "address", label: "ঠিকানা" },
+      { name: "category", label: "ক্যাটাগরি", type: "select", options: ["সরকারি", "আধা-সরকারি", "স্বায়ত্তশাসিত", "বেসরকারি"] },
+      { name: "visiting_hours", label: "ভিজিটিং সময়" },
       { name: "description", label: "বিবরণ" },
       { name: "sort_order", label: "ক্রম", type: "number" },
     ],
