@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import SplashScreen from "@/components/SplashScreen";
+import MaintenanceGuard from "@/components/MaintenanceGuard";
+import PageTracker from "@/components/PageTracker";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import EmergencyCalls from "./pages/EmergencyCalls";
@@ -37,25 +39,28 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/service/tuition" element={<TuitionMedia />} />
-              <Route path="/service/:slug" element={<CategoryServices />} />
-              <Route path="/emergency-calls" element={<EmergencyCalls />} />
-              <Route path="/blood-bank" element={<BloodBank />} />
-              <Route path="/donation" element={<Donation />} />
-              <Route path="/about-ramganj" element={<AboutRamganj />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/news" element={<News />} />
-              <Route path="/news/:id" element={<NewsDetail />} />
-              <Route path="/offices" element={<Offices />} />
-              <Route path="/admin-login" element={<AdminLogin />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <MaintenanceGuard>
+              <PageTracker />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/service/tuition" element={<TuitionMedia />} />
+                <Route path="/service/:slug" element={<CategoryServices />} />
+                <Route path="/emergency-calls" element={<EmergencyCalls />} />
+                <Route path="/blood-bank" element={<BloodBank />} />
+                <Route path="/donation" element={<Donation />} />
+                <Route path="/about-ramganj" element={<AboutRamganj />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/news/:id" element={<NewsDetail />} />
+                <Route path="/offices" element={<Offices />} />
+                <Route path="/admin-login" element={<AdminLogin />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </MaintenanceGuard>
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>

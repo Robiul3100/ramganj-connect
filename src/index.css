@@ -106,15 +106,19 @@
 
 @layer components {
   .glass-card {
-    @apply bg-card rounded-2xl;
+    @apply bg-card/80 rounded-2xl;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     box-shadow: var(--shadow-card);
+    border: 1px solid hsl(var(--border) / 0.5);
   }
 
   .glass-card-hover {
-    @apply glass-card transition-shadow duration-300;
+    @apply glass-card transition-all duration-300;
   }
   .glass-card-hover:hover {
     box-shadow: var(--shadow-card-hover);
+    transform: translateY(-1px);
   }
 
   .service-icon-wrapper {
