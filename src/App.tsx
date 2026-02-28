@@ -22,6 +22,7 @@ import CategoryServices from "./pages/CategoryServices";
 import TuitionMedia from "./pages/TuitionMedia";
 import News from "./pages/News";
 import NewsDetail from "./pages/NewsDetail";
+import Offices from "./pages/Offices";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ const App = () => {
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/news" element={<News />} />
               <Route path="/news/:id" element={<NewsDetail />} />
+              <Route path="/offices" element={<Offices />} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="*" element={<NotFound />} />

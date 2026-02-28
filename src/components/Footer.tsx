@@ -5,10 +5,10 @@ import ramganjCityLogo from "@/assets/ramganj-city-logo.png";
 const footerLinks = [
   { label: "সার্ভিস", path: "/services" },
   { label: "জরুরি কল", path: "/emergency-calls" },
+  { label: "অফিস", path: "/offices" },
   { label: "ব্লাড ব্যাংক", path: "/blood-bank" },
   { label: "সংবাদ", path: "/news" },
   { label: "যোগাযোগ", path: "/contact" },
-  { label: "রামগঞ্জ সম্পর্কে", path: "/about-ramganj" },
 ];
 
 const Footer = () => {
