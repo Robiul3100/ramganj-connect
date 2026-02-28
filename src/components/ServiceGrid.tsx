@@ -590,6 +590,7 @@ const ServiceGrid = () => {
   };
 
   const handleNavigate = async (cat: Category) => {
+    if (navigator.vibrate) navigator.vibrate(30);
     if (cat.id !== "news-static") {
       await supabase.rpc("increment_category_view", { cat_id: cat.id });
       setCategories(prev => prev.map(c => c.id === cat.id ? { ...c, view_count: (c.view_count ?? 0) + 1 } : c));
