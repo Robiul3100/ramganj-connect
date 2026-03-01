@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSlider from "@/components/HeroSlider";
+import PrayerTimesWidget from "@/components/PrayerTimesWidget";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import SmartSearch from "@/components/SmartSearch";
 import ServiceGrid from "@/components/ServiceGrid";
@@ -21,6 +22,7 @@ const Index = () => {
 
       <div className="space-y-5 pb-6 mt-2">
         <HeroSlider />
+        <PrayerTimesWidget />
         <AnnouncementBar />
 
         {/* Smart Search */}
