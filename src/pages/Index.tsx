@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import HeroSlider from "@/components/HeroSlider";
 import PrayerTimesWidget from "@/components/PrayerTimesWidget";
 import AnnouncementBar from "@/components/AnnouncementBar";
-import SmartSearch from "@/components/SmartSearch";
+
 import ServiceGrid from "@/components/ServiceGrid";
 import { QuickStatsWidget } from "@/components/DashboardWidgets";
 import LatestNews from "@/components/LatestNews";
@@ -24,11 +24,6 @@ const Index = () => {
         <HeroSlider />
         <PrayerTimesWidget />
         <AnnouncementBar />
-
-        {/* Smart Search */}
-        <div className="px-4">
-          <SmartSearch />
-        </div>
 
 
         <ServiceGrid />
