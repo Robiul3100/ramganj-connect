@@ -61,6 +61,7 @@ const getHijriDate = (date: Date) => {
 const fmt = (d: Date): string => {
   let h = d.getHours();
   const m = d.getMinutes();
+  const ampm = h >= 12 ? "PM" : "AM";
   if (h > 12) h -= 12;
   if (h === 0) h = 12;
   return `${toBn(h)}:${toBn(String(m).padStart(2, "0"))}`;
@@ -77,123 +78,118 @@ const PrayerTimesWidget = () => {
   const pt = new PrayerTimes(COORDS, now, PARAMS);
   const bangla = getBanglaDate(now);
   const hijri = getHijriDate(now);
-  const isRamadan = hijri.month === "রমজান";
-
-  // Sehri = Fajr - 10 min, Iftar = Maghrib
-  const sehriTime = new Date(pt.fajr.getTime() - 10 * 60000);
-  const iftarTime = pt.maghrib;
 
   const prayerEntries = [
     { key: "fajr", name: "ফজর", time: pt.fajr, icon: "🌅" },
-    { key: "sunrise", name: "সূর্যোদয়", time: pt.sunrise, icon: "🌤️" },
-    { key: "dhuhr", name: "জোহর", time: pt.dhuhr, icon: "☀️" },
-    { key: "asr", name: "আসর", time: pt.asr, icon: "🌤" },
-    { key: "maghrib", name: "মাগরিব", time: pt.maghrib, icon: "🌙" },
-    { key: "isha", name: "এশা", time: pt.isha, icon: "🌑" },
+    { key: "sunrise", name: "সূর্যোদয়", time: pt.sunrise, icon: "☀️" },
+    { key: "dhuhr", name: "জোহর", time: pt.dhuhr, icon: "🌤️" },
+    { key: "asr", name: "আসর", time: pt.asr, icon: "🌥️" },
+    { key: "maghrib", name: "মাগরিব", time: pt.maghrib, icon: "🌇" },
+    { key: "isha", name: "এশা", time: pt.isha, icon: "🌙" },
   ];
 
-  // Determine current waqt and next waqt
   const waqtOrder = [pt.fajr, pt.sunrise, pt.dhuhr, pt.asr, pt.maghrib, pt.isha];
   let currentIdx = -1;
   for (let i = waqtOrder.length - 1; i >= 0; i--) {
     if (now >= waqtOrder[i]) { currentIdx = i; break; }
   }
 
-  // Next prayer (skip sunrise as it's not a prayer)
+  const prayerIndices = [0, 2, 3, 4, 5];
   let nextIdx = -1;
-  const prayerIndices = [0, 2, 3, 4, 5]; // fajr, dhuhr, asr, maghrib, isha
   for (const idx of prayerIndices) {
     if (now < waqtOrder[idx]) { nextIdx = idx; break; }
   }
 
-  // Countdown to next prayer
   let countdown = "";
   if (nextIdx >= 0) {
     const diff = waqtOrder[nextIdx].getTime() - now.getTime();
     const hrs = Math.floor(diff / 3600000);
     const mins = Math.floor((diff % 3600000) / 60000);
     const secs = Math.floor((diff % 60000) / 1000);
-    countdown = `${toBn(hrs)}ঘ ${toBn(String(mins).padStart(2, "0"))}মি ${toBn(String(secs).padStart(2, "0"))}সে`;
+    countdown = `${toBn(hrs)}:${toBn(String(mins).padStart(2, "0"))}:${toBn(String(secs).padStart(2, "0"))}`;
   }
 
   return (
-    <div className="px-4">
-      <div
-        className="rounded-2xl border border-border/60 bg-card p-4 space-y-3"
-        style={{ boxShadow: "var(--shadow-card, 0 2px 12px rgba(0,0,0,0.08))" }}
-      >
-        {/* Header */}
-        <div className="text-center text-[11px] text-muted-foreground flex items-center justify-center gap-1.5">
-          <span className="text-destructive text-sm">⚠</span>
-          নামাজের সময়সূচি কেবলমাত্র লক্ষ্মীপুর জেলার জন্য প্রযোজ্য
+    <div className="px-3 sm:px-4">
+      <div className="rounded-2xl border border-border/40 bg-gradient-to-br from-card via-card to-accent/5 overflow-hidden">
+        {/* Location badge */}
+        <div className="bg-muted/50 px-3 py-1.5 flex items-center justify-center gap-1.5 border-b border-border/30">
+          <span className="text-[10px] sm:text-[11px] text-muted-foreground">
+            📍 লক্ষ্মীপুর জেলা • নামাজের সময়সূচি
+          </span>
         </div>
 
-        {/* Countdown bar */}
-        {nextIdx >= 0 && (
-          <div className="text-center bg-primary/10 rounded-lg py-1.5 px-3">
-            <span className="text-xs text-muted-foreground">পরবর্তী: </span>
-            <span className="text-xs font-bold text-primary">{prayerEntries[nextIdx].name}</span>
-            <span className="text-xs text-muted-foreground"> — </span>
-            <span className="text-sm font-mono font-bold text-primary">{countdown}</span>
-          </div>
-        )}
-
-        {/* Date + Prayers */}
-        <div className="flex gap-4">
-          {/* Left: Date */}
-          <div className="flex-shrink-0 space-y-1.5 min-w-[90px]">
-            <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-bold text-foreground leading-none">
-                {toBn(now.getDate())}
+        {/* Date section */}
+        <div className="px-3 sm:px-4 pt-3 pb-2 flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex flex-col items-center justify-center flex-shrink-0">
+              <span className="text-lg sm:text-xl font-bold text-primary leading-none">{toBn(now.getDate())}</span>
+              <span className="text-[8px] sm:text-[9px] text-primary/70 leading-none mt-0.5">
+                {banglaMonths[now.getMonth()].slice(0, 3)}
               </span>
-              <div className="text-xs text-muted-foreground leading-tight">
-                <div>{banglaMonths[now.getMonth()]}</div>
-                <div>{banglaWeekdays[now.getDay()]}</div>
+            </div>
+            <div className="min-w-0">
+              <div className="text-sm sm:text-base font-semibold text-foreground truncate">
+                {banglaWeekdays[now.getDay()]}
+              </div>
+              <div className="text-[10px] sm:text-[11px] text-muted-foreground truncate">
+                {toBn(bangla.day)} {bangla.month} {toBn(bangla.year)} বঙ্গাব্দ
+              </div>
+              <div className="text-[10px] sm:text-[11px] text-muted-foreground truncate">
+                {toBn(hijri.day)} {hijri.month} {toBn(hijri.year)} হিজরি
               </div>
             </div>
-            <div className="text-[11px] text-primary flex items-center gap-1">
-              📅 {toBn(bangla.day)} {bangla.month} {toBn(bangla.year)}
-            </div>
-            <div className="text-[11px] text-muted-foreground flex items-center gap-1">
-              🗓️ {toBn(hijri.day)} {hijri.month} {toBn(hijri.year)}
-            </div>
           </div>
 
-          {/* Right: Prayer grid */}
-          <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-1.5">
+          {/* Countdown pill */}
+          {nextIdx >= 0 && (
+            <div className="bg-primary/10 border border-primary/20 rounded-xl px-3 py-1.5 text-center flex-shrink-0">
+              <div className="text-[9px] sm:text-[10px] text-muted-foreground leading-tight">
+                {prayerEntries[nextIdx].icon} {prayerEntries[nextIdx].name} বাকি
+              </div>
+              <div className="text-base sm:text-lg font-bold font-mono text-primary leading-tight tracking-wide">
+                {countdown}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Prayer times grid */}
+        <div className="px-2 sm:px-3 pb-3">
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
             {prayerEntries.map((p, i) => {
               const isActive = i === currentIdx;
+              const isNext = i === nextIdx;
               return (
                 <div
                   key={p.key}
-                  className={`flex items-center gap-1.5 text-sm rounded-md px-1.5 py-0.5 transition-colors ${
-                    isActive ? "bg-primary/15 font-bold" : ""
+                  className={`relative rounded-xl px-2 py-2 sm:px-3 sm:py-2.5 text-center transition-all duration-200 ${
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-md shadow-primary/25 scale-[1.02]"
+                      : isNext
+                      ? "bg-primary/10 border border-primary/25 ring-1 ring-primary/10"
+                      : "bg-muted/40 border border-border/20"
                   }`}
                 >
-                  <span className="text-xs">{p.icon}</span>
-                  <span className={isActive ? "text-primary" : "text-muted-foreground"}>{p.name} :</span>
-                  <span className={`font-semibold ${isActive ? "text-primary" : "text-foreground"}`}>
+                  <span className="text-xs sm:text-sm block">{p.icon}</span>
+                  <span className={`text-[10px] sm:text-xs font-medium block mt-0.5 ${
+                    isActive ? "text-primary-foreground/80" : "text-muted-foreground"
+                  }`}>
+                    {p.name}
+                  </span>
+                  <span className={`text-sm sm:text-base font-bold block leading-tight ${
+                    isActive ? "text-primary-foreground" : isNext ? "text-primary" : "text-foreground"
+                  }`}>
                     {fmt(p.time)}
                   </span>
+                  {isActive && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-primary/60 rounded-full border-2 border-card animate-pulse" />
+                  )}
                 </div>
               );
             })}
           </div>
         </div>
-
-        {/* Ramadan Sehri/Iftar */}
-        {isRamadan && (
-          <div className="flex gap-3 pt-1">
-            <div className="flex-1 bg-accent/60 rounded-xl py-2 px-3 text-center">
-              <div className="text-[10px] text-muted-foreground">সেহরি শেষ</div>
-              <div className="text-base font-bold text-foreground">{fmt(sehriTime)}</div>
-            </div>
-            <div className="flex-1 bg-primary/10 rounded-xl py-2 px-3 text-center">
-              <div className="text-[10px] text-muted-foreground">ইফতার</div>
-              <div className="text-base font-bold text-primary">{fmt(iftarTime)}</div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
