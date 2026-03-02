@@ -23,11 +23,12 @@ import AnalyticsCharts from "@/components/AnalyticsCharts";
 import AddServiceForm from "@/components/admin/AddServiceForm";
 import VisitorAnalytics from "@/components/admin/VisitorAnalytics";
 import AdminNotificationPanel from "@/components/admin/AdminNotificationPanel";
+import AppSettingsPanel from "@/components/admin/AppSettingsPanel";
 import TrendCharts from "@/components/admin/TrendCharts";
 import Navbar from "@/components/Navbar";
 import DrawerMenu from "@/components/DrawerMenu";
 
-type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications";
+type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications" | "app_settings";
 
 const tabGroups = [
   {
@@ -70,7 +71,9 @@ const tabGroups = [
     items: [
       { id: "analytics" as Tab, label: "ভিজিটর", icon: TrendingUp },
       { id: "site_settings" as Tab, label: "সাইট সেটিং", icon: Settings },
+      { id: "app_settings" as Tab, label: "অ্যাপ সেটিং", icon: Globe },
       { id: "users" as Tab, label: "ইউজার", icon: Users },
+      { id: "activity" as Tab, label: "অ্যাক্টিভিটি", icon: Activity },
       { id: "activity" as Tab, label: "অ্যাক্টিভিটি", icon: Activity },
     ],
   },
@@ -1500,6 +1503,7 @@ const AdminDashboard = () => {
   );
 
   const renderSiteSettings = () => <SiteSettingsPanel />;
+  const renderAppSettings = () => <AppSettingsPanel />;
   const renderNotifications = () => <AdminNotificationPanel />;
 
   const refreshSliderItems = async () => {
@@ -1750,6 +1754,7 @@ const AdminDashboard = () => {
       case "advertisements": return renderAdvertisements();
       case "about": return renderAbout();
       case "site_settings": return renderSiteSettings();
+      case "app_settings": return renderAppSettings();
       case "notifications": return renderNotifications();
       case "analytics": return <VisitorAnalytics />;
       default: return renderLegacy();
