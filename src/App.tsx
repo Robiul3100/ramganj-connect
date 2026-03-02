@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { UserPreferencesProvider } from "@/hooks/useUserPreferences";
 import SplashScreen from "@/components/SplashScreen";
 import MaintenanceGuard from "@/components/MaintenanceGuard";
 import PageTracker from "@/components/PageTracker";
@@ -33,6 +34,7 @@ const App = () => {
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="ramganj-theme">
+      <UserPreferencesProvider>
       {!splashDone && <SplashScreen onFinish={() => setSplashDone(true)} />}
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
@@ -64,6 +66,7 @@ const App = () => {
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
+      </UserPreferencesProvider>
     </ThemeProvider>
   );
 };

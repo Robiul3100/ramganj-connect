@@ -15,13 +15,16 @@ const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [tappedIdx, setTappedIdx] = useState<number | null>(null);
 
   if (location.pathname.startsWith("/admin")) return null;
 
   const vibrate = () => navigator.vibrate?.(25);
 
-  const handleClick = (item: typeof navItems[0]) => {
+  const handleClick = (item: typeof navItems[0], idx: number) => {
     vibrate();
+    setTappedIdx(idx);
+    setTimeout(() => setTappedIdx(null), 350);
     if (item.type === "menu") {
       setMenuOpen(true);
     } else {
@@ -43,12 +46,13 @@ const BottomNav = () => {
                 ? (item.route === "/" ? location.pathname === "/" : location.pathname.startsWith(item.route))
                 : menuOpen;
               const isCenter = idx === 2;
+              const isTapped = tappedIdx === idx;
 
               if (isCenter) {
                 return (
                   <button
                     key={item.label}
-                    onClick={() => handleClick(item)}
+                    onClick={() => handleClick(item, idx)}
                     className="relative flex flex-col items-center -mt-5 group"
                     aria-label={item.label}
                   >
@@ -59,13 +63,15 @@ const BottomNav = () => {
                       style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.6))" }}
                     />
                     <div
-                      className={`relative w-[52px] h-[52px] rounded-full flex items-center justify-center shadow-lg transition-all duration-300 bg-primary ${
-                        isActive ? "scale-110 shadow-primary/30" : "scale-100 group-hover:scale-105"
+                      className={`relative w-[52px] h-[52px] rounded-full flex items-center justify-center shadow-lg bg-primary transition-all duration-300 ease-out ${
+                        isTapped ? "scale-90" : isActive ? "scale-110 shadow-primary/30" : "scale-100 group-hover:scale-105"
                       }`}
                     >
-                      <Icon className="w-[22px] h-[22px] text-primary-foreground" strokeWidth={2.2} />
+                      <Icon className={`w-[22px] h-[22px] text-primary-foreground transition-transform duration-300 ${
+                        isTapped ? "scale-75 rotate-[-8deg]" : "scale-100 rotate-0"
+                      }`} strokeWidth={2.2} />
                     </div>
-                    <span className={`text-[10px] mt-1 leading-tight font-bold transition-colors duration-200 ${
+                    <span className={`text-[10px] mt-1 leading-tight font-bold transition-all duration-300 ${
                       isActive ? "text-primary" : "text-muted-foreground"
                     }`}>
                       {item.label}
@@ -77,29 +83,31 @@ const BottomNav = () => {
               return (
                 <button
                   key={item.label}
-                  onClick={() => handleClick(item)}
+                  onClick={() => handleClick(item, idx)}
                   className="relative flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl transition-all duration-200 min-w-[50px] group"
                   aria-label={item.label}
                 >
-                  {/* Active dot */}
+                  {/* Active indicator line */}
                   <span
-                    className={`absolute -top-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary transition-all duration-300 ${
-                      isActive ? "opacity-100 scale-100" : "opacity-0 scale-0"
+                    className={`absolute -top-0.5 left-1/2 -translate-x-1/2 h-[3px] rounded-full bg-primary transition-all duration-300 ease-out ${
+                      isActive ? "opacity-100 w-5" : "opacity-0 w-0"
                     }`}
                   />
 
-                  <div className={`relative flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200 ${
-                    isActive ? "bg-primary/10 dark:bg-primary/15" : "group-hover:bg-muted/60"
+                  <div className={`relative flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-300 ease-out ${
+                    isTapped ? "scale-[0.8]" : isActive ? "bg-primary/10 dark:bg-primary/15 scale-100" : "group-hover:bg-muted/60 scale-100"
                   }`}>
                     <Icon
-                      className={`w-[20px] h-[20px] transition-all duration-200 ${
+                      className={`w-[20px] h-[20px] transition-all duration-300 ease-out ${
+                        isTapped ? "scale-75" : "scale-100"
+                      } ${
                         isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
                       }`}
                       strokeWidth={isActive ? 2.4 : 1.8}
                     />
                   </div>
 
-                  <span className={`text-[10px] leading-tight transition-all duration-200 ${
+                  <span className={`text-[10px] leading-tight transition-all duration-300 ${
                     isActive ? "font-bold text-primary" : "font-medium text-muted-foreground"
                   }`}>
                     {item.label}
