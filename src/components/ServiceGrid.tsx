@@ -525,6 +525,7 @@ interface Category {
   view_count?: number;
   svg_icon?: string | null;
   accent_color?: string | null;
+  icon_url?: string | null;
 }
 
 /* Shared SVG filter definitions for 3D icon effects */
@@ -686,6 +687,7 @@ const ServiceGrid = () => {
             const iconData = SvgIcons[cat.icon] || SvgIcons["Tag"];
             const bColor = cat.accent_color || borderColorMap[cat.icon] || "hsl(210,60%,72%)";
             const hasDynamicSvg = !!cat.svg_icon;
+            const hasPngIcon = !!cat.icon_url;
             return (
               <button
                 key={cat.id}
@@ -699,7 +701,15 @@ const ServiceGrid = () => {
                     boxShadow: `0 4px 12px -2px ${bColor}33, inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.05)`,
                   }}
                 >
-                  {hasDynamicSvg ? (
+                  {hasPngIcon ? (
+                    <>
+                      <div className="absolute inset-0 rounded-xl" style={{ background: `linear-gradient(135deg, ${bColor}22, ${bColor}11)`, opacity: 0.3 }} />
+                      <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
+                        background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 50%, rgba(0,0,0,0.04) 100%)",
+                      }} />
+                      <img src={cat.icon_url!} alt="" className="relative w-8 h-8 object-contain" style={{ transform: "scale(1.15)" }} />
+                    </>
+                  ) : hasDynamicSvg ? (
                     <>
                       <div className="absolute inset-0 rounded-xl" style={{ background: `linear-gradient(135deg, ${bColor}22, ${bColor}11)`, opacity: 0.3 }} />
                       <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
@@ -736,6 +746,7 @@ const ServiceGrid = () => {
             const iconData = SvgIcons[cat.icon] || SvgIcons["Tag"];
             const bColor = cat.accent_color || borderColorMap[cat.icon] || "hsl(210,60%,72%)";
             const hasDynamicSvg = !!cat.svg_icon;
+            const hasPngIcon = !!cat.icon_url;
             return (
               <div key={cat.id}>
                 <button
@@ -749,7 +760,15 @@ const ServiceGrid = () => {
                       boxShadow: `0 4px 12px -2px ${bColor}33, inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.05)`,
                     }}
                   >
-                    {hasDynamicSvg ? (
+                    {hasPngIcon ? (
+                      <>
+                        <div className="absolute inset-0 rounded-xl" style={{ background: `linear-gradient(135deg, ${bColor}22, ${bColor}11)`, opacity: 0.3 }} />
+                        <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
+                          background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 50%, rgba(0,0,0,0.04) 100%)",
+                        }} />
+                        <img src={cat.icon_url!} alt="" className="relative w-7 h-7 object-contain" style={{ transform: "scale(1.15)" }} />
+                      </>
+                    ) : hasDynamicSvg ? (
                       <>
                         <div className="absolute inset-0 rounded-xl" style={{ background: `linear-gradient(135deg, ${bColor}22, ${bColor}11)`, opacity: 0.3 }} />
                         <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
