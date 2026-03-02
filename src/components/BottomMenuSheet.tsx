@@ -31,6 +31,7 @@ import {
   Rows3,
   Columns3,
   Sparkles,
+  Download,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
@@ -102,6 +103,7 @@ const BottomMenuSheet = ({ open, onOpenChange }: BottomMenuSheetProps) => {
       items: [
         { icon: Info, label: "রামগঞ্জ সম্পর্কে", action: () => go("/about-ramganj") },
         { icon: MessageSquare, label: "যোগাযোগ", action: () => go("/contact") },
+        { icon: Download, label: "অ্যাপ ইনস্টল করুন", action: () => go("/install") },
       ],
     },
   ];
