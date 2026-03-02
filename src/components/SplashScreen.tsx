@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import logoImg from "@/assets/ramganj-logo.png";
+import logoImg from "@/assets/ramganj-logo.webp";
 
 interface SplashScreenProps {
   onFinish: () => void;
@@ -23,86 +23,110 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
         fadeOut ? "opacity-0" : "opacity-100"
       }`}
     >
-      {/* Clean logo with smooth shine sweep — larger, shifted slightly down */}
-      <div className="relative overflow-hidden mt-8" style={{ width: 270, height: 270 }}>
+      {/* Ambient glow rings behind logo */}
+      <div className="relative flex items-center justify-center mt-4">
+        <div
+          className="absolute rounded-full"
+          style={{
+            width: 300,
+            height: 300,
+            background: "radial-gradient(circle, hsl(var(--primary) / 0.08) 0%, transparent 70%)",
+            animation: "glow-pulse 2.5s ease-in-out infinite",
+          }}
+        />
+        <div
+          className="absolute rounded-full border border-primary/10"
+          style={{
+            width: 260,
+            height: 260,
+            animation: "ring-expand 2.5s ease-out infinite",
+          }}
+        />
+        <div
+          className="absolute rounded-full border border-primary/5"
+          style={{
+            width: 260,
+            height: 260,
+            animation: "ring-expand 2.5s ease-out 0.6s infinite",
+          }}
+        />
+
+        {/* Logo with 3D pop-in */}
         <img
           src={logoImg}
           alt="Ramganj City Logo"
-          className="w-full h-full object-contain"
-          style={{ animation: "logo-appear 0.5s ease-out both" }}
-        />
-        {/* Smooth glass shine — wider, softer beam */}
-        <div
-          className="absolute inset-0 pointer-events-none"
+          className="relative z-10"
           style={{
-            background:
-              "linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.12) 40%, rgba(255,255,255,0.72) 50%, rgba(255,255,255,0.12) 60%, transparent 75%)",
-            animation: "shine-smooth 2.2s cubic-bezier(0.4,0,0.2,1) infinite",
+            width: 220,
+            height: 220,
+            objectFit: "contain",
+            animation: "logo-3d-pop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both",
+            filter: "drop-shadow(0 8px 24px hsl(var(--primary) / 0.18))",
           }}
         />
       </div>
 
-      {/* Facebook Lite style bouncing dots loader — between logo and text */}
+      {/* Bouncing dots loader */}
       <div
-        className="flex items-center gap-2 mt-3 mb-2"
-        style={{ animation: "slide-up-text 0.5s ease-out 0.25s both" }}
+        className="flex items-center gap-2 mt-5 mb-3"
+        style={{ animation: "slide-up-text 0.5s ease-out 0.5s both" }}
       >
         {[0, 1, 2].map((i) => (
           <span
             key={i}
             className="block rounded-full bg-primary"
             style={{
-              width: 10,
-              height: 10,
-              animation: `fb-bounce 1.2s ease-in-out ${i * 0.18}s infinite`,
+              width: 9,
+              height: 9,
+              animation: `dot-wave 1.4s ease-in-out ${i * 0.16}s infinite`,
             }}
           />
         ))}
       </div>
 
-      {/* Text block — each line slides up with stagger */}
-      <div className="flex flex-col items-center gap-1 overflow-hidden">
+      {/* Text block with staggered reveals */}
+      <div className="flex flex-col items-center gap-1.5 overflow-hidden">
         <p
           className="text-lg font-bold text-foreground tracking-wide"
-          style={{ animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.35s both" }}
+          style={{ animation: "text-reveal 0.6s cubic-bezier(0.22,1,0.36,1) 0.4s both" }}
         >
           পরিকল্পনা ও বাস্তবায়ন
         </p>
 
         <div
-          className="w-40 h-px my-1"
+          className="w-44 h-px my-0.5"
           style={{
             background: "linear-gradient(90deg, transparent, hsl(var(--primary)), transparent)",
-            animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.48s both",
+            animation: "line-grow 0.7s cubic-bezier(0.22,1,0.36,1) 0.55s both",
           }}
         />
 
         <p
           className="text-base font-bold text-primary"
-          style={{ animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.58s both" }}
+          style={{ animation: "text-reveal 0.6s cubic-bezier(0.22,1,0.36,1) 0.65s both" }}
         >
           Ramganj City Organisation
         </p>
 
         <p
-          className="text-sm text-muted-foreground mt-1"
-          style={{ animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.70s both" }}
+          className="text-sm text-muted-foreground mt-0.5"
+          style={{ animation: "text-reveal 0.6s cubic-bezier(0.22,1,0.36,1) 0.8s both" }}
         >
           রামগঞ্জকে দেখুন, রামগঞ্জকে জানুন
         </p>
 
         <p
-          className="text-xs text-muted-foreground/70"
-          style={{ animation: "slide-up-text 0.55s cubic-bezier(0.22,1,0.36,1) 0.82s both" }}
+          className="text-xs text-muted-foreground/60"
+          style={{ animation: "text-reveal 0.6s cubic-bezier(0.22,1,0.36,1) 0.95s both" }}
         >
           www.ramganjcity.com
         </p>
       </div>
 
-      {/* Developer credit at bottom */}
+      {/* Developer credit */}
       <div
         className="absolute bottom-8 flex items-center justify-center"
-        style={{ animation: "slide-up-text 0.5s ease-out 1s both" }}
+        style={{ animation: "text-reveal 0.5s ease-out 1.1s both" }}
       >
         <p className="text-xs text-foreground/70">
           Developed by:{" "}
@@ -113,22 +137,30 @@ const SplashScreen = ({ onFinish }: SplashScreenProps) => {
       </div>
 
       <style>{`
-        @keyframes logo-appear {
-          from { opacity: 0; transform: scale(0.88); }
-          to   { opacity: 1; transform: scale(1); }
+        @keyframes logo-3d-pop {
+          0% { opacity: 0; transform: scale(0.4) rotateY(90deg); }
+          60% { opacity: 1; transform: scale(1.05) rotateY(-5deg); }
+          100% { opacity: 1; transform: scale(1) rotateY(0deg); }
         }
-        @keyframes shine-smooth {
-          0%   { transform: translateX(-160%); }
-          50%  { transform: translateX(160%); }
-          100% { transform: translateX(160%); }
+        @keyframes glow-pulse {
+          0%, 100% { opacity: 0.6; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.08); }
         }
-        @keyframes slide-up-text {
-          from { opacity: 0; transform: translateY(22px); }
-          to   { opacity: 1; transform: translateY(0); }
+        @keyframes ring-expand {
+          0% { transform: scale(0.8); opacity: 0.6; }
+          100% { transform: scale(1.4); opacity: 0; }
         }
-        @keyframes fb-bounce {
-          0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-          40%            { transform: scale(1);   opacity: 1; }
+        @keyframes dot-wave {
+          0%, 60%, 100% { transform: translateY(0) scale(0.7); opacity: 0.4; }
+          30% { transform: translateY(-8px) scale(1); opacity: 1; }
+        }
+        @keyframes text-reveal {
+          from { opacity: 0; transform: translateY(18px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes line-grow {
+          from { opacity: 0; transform: scaleX(0); }
+          to { opacity: 1; transform: scaleX(1); }
         }
       `}</style>
     </div>
