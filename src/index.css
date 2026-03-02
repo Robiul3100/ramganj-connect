@@ -100,7 +100,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Hind Siliguri', sans-serif;
+    font-family: 'Bensen Handwriting', 'Hind Siliguri', sans-serif;
   }
 }
 
