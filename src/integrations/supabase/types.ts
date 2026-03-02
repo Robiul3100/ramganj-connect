@@ -95,6 +95,33 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_notifications: {
+        Row: {
+          body: string
+          created_at: string
+          icon_name: string | null
+          id: string
+          is_read: boolean
+          title: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          icon_name?: string | null
+          id?: string
+          is_read?: boolean
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          icon_name?: string | null
+          id?: string
+          is_read?: boolean
+          title?: string
+        }
+        Relationships: []
+      }
       advertisements: {
         Row: {
           click_count: number

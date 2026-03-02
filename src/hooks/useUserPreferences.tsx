@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from "react";
+import { useState, useEffect, createContext, useContext, ReactNode, useCallback } from "react";
 
 export interface UserPreferences {
   fontSize: "small" | "medium" | "large";
@@ -21,6 +21,7 @@ const defaultPrefs: UserPreferences = {
 interface UserPreferencesContextType {
   prefs: UserPreferences;
   setPref: <K extends keyof UserPreferences>(key: K, value: UserPreferences[K]) => void;
+  requestNotificationPermission: () => Promise<boolean>;
 }
 
 const UserPreferencesContext = createContext<UserPreferencesContextType | null>(null);
@@ -42,18 +43,49 @@ export const UserPreferencesProvider = ({ children }: { children: ReactNode }) =
     
     // Apply font size to root
     const root = document.documentElement;
-    root.classList.remove("text-sm", "text-base", "text-lg");
     if (prefs.fontSize === "small") root.style.fontSize = "14px";
     else if (prefs.fontSize === "large") root.style.fontSize = "18px";
     else root.style.fontSize = "16px";
   }, [prefs]);
+
+  // Auto theme color: switch based on time of day
+  useEffect(() => {
+    if (!prefs.autoThemeColor) return;
+
+    const applyAutoTheme = () => {
+      const hour = new Date().getHours();
+      // 6 AM - 6 PM = light, otherwise dark
+      const shouldBeDark = hour < 6 || hour >= 18;
+      const root = document.documentElement;
+      const currentIsDark = root.classList.contains("dark");
+      if (shouldBeDark && !currentIsDark) {
+        root.classList.add("dark");
+        localStorage.setItem("ramganj-theme", "dark");
+      } else if (!shouldBeDark && currentIsDark) {
+        root.classList.remove("dark");
+        localStorage.setItem("ramganj-theme", "light");
+      }
+    };
+
+    applyAutoTheme();
+    const interval = setInterval(applyAutoTheme, 60000); // check every minute
+    return () => clearInterval(interval);
+  }, [prefs.autoThemeColor]);
+
+  const requestNotificationPermission = useCallback(async (): Promise<boolean> => {
+    if (!("Notification" in window)) return false;
+    if (Notification.permission === "granted") return true;
+    if (Notification.permission === "denied") return false;
+    const result = await Notification.requestPermission();
+    return result === "granted";
+  }, []);
 
   const setPref = <K extends keyof UserPreferences>(key: K, value: UserPreferences[K]) => {
     setPrefs((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
-    <UserPreferencesContext.Provider value={{ prefs, setPref }}>
+    <UserPreferencesContext.Provider value={{ prefs, setPref, requestNotificationPermission }}>
       {children}
     </UserPreferencesContext.Provider>
   );
