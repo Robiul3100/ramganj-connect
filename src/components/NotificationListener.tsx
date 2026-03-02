@@ -49,7 +49,6 @@ const NotificationListener = () => {
 
           const title = payload.notification?.title || "নতুন নোটিফিকেশন";
           const body = payload.notification?.body || "";
-          const redirectUrl = payload.data?.redirect_url;
 
           // Dedup with realtime channel
           const notifId = payload.data?.notification_id;
@@ -62,9 +61,12 @@ const NotificationListener = () => {
           toast(title, {
             description: body,
             duration: 6000,
-            action: redirectUrl
-              ? { label: "দেখুন", onClick: () => window.location.assign(redirectUrl) }
-              : undefined,
+            action: {
+              label: "দেখুন",
+              onClick: () => {
+                window.location.href = "/notifications";
+              },
+            },
           });
         });
       } catch (err) {
@@ -85,20 +87,23 @@ const NotificationListener = () => {
         { event: "INSERT", schema: "public", table: "admin_notifications" },
         (payload: any) => {
           if (!enabledRef.current) return;
-          const { title, body, is_draft, redirect_url } = payload.new || {};
+          const { title, body, is_draft } = payload.new || {};
           if (!title || is_draft) return;
 
           const key = `notif_${payload.new.id}`;
           if (sessionStorage.getItem(key)) return;
           sessionStorage.setItem(key, "1");
 
-          // In-app toast
+          // In-app toast — clicking "দেখুন" goes to notifications page
           toast(title, {
             description: body || "",
             duration: 6000,
-            action: redirect_url
-              ? { label: "দেখুন", onClick: () => window.location.assign(redirect_url) }
-              : undefined,
+            action: {
+              label: "দেখুন",
+              onClick: () => {
+                window.location.href = "/notifications";
+              },
+            },
           });
 
           // Browser notification (background tab)

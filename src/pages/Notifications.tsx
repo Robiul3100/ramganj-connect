@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Bell, Calendar, ExternalLink } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Bell, Calendar, ExternalLink, CheckCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
 import BottomNav from "@/components/BottomNav";
@@ -15,9 +15,27 @@ interface Notification {
   created_at: string;
 }
 
+const READ_KEY = "read_notifications";
+
+const getReadIds = (): Set<string> => {
+  try {
+    const raw = localStorage.getItem(READ_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch {
+    return new Set();
+  }
+};
+
+const saveReadIds = (ids: Set<string>) => {
+  // Keep max 200 to avoid bloating localStorage
+  const arr = Array.from(ids).slice(-200);
+  localStorage.setItem(READ_KEY, JSON.stringify(arr));
+};
+
 const Notifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [readIds, setReadIds] = useState<Set<string>>(getReadIds);
 
   const fetchNotifications = async () => {
     setLoading(true);
@@ -48,11 +66,65 @@ const Notifications = () => {
     };
   }, []);
 
+  const markAsRead = useCallback((id: string) => {
+    setReadIds((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      saveReadIds(next);
+      return next;
+    });
+  }, []);
+
+  const markAllAsRead = useCallback(() => {
+    setReadIds((prev) => {
+      const next = new Set(prev);
+      notifications.forEach((n) => next.add(n.id));
+      saveReadIds(next);
+      return next;
+    });
+  }, [notifications]);
+
+  const unreadCount = notifications.filter((n) => !readIds.has(n.id)).length;
+
+  const handleClick = (n: Notification) => {
+    markAsRead(n.id);
+    if (n.redirect_url) {
+      window.location.href = n.redirect_url;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background max-w-4xl mx-auto pb-20">
       <PageHeader title="নোটিফিকেশন" color="linear-gradient(135deg, hsl(40,80%,50%), hsl(25,85%,55%))" />
 
-      <div className="px-4 -mt-2 space-y-3">
+      {/* Unread count + Mark all read */}
+      {notifications.length > 0 && (
+        <div className="px-4 flex items-center justify-between mb-2">
+          <p className="text-xs text-muted-foreground">
+            {unreadCount > 0 ? (
+              <span className="inline-flex items-center gap-1">
+                <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
+                {unreadCount}টি অপঠিত
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 text-muted-foreground">
+                <CheckCheck className="w-3.5 h-3.5" />
+                সব পড়া হয়েছে
+              </span>
+            )}
+          </p>
+          {unreadCount > 0 && (
+            <button
+              onClick={markAllAsRead}
+              className="text-xs text-primary font-medium hover:underline"
+            >
+              সব পঠিত করুন
+            </button>
+          )}
+        </div>
+      )}
+
+      <div className="px-4 -mt-0 space-y-3">
         {loading && notifications.length === 0 && (
           <div className="flex justify-center py-16">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -69,48 +141,64 @@ const Notifications = () => {
           </div>
         )}
 
-        {notifications.map((n) => (
-          <div
-            key={n.id}
-            className="glass-card p-4 flex items-start gap-3 cursor-pointer hover:bg-muted/30 transition-colors"
-            onClick={() => {
-              if (n.redirect_url) window.location.href = n.redirect_url;
-            }}
-          >
-            {n.image_url ? (
-              <img
-                src={n.image_url}
-                alt=""
-                className="w-12 h-12 rounded-xl object-cover shrink-0"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                <Bell className="w-5 h-5 text-primary" />
-              </div>
-            )}
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-foreground leading-snug">{n.title}</p>
-              {n.body && (
-                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{n.body}</p>
+        {notifications.map((n) => {
+          const isRead = readIds.has(n.id);
+          return (
+            <div
+              key={n.id}
+              className={`glass-card p-4 flex items-start gap-3 cursor-pointer transition-all duration-200 ${
+                isRead
+                  ? "opacity-70 hover:opacity-90"
+                  : "border-l-[3px] border-l-primary shadow-sm hover:shadow-md"
+              }`}
+              onClick={() => handleClick(n)}
+            >
+              {n.image_url ? (
+                <img
+                  src={n.image_url}
+                  alt=""
+                  className="w-12 h-12 rounded-xl object-cover shrink-0"
+                />
+              ) : (
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+                    isRead ? "bg-muted" : "bg-primary/10"
+                  }`}
+                >
+                  <Bell className={`w-5 h-5 ${isRead ? "text-muted-foreground" : "text-primary"}`} />
+                </div>
               )}
-              <div className="flex items-center gap-2 mt-1.5">
-                <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                  <Calendar className="w-3 h-3" />
-                  {new Date(n.created_at).toLocaleDateString("bn-BD", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-                {n.redirect_url && (
-                  <ExternalLink className="w-3 h-3 text-primary" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start gap-1.5">
+                  <p className={`text-sm leading-snug flex-1 ${isRead ? "font-medium text-muted-foreground" : "font-bold text-foreground"}`}>
+                    {n.title}
+                  </p>
+                  {!isRead && (
+                    <span className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                  )}
+                </div>
+                {n.body && (
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{n.body}</p>
                 )}
+                <div className="flex items-center gap-2 mt-1.5">
+                  <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    {new Date(n.created_at).toLocaleDateString("bn-BD", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  {n.redirect_url && (
+                    <ExternalLink className="w-3 h-3 text-primary" />
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <BottomNav />
