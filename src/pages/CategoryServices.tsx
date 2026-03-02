@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { Phone, MapPin, Share2, MessageCircle, Star, GraduationCap, Building2, Briefcase, Clock, User, Award, Stethoscope, BadgeCheck, CalendarClock, Banknote } from "lucide-react";
+import { Phone, MapPin, Share2, MessageCircle, Star, GraduationCap, Building2, Briefcase, Clock, User, Award, Stethoscope, BadgeCheck, CalendarClock, Banknote, Filter, ChevronDown, Eye, Calendar, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
 import SubmitFormDialog from "@/components/SubmitFormDialog";
@@ -102,6 +102,8 @@ const getCategoryFormFields = (slug: string) => {
         { name: "experience", label: "অভিজ্ঞতা", placeholder: "যেমন: ১৫+ বছর" },
         { name: "chamber_time", label: "চেম্বার সময়", placeholder: "যেমন: বিকাল ৫টা - রাত ৯টা" },
         { name: "consultation_fee", label: "ভিজিট ফি", placeholder: "যেমন: ৫০০ টাকা" },
+        { name: "rating", label: "রেটিং (১-৫)", placeholder: "যেমন: 4.5" },
+        { name: "available_today", label: "আজ উপলব্ধ?", type: "select" as const, options: ["হ্যাঁ", "না"] },
         { name: "description", label: "অতিরিক্ত তথ্য", type: "textarea" as const },
         { name: "phone", label: "ফোন নাম্বার", type: "tel" as const, required: true },
         { name: "whatsapp", label: "WhatsApp নাম্বার", type: "tel" as const },
@@ -164,6 +166,8 @@ const buildMetadata = (slug: string, data: Record<string, string>) => {
       if (data.experience) meta.experience = data.experience;
       if (data.chamber_time) meta.chamber_time = data.chamber_time;
       if (data.consultation_fee) meta.consultation_fee = data.consultation_fee;
+      if (data.rating) meta.rating = parseFloat(data.rating) || 0;
+      if (data.available_today) meta.available_today = data.available_today === "হ্যাঁ";
       break;
     case "education":
       if (data.edu_type) meta.edu_category = data.edu_type;
@@ -184,7 +188,22 @@ const buildMetadata = (slug: string, data: Record<string, string>) => {
   return meta;
 };
 
-// ──── Doctor Card (Modern Minimal Card) ────
+// ──── Star Rating Component ────
+const StarRating = ({ rating }: { rating: number }) => {
+  return (
+    <div className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map(i => (
+        <Star
+          key={i}
+          className={`w-3.5 h-3.5 ${i <= Math.floor(rating) ? "text-amber-400 fill-amber-400" : i - 0.5 <= rating ? "text-amber-400 fill-amber-400/50" : "text-muted-foreground/30"}`}
+        />
+      ))}
+      <span className="text-[11px] font-bold text-amber-600 ml-1">{rating.toFixed(1)}</span>
+    </div>
+  );
+};
+
+// ──── Doctor Card (Premium Healthcare Design) ────
 const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: string; bg: string; gradient: string }; onShare: () => void }) => {
   const m = s.metadata || {};
   const degrees: string[] = m.degrees || [];
@@ -194,62 +213,76 @@ const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: stri
   const experience = m.experience || "";
   const chamberTime = m.chamber_time || "";
   const fee = m.consultation_fee || "";
-
-  const infoItems = [
-    experience && { icon: Award, label: "অভিজ্ঞতা", value: experience },
-    chamberTime && { icon: CalendarClock, label: "চেম্বার", value: chamberTime },
-    fee && { icon: Banknote, label: "ভিজিট", value: fee },
-    regNo && { icon: BadgeCheck, label: "BMDC", value: regNo },
-  ].filter(Boolean) as { icon: any; label: string; value: string }[];
+  const rating = typeof m.rating === "number" ? m.rating : 0;
+  const availableToday = m.available_today === true;
+  const [showProfile, setShowProfile] = useState(false);
 
   return (
-    <div className="relative rounded-2xl bg-card overflow-hidden border border-border/40 transition-all duration-300 hover:shadow-lg">
+    <div className="relative rounded-2xl bg-card overflow-hidden border border-border/40 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 group">
       {/* Accent top bar */}
       <div className="h-1.5 w-full" style={{ background: colors.gradient }} />
 
       {/* Featured ribbon */}
       {s.is_featured && (
-        <div className="absolute top-3 right-0 flex items-center gap-1 px-2.5 py-1 rounded-l-full shadow-sm"
-          style={{ background: "hsl(45,90%,55%)" }}>
+        <div className="absolute top-3 right-0 flex items-center gap-1 px-3 py-1 rounded-l-full shadow-md z-10"
+          style={{ background: "linear-gradient(135deg, hsl(45,90%,50%), hsl(35,85%,55%))" }}>
           <Star className="w-3 h-3 text-white fill-white" />
-          <span className="text-[9px] font-extrabold text-white tracking-wide">ফিচার্ড</span>
+          <span className="text-[9px] font-extrabold text-white tracking-wide uppercase">ফিচার্ড</span>
+        </div>
+      )}
+
+      {/* Available Today badge */}
+      {availableToday && (
+        <div className="absolute top-3 left-3 flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/90 shadow-sm z-10">
+          <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+          <span className="text-[9px] font-bold text-white">আজ উপলব্ধ</span>
         </div>
       )}
 
       {/* Main content */}
       <div className="p-4 sm:p-5">
         {/* Profile row */}
-        <div className="flex gap-3.5">
-          {/* Circular avatar */}
+        <div className="flex gap-4">
+          {/* Circular avatar with ring */}
           <div className="relative shrink-0">
             {s.image_url ? (
               <img
                 src={s.image_url}
                 alt={s.title}
-                className="w-16 h-16 sm:w-[76px] sm:h-[76px] rounded-full object-cover ring-2 ring-offset-2 ring-offset-card"
-                style={{ ringColor: `${colors.accent}40` } as any}
+                className="w-20 h-20 sm:w-[88px] sm:h-[88px] rounded-full object-cover shadow-md"
+                style={{ border: `3px solid ${colors.accent}30` }}
               />
             ) : (
               <div
-                className="w-16 h-16 sm:w-[76px] sm:h-[76px] rounded-full flex items-center justify-center ring-2 ring-offset-2 ring-offset-card"
-                style={{ background: colors.bg, color: colors.accent }}
+                className="w-20 h-20 sm:w-[88px] sm:h-[88px] rounded-full flex items-center justify-center shadow-md"
+                style={{ background: colors.bg, color: colors.accent, border: `3px solid ${colors.accent}30` }}
               >
-                <Stethoscope className="w-7 h-7 sm:w-8 sm:h-8" />
+                <Stethoscope className="w-8 h-8 sm:w-9 sm:h-9" />
               </div>
             )}
-            <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-card" />
+            {/* Online indicator */}
+            {availableToday && (
+              <div className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-500 border-[2.5px] border-card" />
+            )}
           </div>
 
-          {/* Name block */}
+          {/* Name & info block */}
           <div className="flex-1 min-w-0 py-0.5">
-            <h3 className="font-extrabold text-foreground text-base sm:text-[17px] leading-snug line-clamp-2">{s.title}</h3>
+            <h3 className="font-extrabold text-foreground text-[16px] sm:text-[18px] leading-snug line-clamp-2">{s.title}</h3>
             {specialty && (
-              <p className="text-xs sm:text-[13px] font-medium mt-0.5" style={{ color: colors.accent }}>{specialty}</p>
+              <p className="text-[12px] sm:text-[13px] font-semibold mt-0.5" style={{ color: colors.accent }}>{specialty}</p>
             )}
+            {/* Verified badge */}
             {regNo && (
-              <div className="flex items-center gap-1 mt-1.5">
-                <BadgeCheck className="w-3.5 h-3.5" style={{ color: colors.accent }} />
-                <span className="text-[10px] font-semibold" style={{ color: colors.accent }}>যাচাইকৃত চিকিৎসক</span>
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <BadgeCheck className="w-4 h-4 text-blue-500 fill-blue-500/20" />
+                <span className="text-[10px] font-bold text-blue-600">যাচাইকৃত • BMDC {regNo}</span>
+              </div>
+            )}
+            {/* Rating */}
+            {rating > 0 && (
+              <div className="mt-1.5">
+                <StarRating rating={rating} />
               </div>
             )}
           </div>
@@ -257,14 +290,15 @@ const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: stri
 
         {/* Degree tags */}
         {degrees.length > 0 && (
-          <div className="flex gap-1.5 mt-3 flex-wrap">
+          <div className="flex gap-1.5 mt-3.5 flex-wrap">
             {degrees.map((deg, i) => (
               <span
                 key={i}
-                className="text-[10px] font-semibold px-2.5 py-1 rounded-full"
+                className="text-[10px] font-semibold px-2.5 py-1 rounded-full border"
                 style={{
                   background: tagColors[i % tagColors.length].bg,
                   color: tagColors[i % tagColors.length].text,
+                  borderColor: tagColors[i % tagColors.length].text + "20",
                 }}
               >
                 {deg}
@@ -273,68 +307,97 @@ const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: stri
           </div>
         )}
 
-        {/* Info grid */}
-        {infoItems.length > 0 && (
-          <div className={`grid gap-2 mt-3.5 ${infoItems.length <= 2 ? 'grid-cols-2' : infoItems.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
-            {infoItems.map((item, i) => {
-              const Icon = item.icon;
-              return (
-                <div key={i} className="flex items-center gap-2 rounded-xl px-3 py-2.5 bg-muted/50">
-                  <Icon className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
-                  <div className="min-w-0">
-                    <p className="text-[9px] text-muted-foreground leading-none">{item.label}</p>
-                    <p className="text-[11px] font-bold text-foreground leading-tight mt-0.5 truncate">{item.value}</p>
-                  </div>
-                </div>
-              );
-            })}
+        {/* Info grid - 2x2 */}
+        <div className="grid grid-cols-2 gap-2 mt-3.5">
+          {experience && (
+            <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 bg-muted/50 border border-border/30">
+              <Award className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
+              <div className="min-w-0">
+                <p className="text-[9px] text-muted-foreground leading-none">অভিজ্ঞতা</p>
+                <p className="text-[11px] font-bold text-foreground leading-tight mt-0.5 truncate">{experience}</p>
+              </div>
+            </div>
+          )}
+          {chamberTime && (
+            <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 bg-muted/50 border border-border/30">
+              <CalendarClock className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
+              <div className="min-w-0">
+                <p className="text-[9px] text-muted-foreground leading-none">সময়সূচি</p>
+                <p className="text-[11px] font-bold text-foreground leading-tight mt-0.5 truncate">{chamberTime}</p>
+              </div>
+            </div>
+          )}
+          {fee && (
+            <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 bg-muted/50 border border-border/30">
+              <Banknote className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
+              <div className="min-w-0">
+                <p className="text-[9px] text-muted-foreground leading-none">ভিজিট ফি</p>
+                <p className="text-[11px] font-bold text-foreground leading-tight mt-0.5 truncate">{fee}</p>
+              </div>
+            </div>
+          )}
+          {hospital && (
+            <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 bg-muted/50 border border-border/30">
+              <Building2 className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
+              <div className="min-w-0">
+                <p className="text-[9px] text-muted-foreground leading-none">চেম্বার</p>
+                <p className="text-[11px] font-bold text-foreground leading-tight mt-0.5 truncate">{hospital}</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Location */}
+        {s.address && (
+          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/30">
+            <MapPin className="w-4 h-4 shrink-0 text-muted-foreground" />
+            <p className="text-[11px] text-muted-foreground line-clamp-1">{s.address}{s.area ? `, ${s.area}` : ""}</p>
           </div>
         )}
 
-        {/* Hospital & Address */}
-        {(hospital || s.address) && (
-          <div className="mt-3 space-y-2 border-t border-border/30 pt-3">
-            {hospital && (
-              <div className="flex items-center gap-2">
-                <Building2 className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
-                <p className="text-xs font-semibold text-foreground line-clamp-1">{hospital}</p>
-              </div>
-            )}
-            {s.address && (
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 shrink-0 text-muted-foreground" />
-                <p className="text-[11px] text-muted-foreground line-clamp-1">{s.address}{s.area ? `, ${s.area}` : ""}</p>
-              </div>
-            )}
+        {/* Expandable profile section */}
+        {showProfile && s.description && (
+          <div className="mt-3 pt-3 border-t border-border/30 animate-in fade-in slide-in-from-top-2 duration-200">
+            <p className="text-[12px] text-muted-foreground leading-relaxed">{s.description}</p>
           </div>
-        )}
-
-        {s.description && (
-          <p className="text-[11px] text-muted-foreground line-clamp-2 mt-2.5 leading-relaxed">{s.description}</p>
         )}
       </div>
 
-      {/* CTA area */}
-      <div className="px-4 sm:px-5 pb-4 sm:pb-5 flex gap-2">
-        {s.phone && (
+      {/* CTA Buttons */}
+      <div className="px-4 sm:px-5 pb-4 sm:pb-5 grid grid-cols-3 gap-2">
+        <button
+          onClick={() => setShowProfile(!showProfile)}
+          className="py-2.5 rounded-xl text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1.5 bg-muted/70 text-foreground border border-border/40 hover:bg-muted transition-colors"
+        >
+          <Eye className="w-3.5 h-3.5" /> প্রোফাইল
+        </button>
+        {s.phone ? (
           <a
             href={`tel:${s.phone}`}
-            className="flex-1 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-2 text-white active:scale-[0.97] transition-transform"
+            className="py-2.5 rounded-xl text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1.5 text-white active:scale-[0.97] transition-transform"
             style={{ background: colors.gradient }}
           >
-            <Phone className="w-4 h-4" /> কল করুন
+            <Phone className="w-3.5 h-3.5" /> কল করুন
           </a>
+        ) : (
+          <div className="py-2.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 bg-muted/40 text-muted-foreground cursor-not-allowed">
+            <Phone className="w-3.5 h-3.5" /> কল
+          </div>
         )}
-        {s.whatsapp && (
+        {s.whatsapp ? (
           <a
             href={`https://wa.me/88${s.whatsapp}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-2 text-white active:scale-[0.97] transition-transform"
+            className="py-2.5 rounded-xl text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1.5 text-white active:scale-[0.97] transition-transform"
             style={{ background: "linear-gradient(135deg, hsl(142,70%,38%), hsl(152,65%,45%))" }}
           >
-            <MessageCircle className="w-4 h-4" /> হোয়াটসঅ্যাপ
+            <Calendar className="w-3.5 h-3.5" /> অ্যাপয়েন্টমেন্ট
           </a>
+        ) : (
+          <div className="py-2.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 bg-muted/40 text-muted-foreground cursor-not-allowed">
+            <Calendar className="w-3.5 h-3.5" /> অ্যাপয়েন্টমেন্ট
+          </div>
         )}
       </div>
     </div>
@@ -565,13 +628,143 @@ const DefaultCard = ({ s, colors }: { s: Service; colors: { accent: string; bg: 
   );
 };
 
+// ──── Doctor Filters Component ────
+const DoctorFilters = ({
+  services,
+  filters,
+  setFilters,
+}: {
+  services: Service[];
+  filters: { specialty: string; location: string; feeRange: string; rating: string; search: string };
+  setFilters: (f: any) => void;
+}) => {
+  const [showFilters, setShowFilters] = useState(false);
+
+  const specialties = useMemo(() => {
+    const set = new Set<string>();
+    services.forEach(s => { if (s.metadata?.specialty) set.add(s.metadata.specialty); });
+    return Array.from(set).sort();
+  }, [services]);
+
+  const locations = useMemo(() => {
+    const set = new Set<string>();
+    services.forEach(s => { if (s.area) set.add(s.area); if (s.address) set.add(s.address); });
+    return Array.from(set).sort();
+  }, [services]);
+
+  const activeCount = [filters.specialty, filters.location, filters.feeRange, filters.rating].filter(Boolean).length;
+
+  return (
+    <div className="space-y-2">
+      {/* Search bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder="ডাক্তার খুঁজুন..."
+          value={filters.search}
+          onChange={e => setFilters({ ...filters, search: e.target.value })}
+          className="w-full pl-9 pr-10 py-2.5 rounded-xl bg-card border border-border/60 text-sm outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground"
+        />
+        {filters.search && (
+          <button onClick={() => setFilters({ ...filters, search: "" })} className="absolute right-3 top-1/2 -translate-y-1/2">
+            <X className="w-4 h-4 text-muted-foreground" />
+          </button>
+        )}
+      </div>
+
+      {/* Filter toggle */}
+      <button
+        onClick={() => setShowFilters(!showFilters)}
+        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-card border border-border/60 text-sm font-semibold text-foreground w-full justify-between"
+      >
+        <span className="flex items-center gap-2">
+          <Filter className="w-4 h-4" style={{ color: "hsl(185,60%,42%)" }} />
+          ফিল্টার করুন
+          {activeCount > 0 && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style={{ background: "hsl(185,60%,42%)" }}>{activeCount}</span>
+          )}
+        </span>
+        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showFilters ? "rotate-180" : ""}`} />
+      </button>
+
+      {/* Filter options */}
+      {showFilters && (
+        <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-card border border-border/40 animate-in fade-in slide-in-from-top-2 duration-200">
+          {/* Specialty */}
+          <div>
+            <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">বিশেষত্ব</label>
+            <select
+              value={filters.specialty}
+              onChange={e => setFilters({ ...filters, specialty: e.target.value })}
+              className="w-full text-xs px-2 py-2 rounded-lg bg-muted/50 border border-border/40 outline-none"
+            >
+              <option value="">সকল</option>
+              {specialties.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+          {/* Location */}
+          <div>
+            <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">এলাকা</label>
+            <select
+              value={filters.location}
+              onChange={e => setFilters({ ...filters, location: e.target.value })}
+              className="w-full text-xs px-2 py-2 rounded-lg bg-muted/50 border border-border/40 outline-none"
+            >
+              <option value="">সকল</option>
+              {locations.map(l => <option key={l} value={l}>{l}</option>)}
+            </select>
+          </div>
+          {/* Fee range */}
+          <div>
+            <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">ভিজিট ফি</label>
+            <select
+              value={filters.feeRange}
+              onChange={e => setFilters({ ...filters, feeRange: e.target.value })}
+              className="w-full text-xs px-2 py-2 rounded-lg bg-muted/50 border border-border/40 outline-none"
+            >
+              <option value="">সকল</option>
+              <option value="low">৫০০ টাকার নিচে</option>
+              <option value="mid">৫০০-১০০০ টাকা</option>
+              <option value="high">১০০০+ টাকা</option>
+            </select>
+          </div>
+          {/* Rating */}
+          <div>
+            <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">রেটিং</label>
+            <select
+              value={filters.rating}
+              onChange={e => setFilters({ ...filters, rating: e.target.value })}
+              className="w-full text-xs px-2 py-2 rounded-lg bg-muted/50 border border-border/40 outline-none"
+            >
+              <option value="">সকল</option>
+              <option value="4">৪+ স্টার</option>
+              <option value="3">৩+ স্টার</option>
+              <option value="2">২+ স্টার</option>
+            </select>
+          </div>
+          {/* Clear all */}
+          {activeCount > 0 && (
+            <button
+              onClick={() => setFilters({ specialty: "", location: "", feeRange: "", rating: "", search: filters.search })}
+              className="col-span-2 text-xs font-bold py-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+            >
+              সকল ফিল্টার মুছুন
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const CategoryServices = () => {
   const { slug } = useParams<{ slug: string }>();
   const [services, setServices] = useState<Service[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
-  
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [doctorFilters, setDoctorFilters] = useState({ specialty: "", location: "", feeRange: "", rating: "", search: "" });
 
   const colors = (slug && categoryColors[slug]) || defaultColor;
 
@@ -599,7 +792,36 @@ const CategoryServices = () => {
     return () => { supabase.removeChannel(ch); };
   }, [slug]);
 
-  const filtered = services;
+  // Doctor filtering logic
+  const filtered = useMemo(() => {
+    if (slug !== "doctors") return services;
+    return services.filter(s => {
+      const m = s.metadata || {};
+      // Search
+      if (doctorFilters.search) {
+        const q = doctorFilters.search.toLowerCase();
+        const match = s.title.toLowerCase().includes(q) || (m.specialty || "").toLowerCase().includes(q) || (m.hospital_name || "").toLowerCase().includes(q);
+        if (!match) return false;
+      }
+      // Specialty
+      if (doctorFilters.specialty && m.specialty !== doctorFilters.specialty) return false;
+      // Location
+      if (doctorFilters.location && s.area !== doctorFilters.location && s.address !== doctorFilters.location) return false;
+      // Fee range
+      if (doctorFilters.feeRange) {
+        const feeNum = parseInt((m.consultation_fee || "").replace(/[^\d]/g, "")) || 0;
+        if (doctorFilters.feeRange === "low" && feeNum >= 500) return false;
+        if (doctorFilters.feeRange === "mid" && (feeNum < 500 || feeNum > 1000)) return false;
+        if (doctorFilters.feeRange === "high" && feeNum <= 1000) return false;
+      }
+      // Rating
+      if (doctorFilters.rating) {
+        const minRating = parseInt(doctorFilters.rating);
+        if ((m.rating || 0) < minRating) return false;
+      }
+      return true;
+    });
+  }, [services, doctorFilters, slug]);
 
   const handleShare = (service: Service) => {
     if (navigator.share) {
@@ -648,37 +870,62 @@ const CategoryServices = () => {
         {/* Ad Banner */}
         <PageAdBanner pageSlug={slug || "services"} />
 
+        {/* Doctor Filters */}
+        {slug === "doctors" && !loading && services.length > 0 && (
+          <DoctorFilters services={services} filters={doctorFilters} setFilters={setDoctorFilters} />
+        )}
+
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {[1, 2, 3, 4].map(i => (
               <div key={i} className="rounded-2xl overflow-hidden border border-border/60">
                 <div className="p-4 flex items-start gap-3.5 bg-muted/30">
-                  <div className="w-[72px] h-[72px] rounded-full skeleton-shimmer shrink-0" />
+                  <div className="w-20 h-20 rounded-full skeleton-shimmer shrink-0" />
                   <div className="flex-1 space-y-2 pt-2">
-                    <div className="h-4 w-3/4 rounded skeleton-shimmer" />
+                    <div className="h-5 w-3/4 rounded skeleton-shimmer" />
+                    <div className="h-3 w-1/2 rounded skeleton-shimmer" />
                     <div className="flex gap-1.5">
                       <div className="h-5 w-16 rounded-full skeleton-shimmer" />
                       <div className="h-5 w-20 rounded-full skeleton-shimmer" />
                     </div>
                   </div>
                 </div>
-                <div className="p-4 space-y-2">
-                  <div className="h-4 w-2/3 rounded skeleton-shimmer" />
-                  <div className="h-3 w-1/2 rounded skeleton-shimmer" />
+                <div className="p-4 grid grid-cols-2 gap-2">
+                  <div className="h-12 rounded-xl skeleton-shimmer" />
+                  <div className="h-12 rounded-xl skeleton-shimmer" />
+                  <div className="h-12 rounded-xl skeleton-shimmer" />
+                  <div className="h-12 rounded-xl skeleton-shimmer" />
                 </div>
-                <div className="flex border-t border-border/30">
-                  <div className="flex-1 h-12 skeleton-shimmer" />
-                  <div className="flex-1 h-12 skeleton-shimmer" />
+                <div className="px-4 pb-4 grid grid-cols-3 gap-2">
+                  <div className="h-10 rounded-xl skeleton-shimmer" />
+                  <div className="h-10 rounded-xl skeleton-shimmer" />
+                  <div className="h-10 rounded-xl skeleton-shimmer" />
                 </div>
               </div>
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <p className="text-center text-muted-foreground py-12">কোন তথ্য পাওয়া যায়নি</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-6">
-            {filtered.map(renderCard)}
+          <div className="text-center py-12">
+            <Stethoscope className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
+            <p className="text-muted-foreground font-semibold">কোন তথ্য পাওয়া যায়নি</p>
+            {slug === "doctors" && (doctorFilters.specialty || doctorFilters.location || doctorFilters.feeRange || doctorFilters.rating || doctorFilters.search) && (
+              <button
+                onClick={() => setDoctorFilters({ specialty: "", location: "", feeRange: "", rating: "", search: "" })}
+                className="mt-2 text-sm font-bold text-primary"
+              >
+                ফিল্টার মুছুন
+              </button>
+            )}
           </div>
+        ) : (
+          <>
+            {slug === "doctors" && (
+              <p className="text-xs text-muted-foreground font-semibold">{filtered.length}জন ডাক্তার পাওয়া গেছে</p>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-6">
+              {filtered.map(renderCard)}
+            </div>
+          </>
         )}
       </div>
 
