@@ -835,6 +835,7 @@ export type Database = {
       }
       service_categories: {
         Row: {
+          accent_color: string | null
           created_at: string
           description: string | null
           icon: string
@@ -843,9 +844,11 @@ export type Database = {
           name: string
           slug: string
           sort_order: number
+          svg_icon: string | null
           view_count: number
         }
         Insert: {
+          accent_color?: string | null
           created_at?: string
           description?: string | null
           icon?: string
@@ -854,9 +857,11 @@ export type Database = {
           name: string
           slug: string
           sort_order?: number
+          svg_icon?: string | null
           view_count?: number
         }
         Update: {
+          accent_color?: string | null
           created_at?: string
           description?: string | null
           icon?: string
@@ -865,6 +870,7 @@ export type Database = {
           name?: string
           slug?: string
           sort_order?: number
+          svg_icon?: string | null
           view_count?: number
         }
         Relationships: []

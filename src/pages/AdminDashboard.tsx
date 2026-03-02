@@ -24,11 +24,12 @@ import AddServiceForm from "@/components/admin/AddServiceForm";
 import VisitorAnalytics from "@/components/admin/VisitorAnalytics";
 import AdminNotificationPanel from "@/components/admin/AdminNotificationPanel";
 import AppSettingsPanel from "@/components/admin/AppSettingsPanel";
+import ServiceGridManager from "@/components/admin/ServiceGridManager";
 import TrendCharts from "@/components/admin/TrendCharts";
 import Navbar from "@/components/Navbar";
 import DrawerMenu from "@/components/DrawerMenu";
 
-type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications" | "app_settings";
+type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications" | "app_settings" | "service_grid";
 
 const tabGroups = [
   {
@@ -45,6 +46,7 @@ const tabGroups = [
     items: [
       { id: "services" as Tab, label: "সেবাসমূহ", icon: Globe },
       { id: "categories" as Tab, label: "ক্যাটাগরি", icon: Layers },
+      { id: "service_grid" as Tab, label: "সার্ভিস গ্রিড", icon: SlidersHorizontal },
     ],
   },
   {
@@ -1757,6 +1759,7 @@ const AdminDashboard = () => {
       case "app_settings": return renderAppSettings();
       case "notifications": return renderNotifications();
       case "analytics": return <VisitorAnalytics />;
+      case "service_grid": return <ServiceGridManager />;
       default: return renderLegacy();
     }
   };
