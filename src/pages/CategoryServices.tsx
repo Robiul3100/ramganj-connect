@@ -341,7 +341,7 @@ const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: stri
 };
 
 // ──── Education Card ────
-const EducationCard = ({ s, colors, onShare }: { s: Service; colors: { accent: string; bg: string; gradient: string }; onShare: () => void }) => {
+const EducationCard = ({ s, colors }: { s: Service; colors: { accent: string; bg: string; gradient: string } }) => {
   const m = s.metadata || {};
   return (
     <div className={`rounded-2xl overflow-hidden border transition-shadow hover:shadow-lg ${s.is_featured ? "ring-2 ring-amber-400/40" : ""}`} style={{ borderColor: colors.accent + "55" }}>
@@ -391,16 +391,13 @@ const EducationCard = ({ s, colors, onShare }: { s: Service; colors: { accent: s
             <MessageCircle className="w-4 h-4" /> হোয়াটসঅ্যাপ
           </a>
         )}
-        <button onClick={onShare} className="px-4 py-3 bg-muted text-muted-foreground flex items-center justify-center">
-          <Share2 className="w-4 h-4" />
-        </button>
       </div>
     </div>
   );
 };
 
 // ──── Job Card ────
-const JobCard = ({ s, colors, onShare }: { s: Service; colors: { accent: string; bg: string; gradient: string }; onShare: () => void }) => {
+const JobCard = ({ s, colors }: { s: Service; colors: { accent: string; bg: string; gradient: string } }) => {
   const m = s.metadata || {};
   return (
     <div className={`rounded-2xl overflow-hidden border transition-shadow hover:shadow-lg ${s.is_featured ? "ring-2 ring-amber-400/40" : ""}`} style={{ borderColor: colors.accent + "55" }}>
@@ -442,16 +439,13 @@ const JobCard = ({ s, colors, onShare }: { s: Service; colors: { accent: string;
             <MessageCircle className="w-4 h-4" /> হোয়াটসঅ্যাপ
           </a>
         )}
-        <button onClick={onShare} className="px-4 py-3 bg-muted text-muted-foreground flex items-center justify-center">
-          <Share2 className="w-4 h-4" />
-        </button>
       </div>
     </div>
   );
 };
 
 // ──── Shop Card ────
-const ShopCard = ({ s, colors, onShare }: { s: Service; colors: { accent: string; bg: string; gradient: string }; onShare: () => void }) => {
+const ShopCard = ({ s, colors }: { s: Service; colors: { accent: string; bg: string; gradient: string } }) => {
   const m = s.metadata || {};
   return (
     <div className={`rounded-2xl overflow-hidden border transition-shadow hover:shadow-lg ${s.is_featured ? "ring-2 ring-amber-400/40" : ""}`} style={{ borderColor: colors.accent + "55" }}>
@@ -496,16 +490,13 @@ const ShopCard = ({ s, colors, onShare }: { s: Service; colors: { accent: string
             <MessageCircle className="w-4 h-4" /> হোয়াটসঅ্যাপ
           </a>
         )}
-        <button onClick={onShare} className="px-4 py-3 bg-muted text-muted-foreground flex items-center justify-center">
-          <Share2 className="w-4 h-4" />
-        </button>
       </div>
     </div>
   );
 };
 
 // ──── Default Card (for other categories) ────
-const DefaultCard = ({ s, colors, onShare }: { s: Service; colors: { accent: string; bg: string; gradient: string }; onShare: () => void }) => {
+const DefaultCard = ({ s, colors }: { s: Service; colors: { accent: string; bg: string; gradient: string } }) => {
   const m = s.metadata || {};
   const metaParts: string[] = [];
   if (m.specialty) metaParts.push(m.specialty);
@@ -568,9 +559,6 @@ const DefaultCard = ({ s, colors, onShare }: { s: Service; colors: { accent: str
             <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
           </a>
         )}
-        <button onClick={onShare} className="px-3 py-2 rounded-xl border border-border text-xs font-medium flex items-center justify-center gap-1">
-          <Share2 className="w-3.5 h-3.5" />
-        </button>
       </div>
     </div>
   );
@@ -645,13 +633,13 @@ const CategoryServices = () => {
       case "doctors":
         return <DoctorCard key={s.id} s={s} colors={colors} onShare={() => handleShare(s)} />;
       case "education":
-        return <EducationCard key={s.id} s={s} colors={colors} onShare={() => handleShare(s)} />;
+        return <EducationCard key={s.id} s={s} colors={colors} />;
       case "jobs":
-        return <JobCard key={s.id} s={s} colors={colors} onShare={() => handleShare(s)} />;
+        return <JobCard key={s.id} s={s} colors={colors} />;
       case "shops":
-        return <ShopCard key={s.id} s={s} colors={colors} onShare={() => handleShare(s)} />;
+        return <ShopCard key={s.id} s={s} colors={colors} />;
       default:
-        return <DefaultCard key={s.id} s={s} colors={colors} onShare={() => handleShare(s)} />;
+        return <DefaultCard key={s.id} s={s} colors={colors} />;
     }
   };
 
