@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Save, Edit3, Trash2, Hash, Image as ImageIcon, Plus, Info, History, Eye, EyeOff } from "lucide-react";
+import { Save, Edit3, Trash2, Image as ImageIcon, Plus, Info, History } from "lucide-react";
+import SwipeUpEditor from "./SwipeUpEditor";
 
 interface Props {
   logActivity: (action: string, tableName?: string, recordId?: string, details?: string) => Promise<void>;
@@ -15,13 +16,13 @@ const AdminAboutManager = ({ logActivity }: Props) => {
   const [galleryForm, setGalleryForm] = useState({ image_url: "", caption: "", sort_order: 0 });
   const [galleryEditId, setGalleryEditId] = useState<string | null>(null);
   const [galleryUploading, setGalleryUploading] = useState(false);
+  const [showGalleryForm, setShowGalleryForm] = useState(false);
   const [timelineData, setTimelineData] = useState<any[]>([]);
   const [timelineForm, setTimelineForm] = useState({ title: "", year: "", description: "", sort_order: "0" });
   const [timelineEditId, setTimelineEditId] = useState<string | null>(null);
   const [showTimelineForm, setShowTimelineForm] = useState(false);
 
   useEffect(() => {
-    // Fetch about content
     const fetchAbout = async () => {
       const { data } = await (supabase.from as any)("about_content").select("*").limit(1).single();
       if (data) {
@@ -30,15 +31,11 @@ const AdminAboutManager = ({ logActivity }: Props) => {
       }
     };
     fetchAbout();
-
-    // Fetch gallery
     const fetchGallery = async () => {
       const { data } = await (supabase.from as any)("about_gallery").select("*").order("sort_order");
       setGalleryItems(data || []);
     };
     fetchGallery();
-
-    // Fetch timeline
     const fetchTimeline = async () => {
       const { data } = await (supabase.from as any)("timeline_events").select("*").order("sort_order");
       setTimelineData(data || []);
@@ -81,10 +78,15 @@ const AdminAboutManager = ({ logActivity }: Props) => {
       await (supabase.from as any)("about_gallery").insert(galleryForm);
       toast({ title: "যোগ হয়েছে ✅" });
     }
-    setGalleryForm({ image_url: "", caption: "", sort_order: 0 });
-    setGalleryEditId(null);
+    closeGalleryForm();
     const { data } = await (supabase.from as any)("about_gallery").select("*").order("sort_order");
     setGalleryItems(data || []);
+  };
+
+  const closeGalleryForm = () => {
+    setGalleryForm({ image_url: "", caption: "", sort_order: 0 });
+    setGalleryEditId(null);
+    setShowGalleryForm(false);
   };
 
   const toggleGalleryActive = async (id: string, current: boolean) => {
@@ -109,11 +111,15 @@ const AdminAboutManager = ({ logActivity }: Props) => {
       await (supabase.from as any)("timeline_events").insert(insertData);
       toast({ title: "যোগ হয়েছে ✅" });
     }
+    closeTimelineForm();
+    const { data } = await (supabase.from as any)("timeline_events").select("*").order("sort_order");
+    setTimelineData(data || []);
+  };
+
+  const closeTimelineForm = () => {
     setTimelineForm({ title: "", year: "", description: "", sort_order: "0" });
     setTimelineEditId(null);
     setShowTimelineForm(false);
-    const { data } = await (supabase.from as any)("timeline_events").select("*").order("sort_order");
-    setTimelineData(data || []);
   };
 
   const deleteTimeline = async (id: string) => {
@@ -144,7 +150,7 @@ const AdminAboutManager = ({ logActivity }: Props) => {
         </button>
       </div>
 
-      {/* Gallery */}
+      {/* Gallery with SwipeUpEditor */}
       <div className="bg-card border border-border/60 rounded-2xl p-5 space-y-4">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-sm">
@@ -152,8 +158,16 @@ const AdminAboutManager = ({ logActivity }: Props) => {
           </div>
           <h2 className="text-sm font-bold text-foreground">গ্যালারি ({galleryItems.length}টি)</h2>
         </div>
-        <div className="space-y-3 bg-muted/20 rounded-xl p-4 border border-border/40">
-          <input className="w-full bg-background rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ছবির লিংক (URL)" value={galleryForm.image_url} onChange={(e) => setGalleryForm({ ...galleryForm, image_url: e.target.value })} />
+
+        <SwipeUpEditor
+          open={showGalleryForm}
+          onClose={closeGalleryForm}
+          title={galleryEditId ? "গ্যালারি এডিট" : "নতুন গ্যালারি ছবি"}
+          subtitle="গ্যালারিতে ছবি যোগ বা সম্পাদনা করুন"
+          icon={<ImageIcon className="w-4 h-4 text-white" />}
+          headerGradient="from-pink-500 to-rose-500"
+        >
+          <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ছবির লিংক (URL)" value={galleryForm.image_url} onChange={(e) => setGalleryForm({ ...galleryForm, image_url: e.target.value })} />
           <div className="flex items-center gap-3">
             <label className="inline-flex items-center gap-2 text-xs text-primary font-semibold cursor-pointer bg-primary/10 px-4 py-2.5 rounded-xl hover:bg-primary/15 transition-colors">
               <ImageIcon className="w-4 h-4" /> {galleryUploading ? "আপলোড হচ্ছে..." : "ছবি আপলোড"}
@@ -161,18 +175,21 @@ const AdminAboutManager = ({ logActivity }: Props) => {
             </label>
             {galleryForm.image_url && <img src={galleryForm.image_url} alt="" className="w-16 h-12 rounded-xl object-cover border border-border" />}
           </div>
-          <input className="w-full bg-background rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ক্যাপশন (ঐচ্ছিক)" value={galleryForm.caption} onChange={(e) => setGalleryForm({ ...galleryForm, caption: e.target.value })} />
-          <div className="flex gap-2">
+          <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ক্যাপশন (ঐচ্ছিক)" value={galleryForm.caption} onChange={(e) => setGalleryForm({ ...galleryForm, caption: e.target.value })} />
+          <div className="flex gap-2 pt-2">
             <button onClick={saveGalleryItem} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
               <Save className="w-4 h-4" /> {galleryEditId ? "আপডেট" : "যোগ করুন"}
             </button>
-            {galleryEditId && (
-              <button onClick={() => { setGalleryEditId(null); setGalleryForm({ image_url: "", caption: "", sort_order: 0 }); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium">
-                বাতিল
-              </button>
-            )}
+            <button onClick={closeGalleryForm} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium">
+              বাতিল
+            </button>
           </div>
-        </div>
+        </SwipeUpEditor>
+
+        <button onClick={() => setShowGalleryForm(true)} className="w-full py-3 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors">
+          <Plus className="w-4 h-4" /> নতুন ছবি যোগ করুন
+        </button>
+
         {galleryItems.length > 0 && (
           <div className="grid grid-cols-2 gap-3">
             {galleryItems.map(item => (
@@ -186,7 +203,7 @@ const AdminAboutManager = ({ logActivity }: Props) => {
                 <div className="p-2.5 flex items-center justify-between">
                   {item.caption && <p className="text-[11px] text-foreground font-medium line-clamp-1">{item.caption}</p>}
                   <div className="flex gap-1">
-                    <button onClick={() => { setGalleryEditId(item.id); setGalleryForm({ image_url: item.image_url, caption: item.caption || "", sort_order: item.sort_order }); }}
+                    <button onClick={() => { setGalleryEditId(item.id); setGalleryForm({ image_url: item.image_url, caption: item.caption || "", sort_order: item.sort_order }); setShowGalleryForm(true); }}
                       className="text-[10px] px-2 py-1 rounded bg-blue-500/10 text-blue-600 font-semibold">এডিট</button>
                     <button onClick={() => deleteGalleryItem(item.id)}
                       className="text-[10px] px-2 py-1 rounded bg-red-500/10 text-red-600 font-semibold">মুছুন</button>
@@ -198,7 +215,7 @@ const AdminAboutManager = ({ logActivity }: Props) => {
         )}
       </div>
 
-      {/* Timeline */}
+      {/* Timeline with SwipeUpEditor */}
       <div className="bg-card border border-border/60 rounded-2xl p-5 space-y-4">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center shadow-sm">
@@ -207,25 +224,30 @@ const AdminAboutManager = ({ logActivity }: Props) => {
           <h2 className="text-sm font-bold text-foreground">টাইমলাইন ({timelineData.length}টি)</h2>
         </div>
 
-        {showTimelineForm || timelineEditId ? (
-          <div className="space-y-3 bg-muted/20 rounded-xl p-4 border border-border/40">
-            <input className="w-full bg-background rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="শিরোনাম" value={timelineForm.title} onChange={(e) => setTimelineForm({ ...timelineForm, title: e.target.value })} />
-            <input type="number" className="w-full bg-background rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="সাল (যেমন: 1920)" value={timelineForm.year} onChange={(e) => setTimelineForm({ ...timelineForm, year: e.target.value })} />
-            <textarea className="w-full bg-background rounded-xl px-4 py-3 text-sm border border-border/60 outline-none min-h-[80px] focus:border-primary/50 transition-all resize-none" placeholder="বিবরণ" value={timelineForm.description} onChange={(e) => setTimelineForm({ ...timelineForm, description: e.target.value })} />
-            <div className="flex gap-2">
-              <button onClick={saveTimeline} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
-                <Save className="w-4 h-4" /> {timelineEditId ? "আপডেট" : "যোগ করুন"}
-              </button>
-              <button onClick={() => { setTimelineEditId(null); setShowTimelineForm(false); setTimelineForm({ title: "", year: "", description: "", sort_order: "0" }); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium">
-                বাতিল
-              </button>
-            </div>
+        <SwipeUpEditor
+          open={showTimelineForm}
+          onClose={closeTimelineForm}
+          title={timelineEditId ? "টাইমলাইন এডিট" : "নতুন টাইমলাইন ইভেন্ট"}
+          subtitle="ইতিহাসের ঘটনা যোগ করুন"
+          icon={<History className="w-4 h-4 text-white" />}
+          headerGradient="from-violet-500 to-indigo-500"
+        >
+          <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="শিরোনাম" value={timelineForm.title} onChange={(e) => setTimelineForm({ ...timelineForm, title: e.target.value })} />
+          <input type="number" className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="সাল (যেমন: 1920)" value={timelineForm.year} onChange={(e) => setTimelineForm({ ...timelineForm, year: e.target.value })} />
+          <textarea className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none min-h-[80px] focus:border-primary/50 transition-all resize-none" placeholder="বিবরণ" value={timelineForm.description} onChange={(e) => setTimelineForm({ ...timelineForm, description: e.target.value })} />
+          <div className="flex gap-2 pt-2">
+            <button onClick={saveTimeline} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+              <Save className="w-4 h-4" /> {timelineEditId ? "আপডেট" : "যোগ করুন"}
+            </button>
+            <button onClick={closeTimelineForm} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium">
+              বাতিল
+            </button>
           </div>
-        ) : (
-          <button onClick={() => setShowTimelineForm(true)} className="w-full py-3 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors">
-            <Plus className="w-4 h-4" /> নতুন টাইমলাইন ইভেন্ট
-          </button>
-        )}
+        </SwipeUpEditor>
+
+        <button onClick={() => setShowTimelineForm(true)} className="w-full py-3 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors">
+          <Plus className="w-4 h-4" /> নতুন টাইমলাইন ইভেন্ট
+        </button>
 
         {timelineData.map(item => (
           <div key={item.id} className="bg-muted/20 rounded-xl p-3.5 border border-border/40">

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Save, Edit3, Trash2, Hash, Image as ImageIcon, Plus, Eye, EyeOff } from "lucide-react";
+import SwipeUpEditor from "./SwipeUpEditor";
 
 const PAGE_OPTIONS = [
   { value: "news", label: "খবর ও সংবাদ" },
@@ -65,11 +66,11 @@ const AdminAdsManager = ({ logActivity }: Props) => {
       await logActivity("created", "advertisements", undefined, form.title);
       toast({ title: "বিজ্ঞাপন যোগ হয়েছে ✅" });
     }
-    resetForm();
+    closeForm();
     fetchItems();
   };
 
-  const resetForm = () => {
+  const closeForm = () => {
     setForm({ title: "", description: "", image_url: "", link_url: "", sort_order: 0, expire_at: "", target_pages: [] });
     setEditId(null);
     setShowForm(false);
@@ -96,63 +97,62 @@ const AdminAdsManager = ({ logActivity }: Props) => {
 
   return (
     <div className="space-y-4">
-      {showForm || editId ? (
-        <div className="bg-card border-2 border-primary/20 rounded-2xl p-5 space-y-4 shadow-md">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-sm">
-              <ImageIcon className="w-4 h-4 text-white" />
-            </div>
-            <h2 className="text-sm font-bold text-foreground">{editId ? "বিজ্ঞাপন এডিট" : "নতুন বিজ্ঞাপন"}</h2>
-          </div>
-          <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="বিজ্ঞাপনের শিরোনাম" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-          <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="বিবরণ (ঐচ্ছিক)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-          <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="লিংক URL (ঐচ্ছিক)" value={form.link_url} onChange={(e) => setForm({ ...form, link_url: e.target.value })} />
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">ক্রম</label>
-              <input type="number" className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">মেয়াদ শেষ</label>
-              <input type="datetime-local" className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" value={form.expire_at} onChange={(e) => setForm({ ...form, expire_at: e.target.value })} />
-            </div>
+      <SwipeUpEditor
+        open={showForm}
+        onClose={closeForm}
+        title={editId ? "বিজ্ঞাপন এডিট" : "নতুন বিজ্ঞাপন"}
+        subtitle="বিজ্ঞাপন তৈরি বা সম্পাদনা করুন"
+        icon={<ImageIcon className="w-4 h-4 text-white" />}
+        headerGradient="from-yellow-500 to-orange-500"
+      >
+        <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="বিজ্ঞাপনের শিরোনাম" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+        <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="বিবরণ (ঐচ্ছিক)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+        <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="লিংক URL (ঐচ্ছিক)" value={form.link_url} onChange={(e) => setForm({ ...form, link_url: e.target.value })} />
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">ক্রম</label>
+            <input type="number" className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
           </div>
           <div>
-            <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">ছবি</label>
-            <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ছবির লিংক (URL)" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
-            <div className="flex items-center gap-3 mt-2">
-              <label className="inline-flex items-center gap-2 text-xs text-primary font-semibold cursor-pointer bg-primary/10 px-4 py-2.5 rounded-xl hover:bg-primary/15 transition-colors">
-                <ImageIcon className="w-4 h-4" /> {uploading ? "আপলোড হচ্ছে..." : "ছবি আপলোড"}
-                <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
-              </label>
-              {form.image_url && <img src={form.image_url} alt="preview" className="w-20 h-14 rounded-xl object-cover border border-border" />}
-            </div>
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">কোন পেজে দেখাবে (খালি রাখলে সব পেজে)</label>
-            <div className="flex flex-wrap gap-2">
-              {PAGE_OPTIONS.map(page => (
-                <button key={page.value} type="button" onClick={() => togglePage(page.value)}
-                  className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-colors ${form.target_pages.includes(page.value) ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
-                  {page.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={save} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm">
-              <Save className="w-4 h-4" /> {editId ? "আপডেট" : "যোগ করুন"}
-            </button>
-            <button onClick={resetForm} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
-              বাতিল
-            </button>
+            <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">মেয়াদ শেষ</label>
+            <input type="datetime-local" className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" value={form.expire_at} onChange={(e) => setForm({ ...form, expire_at: e.target.value })} />
           </div>
         </div>
-      ) : (
-        <button onClick={() => setShowForm(true)} className="w-full py-3.5 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-all">
-          <Plus className="w-4 h-4" /> নতুন বিজ্ঞাপন যোগ করুন
-        </button>
-      )}
+        <div>
+          <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">ছবি</label>
+          <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ছবির লিংক (URL)" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
+          <div className="flex items-center gap-3 mt-2">
+            <label className="inline-flex items-center gap-2 text-xs text-primary font-semibold cursor-pointer bg-primary/10 px-4 py-2.5 rounded-xl hover:bg-primary/15 transition-colors">
+              <ImageIcon className="w-4 h-4" /> {uploading ? "আপলোড হচ্ছে..." : "ছবি আপলোড"}
+              <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
+            </label>
+            {form.image_url && <img src={form.image_url} alt="preview" className="w-20 h-14 rounded-xl object-cover border border-border" />}
+          </div>
+        </div>
+        <div>
+          <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">কোন পেজে দেখাবে (খালি রাখলে সব পেজে)</label>
+          <div className="flex flex-wrap gap-2">
+            {PAGE_OPTIONS.map(page => (
+              <button key={page.value} type="button" onClick={() => togglePage(page.value)}
+                className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-colors ${form.target_pages.includes(page.value) ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+                {page.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="flex gap-2 pt-2">
+          <button onClick={save} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm">
+            <Save className="w-4 h-4" /> {editId ? "আপডেট" : "যোগ করুন"}
+          </button>
+          <button onClick={closeForm} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
+            বাতিল
+          </button>
+        </div>
+      </SwipeUpEditor>
+
+      <button onClick={() => setShowForm(true)} className="w-full py-3.5 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-all">
+        <Plus className="w-4 h-4" /> নতুন বিজ্ঞাপন যোগ করুন
+      </button>
 
       <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> {items.length}টি বিজ্ঞাপন</span>
 

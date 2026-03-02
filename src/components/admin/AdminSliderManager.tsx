@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { SlidersHorizontal, Save, Edit3, Trash2, Hash, Image as ImageIcon, Plus, Eye, EyeOff } from "lucide-react";
+import SwipeUpEditor from "./SwipeUpEditor";
 
 interface Props {
   logActivity: (action: string, tableName?: string, recordId?: string, details?: string) => Promise<void>;
@@ -48,10 +49,14 @@ const AdminSliderManager = ({ logActivity }: Props) => {
       await logActivity("created", "slider_items", undefined, form.title);
       toast({ title: "নতুন স্লাইড যোগ হয়েছে ✅" });
     }
+    closeForm();
+    fetchItems();
+  };
+
+  const closeForm = () => {
     setForm({ title: "", image_url: "", sort_order: 0 });
     setEditId(null);
     setShowForm(false);
-    fetchItems();
   };
 
   const deleteItem = async (id: string, title: string) => {
@@ -70,40 +75,39 @@ const AdminSliderManager = ({ logActivity }: Props) => {
 
   return (
     <div className="space-y-4">
-      {showForm || editId ? (
-        <div className="bg-card border-2 border-primary/20 rounded-2xl p-5 space-y-4 shadow-md">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-sky-500 flex items-center justify-center shadow-sm">
-              <SlidersHorizontal className="w-4 h-4 text-white" />
-            </div>
-            <h2 className="text-sm font-bold text-foreground">{editId ? "স্লাইড এডিট" : "নতুন স্লাইড"}</h2>
-          </div>
-          <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="স্লাইড শিরোনাম" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-          <input type="number" className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ক্রম" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
-          <div>
-            <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ছবির লিংক (URL)" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
-            <div className="flex items-center gap-3 mt-2">
-              <label className="inline-flex items-center gap-2 text-xs text-primary font-semibold cursor-pointer bg-primary/10 px-4 py-2.5 rounded-xl hover:bg-primary/15 transition-colors">
-                <ImageIcon className="w-4 h-4" /> {uploading ? "আপলোড হচ্ছে..." : "ছবি আপলোড"}
-                <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
-              </label>
-              {form.image_url && <img src={form.image_url} alt="preview" className="w-20 h-12 rounded-xl object-cover border border-border" />}
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={save} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm">
-              <Save className="w-4 h-4" /> {editId ? "আপডেট" : "যোগ করুন"}
-            </button>
-            <button onClick={() => { setEditId(null); setShowForm(false); setForm({ title: "", image_url: "", sort_order: 0 }); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
-              বাতিল
-            </button>
+      <SwipeUpEditor
+        open={showForm}
+        onClose={closeForm}
+        title={editId ? "স্লাইড এডিট" : "নতুন স্লাইড"}
+        subtitle="স্লাইডার ছবি ও তথ্য"
+        icon={<SlidersHorizontal className="w-4 h-4 text-white" />}
+        headerGradient="from-blue-500 to-sky-500"
+      >
+        <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="স্লাইড শিরোনাম" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+        <input type="number" className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ক্রম" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
+        <div>
+          <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ছবির লিংক (URL)" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
+          <div className="flex items-center gap-3 mt-2">
+            <label className="inline-flex items-center gap-2 text-xs text-primary font-semibold cursor-pointer bg-primary/10 px-4 py-2.5 rounded-xl hover:bg-primary/15 transition-colors">
+              <ImageIcon className="w-4 h-4" /> {uploading ? "আপলোড হচ্ছে..." : "ছবি আপলোড"}
+              <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
+            </label>
+            {form.image_url && <img src={form.image_url} alt="preview" className="w-20 h-12 rounded-xl object-cover border border-border" />}
           </div>
         </div>
-      ) : (
-        <button onClick={() => setShowForm(true)} className="w-full py-3.5 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-all">
-          <Plus className="w-4 h-4" /> নতুন স্লাইড যোগ করুন
-        </button>
-      )}
+        <div className="flex gap-2 pt-2">
+          <button onClick={save} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm">
+            <Save className="w-4 h-4" /> {editId ? "আপডেট" : "যোগ করুন"}
+          </button>
+          <button onClick={closeForm} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
+            বাতিল
+          </button>
+        </div>
+      </SwipeUpEditor>
+
+      <button onClick={() => setShowForm(true)} className="w-full py-3.5 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-all">
+        <Plus className="w-4 h-4" /> নতুন স্লাইড যোগ করুন
+      </button>
 
       <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> {items.length}টি স্লাইড</span>
 
