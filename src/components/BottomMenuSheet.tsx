@@ -43,7 +43,7 @@ interface BottomMenuSheetProps {
 const BottomMenuSheet = ({ open, onOpenChange }: BottomMenuSheetProps) => {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
-  const { prefs, setPref } = useUserPreferences();
+  const { prefs, setPref, requestNotificationPermission } = useUserPreferences();
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
@@ -279,7 +279,14 @@ const BottomMenuSheet = ({ open, onOpenChange }: BottomMenuSheetProps) => {
               </div>
               <Switch
                 checked={prefs.notificationsEnabled}
-                onCheckedChange={(v) => { vibrate(); setPref("notificationsEnabled", v); }}
+                onCheckedChange={async (v) => {
+                  vibrate();
+                  if (v) {
+                    const granted = await requestNotificationPermission();
+                    if (!granted) return;
+                  }
+                  setPref("notificationsEnabled", v);
+                }}
               />
             </div>
           </div>

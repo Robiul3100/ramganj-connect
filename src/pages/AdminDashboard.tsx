@@ -22,11 +22,12 @@ import SiteSettingsPanel from "@/components/SiteSettingsPanel";
 import AnalyticsCharts from "@/components/AnalyticsCharts";
 import AddServiceForm from "@/components/admin/AddServiceForm";
 import VisitorAnalytics from "@/components/admin/VisitorAnalytics";
+import AdminNotificationPanel from "@/components/admin/AdminNotificationPanel";
 import TrendCharts from "@/components/admin/TrendCharts";
 import Navbar from "@/components/Navbar";
 import DrawerMenu from "@/components/DrawerMenu";
 
-type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics";
+type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications";
 
 const tabGroups = [
   {
@@ -35,6 +36,7 @@ const tabGroups = [
       { id: "dashboard" as Tab, label: "ড্যাশবোর্ড", icon: LayoutDashboard },
       { id: "pending" as Tab, label: "অপেক্ষমান", icon: Clock },
       { id: "news" as Tab, label: "নিউজ", icon: Newspaper },
+      { id: "notifications" as Tab, label: "নোটিফিকেশন", icon: Bell },
     ],
   },
   {
@@ -1498,6 +1500,7 @@ const AdminDashboard = () => {
   );
 
   const renderSiteSettings = () => <SiteSettingsPanel />;
+  const renderNotifications = () => <AdminNotificationPanel />;
 
   const refreshSliderItems = async () => {
     const { data } = await (supabase.from as any)("slider_items").select("*").order("sort_order");
@@ -1747,6 +1750,7 @@ const AdminDashboard = () => {
       case "advertisements": return renderAdvertisements();
       case "about": return renderAbout();
       case "site_settings": return renderSiteSettings();
+      case "notifications": return renderNotifications();
       case "analytics": return <VisitorAnalytics />;
       default: return renderLegacy();
     }

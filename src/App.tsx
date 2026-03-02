@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { UserPreferencesProvider } from "@/hooks/useUserPreferences";
 import SplashScreen from "@/components/SplashScreen";
+import NotificationListener from "@/components/NotificationListener";
 import MaintenanceGuard from "@/components/MaintenanceGuard";
 import PageTracker from "@/components/PageTracker";
 import Index from "./pages/Index";
@@ -41,6 +42,7 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <NotificationListener />
             <MaintenanceGuard>
               <PageTracker />
               <Routes>
