@@ -71,26 +71,31 @@ const LatestNews = () => {
               <Link
                 to={`/news/${item.id}`}
                 key={`${item.id}-${i}`}
-                className="glass-card overflow-hidden w-[200px] shrink-0 flex flex-col transition-transform duration-200 hover:scale-[1.03]"
+                className="glass-card overflow-hidden w-[340px] shrink-0 flex flex-row items-stretch transition-transform duration-200 hover:scale-[1.02] rounded-2xl"
               >
-                {/* 16:9 thumbnail */}
-                <div className="w-full aspect-video bg-muted overflow-hidden shrink-0">
+                {/* Square thumbnail */}
+                <div className="w-[130px] min-h-[100px] bg-muted overflow-hidden shrink-0 rounded-l-2xl">
                   {item.thumbnail_url ? (
                     <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-primary/5">
-                      <Newspaper className="w-7 h-7 text-muted-foreground/30" />
+                      <Newspaper className="w-8 h-8 text-muted-foreground/30" />
                     </div>
                   )}
                 </div>
-                <div className="p-2 flex flex-col gap-1">
-                  <h3 className="font-bold text-foreground text-[11px] leading-snug line-clamp-2">{item.title}</h3>
-                  <div className="flex items-center gap-2 text-[9px] text-muted-foreground">
-                    <span className="flex items-center gap-0.5">
-                      <Calendar className="w-2.5 h-2.5" /> {date}
+                {/* Content side */}
+                <div className="flex-1 p-3 flex flex-col justify-between min-w-0 relative">
+                  {/* Live dot */}
+                  <div className="absolute top-3 right-3">
+                    <span className="w-3 h-3 rounded-full bg-red-500 block animate-pulse" />
+                  </div>
+                  <h3 className="font-bold text-foreground text-sm leading-snug line-clamp-3 pr-5">{item.title}</h3>
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground mt-2">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" /> {date}
                     </span>
-                    <span className="flex items-center gap-0.5">
-                      <Clock className="w-2.5 h-2.5" /> {time}
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" /> {time}
                     </span>
                   </div>
                 </div>
