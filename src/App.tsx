@@ -12,6 +12,7 @@ import MaintenanceGuard from "@/components/MaintenanceGuard";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import useNetworkStatus from "@/hooks/useNetworkStatus";
 import PageTracker from "@/components/PageTracker";
+import useDynamicMeta from "@/hooks/useDynamicMeta";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import EmergencyCalls from "./pages/EmergencyCalls";
@@ -29,12 +30,14 @@ import TuitionMedia from "./pages/TuitionMedia";
 import News from "./pages/News";
 import NewsDetail from "./pages/NewsDetail";
 import Offices from "./pages/Offices";
+import InstallApp from "./pages/InstallApp";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const [splashDone, setSplashDone] = useState(false);
   useNetworkStatus();
+  useDynamicMeta();
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="ramganj-theme">
@@ -64,6 +67,7 @@ const App = () => {
                 <Route path="/news" element={<News />} />
                 <Route path="/news/:id" element={<NewsDetail />} />
                 <Route path="/offices" element={<Offices />} />
+                <Route path="/install" element={<InstallApp />} />
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="*" element={<NotFound />} />
