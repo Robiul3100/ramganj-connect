@@ -842,6 +842,7 @@ export type Database = {
           created_at: string
           description: string | null
           icon: string
+          icon_url: string | null
           id: string
           is_active: boolean
           name: string
@@ -855,6 +856,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           icon?: string
+          icon_url?: string | null
           id?: string
           is_active?: boolean
           name: string
@@ -868,6 +870,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           icon?: string
+          icon_url?: string | null
           id?: string
           is_active?: boolean
           name?: string
