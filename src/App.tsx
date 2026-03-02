@@ -22,6 +22,7 @@ import AboutRamganj from "./pages/AboutRamganj";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import Profile from "./pages/Profile";
+import DeveloperProfile from "./pages/DeveloperProfile";
 import Contact from "./pages/Contact";
 import Notifications from "./pages/Notifications";
 import Services from "./pages/Services";
@@ -62,6 +63,7 @@ const App = () => {
                 <Route path="/donation" element={<Donation />} />
                 <Route path="/about-ramganj" element={<AboutRamganj />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/developer" element={<DeveloperProfile />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/news" element={<News />} />

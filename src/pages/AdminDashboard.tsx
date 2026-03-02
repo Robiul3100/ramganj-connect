@@ -30,6 +30,7 @@ import AdminSliderManager from "@/components/admin/AdminSliderManager";
 import AdminAdsManager from "@/components/admin/AdminAdsManager";
 import AdminAboutManager from "@/components/admin/AdminAboutManager";
 import SwipeUpEditor from "@/components/admin/SwipeUpEditor";
+import AdminDeveloperProfile from "@/components/admin/AdminDeveloperProfile";
 
 // Legacy table configs for CRUD
 const legacyTableConfig: Record<string, { table: string; fields: { name: string; label: string; type?: string; options?: string[] }[]; nameKey: string }> = {
@@ -979,6 +980,7 @@ const AdminDashboard = () => {
     { id: "app_settings" as AdminTab, label: "অ্যাপ সেটিং", desc: "PWA ও SEO সেটিং", icon: Globe, gradient: "from-blue-500 to-indigo-500" },
     { id: "notifications" as AdminTab, label: "নোটিফিকেশন", desc: "পুশ নোটিফিকেশন পাঠান", icon: Bell, gradient: "from-emerald-500 to-green-500" },
     { id: "users" as AdminTab, label: "ইউজার", desc: "ইউজার ও রোল ম্যানেজ", icon: Users, gradient: "from-violet-500 to-purple-500" },
+    { id: "developer_profile" as AdminTab, label: "ডেভেলপার প্রোফাইল", desc: "ডেভেলপারের তথ্য এডিট", icon: UsersRound, gradient: "from-pink-500 to-rose-500" },
     { id: "activity" as AdminTab, label: "অ্যাক্টিভিটি লগ", desc: "সকল কার্যকলাপ দেখুন", icon: Activity, gradient: "from-amber-500 to-orange-500" },
   ];
 
@@ -1041,6 +1043,7 @@ const AdminDashboard = () => {
       case "notifications": return <AdminNotificationPanel />;
       case "analytics": return <VisitorAnalytics />;
       case "service_grid": return <ServiceGridManager />;
+      case "developer_profile": return <AdminDeveloperProfile logActivity={logActivity} />;
       default: return renderLegacy();
     }
   };
