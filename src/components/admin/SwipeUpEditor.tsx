@@ -15,19 +15,20 @@ const SwipeUpEditor = ({ open, onClose, title, subtitle, icon, headerGradient = 
   return (
     <Drawer.Root open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
-        <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-lg outline-none">
-          <div className="bg-card rounded-t-3xl max-h-[92vh] flex flex-col shadow-2xl">
-            {/* Drag handle */}
-            <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 rounded-full bg-muted-foreground/25" />
-            </div>
-
+        <Drawer.Overlay className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm" />
+        <Drawer.Content
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 outline-none"
+          style={{ pointerEvents: "none" }}
+        >
+          <div
+            className="bg-card rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl border border-border/50 animate-in fade-in zoom-in-95 duration-200"
+            style={{ pointerEvents: "auto" }}
+          >
             {/* Header */}
-            <div className={`mx-4 rounded-2xl bg-gradient-to-r ${headerGradient} p-4 flex items-center justify-between mb-1`}>
+            <div className={`mx-3 mt-3 rounded-xl bg-gradient-to-r ${headerGradient} p-3.5 flex items-center justify-between`}>
               <div className="flex items-center gap-2.5">
                 {icon && (
-                  <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center">
                     {icon}
                   </div>
                 )}
@@ -38,7 +39,7 @@ const SwipeUpEditor = ({ open, onClose, title, subtitle, icon, headerGradient = 
               </div>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-lg bg-white/15 hover:bg-white/25 flex items-center justify-center transition-colors"
               >
                 <X className="w-4 h-4 text-white" />
               </button>
