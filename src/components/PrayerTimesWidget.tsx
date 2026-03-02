@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Coordinates, CalculationMethod, PrayerTimes } from "adhan";
+import { supabase } from "@/integrations/supabase/client";
+import { AlertCircle } from "lucide-react";
 
 const COORDS = new Coordinates(22.9447, 90.8282);
 const PARAMS = CalculationMethod.Karachi();
@@ -68,127 +70,104 @@ const fmt = (d: Date): string => {
 
 const PrayerTimesWidget = () => {
   const [now, setNow] = useState(new Date());
+  const [enabled, setEnabled] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 1000);
+    const timer = setInterval(() => setNow(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    const check = async () => {
+      const { data } = await (supabase.from as any)("site_settings")
+        .select("value")
+        .eq("key", "prayer_times_enabled")
+        .maybeSingle();
+      setEnabled(data ? data.value === "true" : true);
+    };
+    check();
+  }, []);
+
+  if (enabled === null) return null;
+  if (!enabled) return null;
 
   const pt = new PrayerTimes(COORDS, now, PARAMS);
   const bangla = getBanglaDate(now);
   const hijri = getHijriDate(now);
 
-  const prayerEntries = [
-    { key: "fajr", name: "ফজর", time: pt.fajr, icon: "🌅" },
-    { key: "sunrise", name: "সূর্যোদয়", time: pt.sunrise, icon: "☀️" },
-    { key: "dhuhr", name: "জোহর", time: pt.dhuhr, icon: "🌤️" },
-    { key: "asr", name: "আসর", time: pt.asr, icon: "🌥️" },
-    { key: "maghrib", name: "মাগরিব", time: pt.maghrib, icon: "🌇" },
-    { key: "isha", name: "এশা", time: pt.isha, icon: "🌙" },
+  const prayers = [
+    { name: "ফজর", time: fmt(pt.fajr), icon: "🌅" },
+    { name: "সূর্যোদয়", time: fmt(pt.sunrise), icon: "☀️", highlight: true },
+    { name: "জোহর", time: fmt(pt.dhuhr), icon: "🌤️" },
+    { name: "আসর", time: fmt(pt.asr), icon: "🌥️" },
+    { name: "মাগরিব", time: fmt(pt.maghrib), icon: "🌙" },
+    { name: "এশা", time: fmt(pt.isha), icon: "🌃" },
   ];
-
-  const waqtOrder = [pt.fajr, pt.sunrise, pt.dhuhr, pt.asr, pt.maghrib, pt.isha];
-  let currentIdx = -1;
-  for (let i = waqtOrder.length - 1; i >= 0; i--) {
-    if (now >= waqtOrder[i]) { currentIdx = i; break; }
-  }
-
-  const prayerIndices = [0, 2, 3, 4, 5];
-  let nextIdx = -1;
-  for (const idx of prayerIndices) {
-    if (now < waqtOrder[idx]) { nextIdx = idx; break; }
-  }
-
-  let countdown = "";
-  if (nextIdx >= 0) {
-    const diff = waqtOrder[nextIdx].getTime() - now.getTime();
-    const hrs = Math.floor(diff / 3600000);
-    const mins = Math.floor((diff % 3600000) / 60000);
-    const secs = Math.floor((diff % 60000) / 1000);
-    countdown = `${toBn(hrs)}:${toBn(String(mins).padStart(2, "0"))}:${toBn(String(secs).padStart(2, "0"))}`;
-  }
 
   return (
     <div className="px-3 sm:px-4">
-      <div className="rounded-2xl bg-card border border-border/50 dark:border-border/30 shadow-sm dark:shadow-none overflow-hidden">
+      <div className="rounded-2xl bg-card border border-border/50 dark:border-border/30 shadow-sm overflow-hidden">
         
-        {/* Top bar: date + countdown */}
-        <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5 border-b border-border/30 dark:border-border/20">
-          {/* Date cluster */}
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary/15 flex flex-col items-center justify-center flex-shrink-0">
-              <span className="text-base font-bold text-primary leading-none">{toBn(now.getDate())}</span>
-              <span className="text-[7px] text-primary/60 leading-none mt-px uppercase tracking-wider">
-                {banglaMonths[now.getMonth()].slice(0, 3)}
+        {/* Top notice bar */}
+        <div className="flex items-center justify-center gap-2 px-3 py-2 bg-muted/40 dark:bg-muted/20 border-b border-border/30 dark:border-border/20">
+          <span className="text-[11px] sm:text-xs text-foreground/80 dark:text-foreground/70 font-medium text-center leading-snug">
+            নামাজের সময়সূচি কেবলমাত্র লক্ষ্মীপুর জেলার জন্য প্রযোজ্য
+          </span>
+          <AlertCircle className="w-4 h-4 text-destructive shrink-0" />
+        </div>
+
+        {/* Main content: date left + prayers right */}
+        <div className="flex items-stretch">
+          
+          {/* Left: Date section */}
+          <div className="flex flex-col justify-center items-start px-3 sm:px-5 py-3 sm:py-4 border-r border-border/30 dark:border-border/20 min-w-[105px] sm:min-w-[140px] space-y-1.5">
+            {/* Gregorian date */}
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-4xl font-extrabold text-foreground leading-none">
+                {toBn(now.getDate())}
+              </span>
+              <div className="flex flex-col">
+                <span className="text-[11px] sm:text-sm font-semibold text-foreground/80 leading-tight">
+                  {banglaMonths[now.getMonth()]}
+                </span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground leading-tight">
+                  {banglaWeekdays[now.getDay()]}
+                </span>
+              </div>
+            </div>
+
+            {/* Bengali date */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm sm:text-base">📅</span>
+              <span className="text-[11px] sm:text-sm font-bold text-primary leading-tight">
+                {toBn(bangla.day)} {bangla.month} {toBn(bangla.year)}
               </span>
             </div>
-            <div className="min-w-0 space-y-px">
-              <div className="text-[13px] font-semibold text-foreground leading-tight truncate">
-                {banglaWeekdays[now.getDay()]}
-              </div>
-              <div className="text-[10px] text-muted-foreground leading-tight truncate">
-                {toBn(bangla.day)} {bangla.month} • {toBn(hijri.day)} {hijri.month}
-              </div>
+
+            {/* Hijri date */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm sm:text-base">🗓️</span>
+              <span className="text-[11px] sm:text-sm font-bold text-primary leading-tight">
+                {toBn(hijri.day)} {hijri.month} {toBn(hijri.year)}
+              </span>
             </div>
           </div>
 
-          {/* Countdown */}
-          {nextIdx >= 0 && (
-            <div className="text-right flex-shrink-0 pl-2">
-              <div className="text-[9px] text-muted-foreground leading-tight">
-                {prayerEntries[nextIdx].name} পর্যন্ত
-              </div>
-              <div className="text-[15px] sm:text-base font-bold font-mono text-primary leading-tight tabular-nums">
-                {countdown}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Prayer grid — 3×2 */}
-        <div className="grid grid-cols-3 divide-x divide-border/20 dark:divide-border/15">
-          {prayerEntries.map((p, i) => {
-            const isActive = i === currentIdx;
-            const isNext = i === nextIdx;
-            const isTopRow = i < 3;
-
-            return (
-              <div
-                key={p.key}
-                className={`relative flex flex-col items-center justify-center py-2.5 sm:py-3 transition-colors
-                  ${isTopRow ? "border-b border-border/20 dark:border-border/15" : ""}
-                  ${isActive
-                    ? "bg-primary/10 dark:bg-primary/15"
-                    : isNext
-                    ? "bg-accent/40 dark:bg-accent/20"
-                    : "bg-transparent"
-                  }
-                `}
-              >
-                {isActive && (
-                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                )}
-                <span className="text-xs leading-none">{p.icon}</span>
-                <span className={`text-[10px] sm:text-[11px] mt-1 leading-none ${
-                  isActive ? "text-primary font-medium" : "text-muted-foreground"
+          {/* Right: Prayer times grid — 2 columns, 3 rows */}
+          <div className="flex-1 grid grid-cols-2 py-2 sm:py-3 px-2.5 sm:px-4 gap-y-1 sm:gap-y-1.5 gap-x-2 sm:gap-x-4">
+            {prayers.map((p) => (
+              <div key={p.name} className="flex items-center gap-1.5 sm:gap-2 py-1">
+                <span className="text-sm sm:text-lg leading-none">{p.icon}</span>
+                <span className={`text-[12px] sm:text-[14px] leading-tight ${
+                  p.highlight 
+                    ? "text-destructive font-bold" 
+                    : "text-foreground font-semibold"
                 }`}>
-                  {p.name}
-                </span>
-                <span className={`text-[14px] sm:text-[15px] font-semibold mt-0.5 leading-tight tabular-nums ${
-                  isActive ? "text-primary" : "text-foreground"
-                }`}>
-                  {fmt(p.time)}
+                  {p.name} : {p.time}
                 </span>
               </div>
-            );
-          })}
-        </div>
-
-        {/* Footer */}
-        <div className="px-3 py-1.5 bg-muted/30 dark:bg-muted/10 border-t border-border/20 dark:border-border/15">
-          <p className="text-[9px] sm:text-[10px] text-muted-foreground text-center">
-            📍 লক্ষ্মীপুর জেলার জন্য প্রযোজ্য
-          </p>
+            ))}
+          </div>
         </div>
       </div>
     </div>
