@@ -287,3 +287,34 @@
 .animate-icon-bounce { animation: icon-bounce 2s ease-in-out infinite; }
 .animate-icon-pulse { animation: icon-pulse 2s ease-in-out infinite; }
 .animate-icon-spin-slow { animation: icon-spin-slow 20s linear infinite; }
+
+/* Animated border for developer cards */
+@keyframes border-rotate {
+  0% { --border-angle: 0deg; }
+  100% { --border-angle: 360deg; }
+}
+
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.dev-card-animated-border {
+  --border-angle: 0deg;
+  position: relative;
+  border: 3px solid transparent;
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  background-image:
+    linear-gradient(hsl(var(--card)), hsl(var(--card))),
+    conic-gradient(
+      from var(--border-angle),
+      hsl(210 85% 55%),
+      hsl(340 75% 60%),
+      hsl(45 95% 55%),
+      hsl(160 70% 50%),
+      hsl(210 85% 55%)
+    );
+  animation: border-rotate 4s linear infinite;
+}
