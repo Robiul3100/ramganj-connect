@@ -436,7 +436,7 @@ const HospitalCard = ({ s, colors }: { s: Service; colors: { accent: string; bg:
   return (
     <div className="rounded-[16px] bg-card overflow-hidden border border-border/40 transition-all duration-300 hover:shadow-xl group">
       {/* Hospital image with gradient overlay */}
-      <div className="relative w-full aspect-video overflow-hidden">
+      <div className="relative w-full h-40 sm:h-44 overflow-hidden">
         {s.image_url ? (
           <img
             src={s.image_url}
@@ -445,11 +445,11 @@ const HospitalCard = ({ s, colors }: { s: Service; colors: { accent: string; bg:
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${colors.bg}, hsl(0,0%,96%))` }}>
-            <Building2 className="w-16 h-16" style={{ color: colors.accent, opacity: 0.4 }} />
+            <Building2 className="w-12 h-12" style={{ color: colors.accent, opacity: 0.4 }} />
           </div>
         )}
         {/* Bottom gradient overlay */}
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-card to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-card to-transparent" />
 
         {/* 24h badge or open hours */}
         {is24h && (
@@ -470,15 +470,15 @@ const HospitalCard = ({ s, colors }: { s: Service; colors: { accent: string; bg:
       </div>
 
       {/* Info section */}
-      <div className="px-4 pt-3 pb-3">
-        <h3 className="font-extrabold text-foreground text-[17px] sm:text-[19px] leading-snug line-clamp-2">{s.title}</h3>
+      <div className="px-4 pt-2.5 pb-2.5">
+        <h3 className="font-extrabold text-foreground text-[15px] sm:text-[17px] leading-snug line-clamp-1">{s.title}</h3>
         {slogan && (
           <p className="text-[12px] italic text-muted-foreground mt-0.5 line-clamp-1">"{slogan}"</p>
         )}
 
         {/* Location */}
         {s.address && (
-          <div className="flex items-center gap-2 mt-2.5">
+          <div className="flex items-center gap-2 mt-1.5">
             <MapPin className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
             <p className="text-[12px] text-muted-foreground line-clamp-1">{s.address}{s.area ? `, ${s.area}` : ""}</p>
           </div>
@@ -494,7 +494,7 @@ const HospitalCard = ({ s, colors }: { s: Service; colors: { accent: string; bg:
 
         {/* Expandable description */}
         {s.description && (
-          <div className="mt-3">
+          <div className="mt-2.5">
             <button
               onClick={() => setExpanded(!expanded)}
               className="flex items-center gap-2 w-full px-3 py-2 rounded-xl bg-muted/50 border border-border/40 text-[12px] font-bold text-foreground hover:bg-muted transition-colors"
@@ -514,17 +514,17 @@ const HospitalCard = ({ s, colors }: { s: Service; colors: { accent: string; bg:
       </div>
 
       {/* Action buttons */}
-      <div className="px-4 pb-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <div className="px-4 pb-3 grid grid-cols-2 gap-2">
         {s.phone ? (
           <a
             href={`tel:${s.phone}`}
-            className="py-3 rounded-xl text-[13px] font-bold flex items-center justify-center gap-2 text-white active:scale-[0.97] transition-transform"
+            className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 text-white active:scale-[0.97] transition-transform"
             style={{ background: colors.gradient }}
           >
             <Phone className="w-4 h-4" /> কল করুন
           </a>
         ) : (
-          <div className="py-3 rounded-xl text-[13px] font-bold flex items-center justify-center gap-2 bg-muted/40 text-muted-foreground cursor-not-allowed">
+          <div className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 bg-muted/40 text-muted-foreground cursor-not-allowed">
             <Phone className="w-4 h-4" /> কল করুন
           </div>
         )}
@@ -533,13 +533,13 @@ const HospitalCard = ({ s, colors }: { s: Service; colors: { accent: string; bg:
             href={mapUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="py-3 rounded-xl text-[13px] font-bold flex items-center justify-center gap-2 border-2 active:scale-[0.97] transition-transform"
+            className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 border-2 active:scale-[0.97] transition-transform"
             style={{ borderColor: colors.accent, color: colors.accent }}
           >
             <Navigation className="w-4 h-4" /> ম্যাপ দেখুন
           </a>
         ) : (
-          <div className="py-3 rounded-xl text-[13px] font-bold flex items-center justify-center gap-2 bg-muted/40 text-muted-foreground cursor-not-allowed">
+          <div className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 bg-muted/40 text-muted-foreground cursor-not-allowed">
             <Navigation className="w-4 h-4" /> ম্যাপ দেখুন
           </div>
         )}
