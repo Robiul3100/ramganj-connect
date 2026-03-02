@@ -30,7 +30,7 @@ interface Category {
 }
 
 const categoryColors: Record<string, { gradient: string; accent: string; bg: string }> = {
-  doctors: { gradient: "linear-gradient(135deg, hsl(185,60%,42%), hsl(195,65%,50%))", accent: "hsl(185,60%,42%)", bg: "hsl(185,60%,92%)" },
+  doctors: { gradient: "linear-gradient(135deg, hsl(25,90%,55%), hsl(35,85%,50%))", accent: "hsl(25,90%,55%)", bg: "hsl(25,90%,92%)" },
   hospitals: { gradient: "linear-gradient(135deg, hsl(150,60%,40%), hsl(160,55%,48%))", accent: "hsl(150,60%,40%)", bg: "hsl(150,60%,92%)" },
   pharmacy: { gradient: "linear-gradient(135deg, hsl(160,50%,45%), hsl(170,55%,50%))", accent: "hsl(160,50%,45%)", bg: "hsl(160,50%,92%)" },
   education: { gradient: "linear-gradient(135deg, hsl(120,45%,40%), hsl(140,50%,48%))", accent: "hsl(120,45%,40%)", bg: "hsl(120,45%,92%)" },
@@ -218,9 +218,9 @@ const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: stri
   const [showProfile, setShowProfile] = useState(false);
 
   return (
-    <div className="relative rounded-2xl bg-card overflow-hidden border border-border/40 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 group">
-      {/* Accent top bar */}
-      <div className="h-1.5 w-full" style={{ background: colors.gradient }} />
+    <div className="relative rounded-2xl bg-card overflow-hidden border-y border-border/40 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 group"
+      style={{ borderLeft: `3px solid ${colors.accent}`, borderRight: `3px solid ${colors.accent}` }}
+    >
 
       {/* Featured ribbon */}
       {s.is_featured && (
