@@ -13,7 +13,7 @@ import {
   Package, Tractor, Home, BookOpen, UtensilsCrossed, Wrench,
   ScrollText, HeartHandshake, Microscope, Car, Building, Rocket,
   Hotel, Coffee, Video, Flower2, type LucideIcon,
-  Newspaper, Settings, Activity, CalendarDays, ArrowUpRight, RefreshCw
+  Newspaper, Settings, Activity, CalendarDays, ArrowUpRight, RefreshCw, Users
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import AdminLayout, { type AdminTab } from "@/components/admin/AdminLayout";
@@ -849,9 +849,136 @@ const AdminDashboard = () => {
     );
   };
 
+  // ============ ALL SERVICES HUB ============
+  const [serviceHubSearch, setServiceHubSearch] = useState("");
+
+  const serviceHubSections = [
+    { id: "services" as AdminTab, label: "সেবাসমূহ", desc: "সেবা যোগ, এডিট, অনুমোদন", icon: Globe, gradient: "from-primary to-primary/80" },
+    { id: "pending" as AdminTab, label: "অপেক্ষমান", desc: `${counts.pending}টি অনুমোদন বাকি`, icon: Clock, gradient: "from-amber-500 to-orange-500" },
+    { id: "categories" as AdminTab, label: "ক্যাটাগরি", desc: "ক্যাটাগরি ম্যানেজ করুন", icon: Layers, gradient: "from-violet-500 to-purple-500" },
+    { id: "service_grid" as AdminTab, label: "সার্ভিস গ্রিড", desc: "হোমপেজ গ্রিড আইকন", icon: SlidersHorizontal, gradient: "from-blue-500 to-indigo-500" },
+    { id: "news" as AdminTab, label: "নিউজ", desc: "সংবাদ প্রকাশ ও এডিট", icon: Newspaper, gradient: "from-emerald-500 to-green-500" },
+    { id: "slider" as AdminTab, label: "স্লাইডার", desc: "হোমপেজ স্লাইডার ছবি", icon: SlidersHorizontal, gradient: "from-sky-500 to-blue-500" },
+    { id: "advertisements" as AdminTab, label: "বিজ্ঞাপন", desc: "বিজ্ঞাপন ম্যানেজ করুন", icon: ImageIcon, gradient: "from-yellow-500 to-orange-500" },
+    { id: "about" as AdminTab, label: "সম্পর্কে / গ্যালারি", desc: "পেজ কন্টেন্ট ও গ্যালারি", icon: Info, gradient: "from-teal-500 to-cyan-500" },
+    { id: "timeline" as AdminTab, label: "টাইমলাইন", desc: "ইতিহাসের ইভেন্ট", icon: History, gradient: "from-indigo-500 to-violet-500" },
+    { id: "emergency" as AdminTab, label: "জরুরি কল", desc: "জরুরি নম্বর ম্যানেজ", icon: Phone, gradient: "from-red-500 to-rose-500" },
+    { id: "blood" as AdminTab, label: "রক্তদাতা", desc: "রক্তদাতা তালিকা", icon: Droplets, gradient: "from-rose-500 to-pink-500" },
+    { id: "donations" as AdminTab, label: "অনুদান", desc: "অনুদান রেকর্ড", icon: Heart, gradient: "from-pink-500 to-fuchsia-500" },
+    { id: "offices" as AdminTab, label: "অফিস", desc: "অফিস ও কর্মকর্তা", icon: Building2, gradient: "from-slate-500 to-zinc-600" },
+    { id: "announcements" as AdminTab, label: "ঘোষণা", desc: "মার্কি ঘোষণা ম্যানেজ", icon: Megaphone, gradient: "from-orange-500 to-red-500" },
+  ];
+
+  const filteredHubSections = serviceHubSections.filter(s =>
+    s.label.toLowerCase().includes(serviceHubSearch.toLowerCase()) ||
+    s.desc.toLowerCase().includes(serviceHubSearch.toLowerCase())
+  );
+
+  const renderAllServicesHub = () => (
+    <div className="space-y-4">
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder="সেকশন খুঁজুন..."
+          className="w-full bg-card rounded-2xl pl-10 pr-4 py-3.5 text-sm outline-none border border-border/60 focus:border-primary/50 transition-all"
+          value={serviceHubSearch}
+          onChange={(e) => setServiceHubSearch(e.target.value)}
+        />
+      </div>
+
+      {/* Pending Alert */}
+      {counts.pending > 0 && (
+        <button onClick={() => setActiveTab("pending")} className="w-full group">
+          <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div className="flex-1 text-left">
+              <p className="font-bold text-amber-800 dark:text-amber-200 text-sm">{counts.pending}টি অনুমোদন অপেক্ষমান</p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </button>
+      )}
+
+      {/* Section Grid */}
+      <div className="grid grid-cols-2 gap-2.5">
+        {filteredHubSections.map(section => (
+          <button
+            key={section.id}
+            onClick={() => setActiveTab(section.id)}
+            className="bg-card border border-border/60 rounded-2xl p-3.5 text-left hover:shadow-md transition-all group"
+          >
+            <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${section.gradient} flex items-center justify-center mb-2.5 shadow-sm group-hover:scale-105 transition-transform`}>
+              <section.icon className="w-4 h-4 text-white" />
+            </div>
+            <p className="text-xs font-bold text-foreground leading-tight">{section.label}</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{section.desc}</p>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  // ============ ALL SETTINGS HUB ============
+  const [settingsHubSearch, setSettingsHubSearch] = useState("");
+
+  const settingsHubSections = [
+    { id: "site_settings" as AdminTab, label: "সাইট সেটিং", desc: "সাইটের মূল তথ্য", icon: Settings, gradient: "from-slate-500 to-zinc-600" },
+    { id: "app_settings" as AdminTab, label: "অ্যাপ সেটিং", desc: "PWA ও SEO সেটিং", icon: Globe, gradient: "from-blue-500 to-indigo-500" },
+    { id: "notifications" as AdminTab, label: "নোটিফিকেশন", desc: "পুশ নোটিফিকেশন পাঠান", icon: Bell, gradient: "from-emerald-500 to-green-500" },
+    { id: "users" as AdminTab, label: "ইউজার", desc: "ইউজার ও রোল ম্যানেজ", icon: Users, gradient: "from-violet-500 to-purple-500" },
+    { id: "activity" as AdminTab, label: "অ্যাক্টিভিটি লগ", desc: "সকল কার্যকলাপ দেখুন", icon: Activity, gradient: "from-amber-500 to-orange-500" },
+  ];
+
+  const filteredSettingsSections = settingsHubSections.filter(s =>
+    s.label.toLowerCase().includes(settingsHubSearch.toLowerCase()) ||
+    s.desc.toLowerCase().includes(settingsHubSearch.toLowerCase())
+  );
+
+  const renderAllSettingsHub = () => (
+    <div className="space-y-4">
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder="সেটিং খুঁজুন..."
+          className="w-full bg-card rounded-2xl pl-10 pr-4 py-3.5 text-sm outline-none border border-border/60 focus:border-primary/50 transition-all"
+          value={settingsHubSearch}
+          onChange={(e) => setSettingsHubSearch(e.target.value)}
+        />
+      </div>
+
+      {/* Section List */}
+      <div className="space-y-2.5">
+        {filteredSettingsSections.map(section => (
+          <button
+            key={section.id}
+            onClick={() => setActiveTab(section.id)}
+            className="w-full bg-card border border-border/60 rounded-2xl p-4 flex items-center gap-3.5 hover:shadow-md transition-all group text-left"
+          >
+            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${section.gradient} flex items-center justify-center shadow-sm shrink-0 group-hover:scale-105 transition-transform`}>
+              <section.icon className="w-4.5 h-4.5 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-foreground">{section.label}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{section.desc}</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform shrink-0" />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard": return renderDashboard();
+      case "all_services": return renderAllServicesHub();
+      case "all_settings": return renderAllSettingsHub();
       case "services": case "pending": return renderServicesList();
       case "categories": return renderCategories();
       case "activity": return renderActivity();

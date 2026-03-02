@@ -9,7 +9,15 @@ import {
   Zap, Plus
 } from "lucide-react";
 
-export type AdminTab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications" | "app_settings" | "service_grid";
+export type AdminTab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications" | "app_settings" | "service_grid" | "all_services" | "all_settings";
+
+// Bottom nav pages (4 main pages)
+const bottomNavItems: { id: AdminTab; label: string; icon: typeof LayoutDashboard }[] = [
+  { id: "dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard },
+  { id: "all_services", label: "সেবা", icon: Globe },
+  { id: "all_settings", label: "সেটিংস", icon: Settings },
+  { id: "analytics", label: "অ্যানালিটিক্স", icon: TrendingUp },
+];
 
 const tabGroups = [
   {
@@ -17,8 +25,9 @@ const tabGroups = [
     icon: LayoutDashboard,
     items: [
       { id: "dashboard" as AdminTab, label: "ড্যাশবোর্ড", icon: LayoutDashboard },
-      { id: "pending" as AdminTab, label: "অপেক্ষমান", icon: Clock },
-      { id: "analytics" as AdminTab, label: "ভিজিটর অ্যানালিটিক্স", icon: TrendingUp },
+      { id: "all_services" as AdminTab, label: "সেবা ম্যানেজার", icon: Globe },
+      { id: "all_settings" as AdminTab, label: "সেটিংস", icon: Settings },
+      { id: "analytics" as AdminTab, label: "অ্যানালিটিক্স", icon: TrendingUp },
     ],
   },
   {
@@ -26,30 +35,18 @@ const tabGroups = [
     icon: Globe,
     items: [
       { id: "services" as AdminTab, label: "সেবাসমূহ", icon: Globe },
+      { id: "pending" as AdminTab, label: "অপেক্ষমান", icon: Clock },
       { id: "categories" as AdminTab, label: "ক্যাটাগরি", icon: Layers },
       { id: "service_grid" as AdminTab, label: "সার্ভিস গ্রিড", icon: SlidersHorizontal },
-    ],
-  },
-  {
-    label: "কমিউনিটি",
-    icon: Heart,
-    items: [
+      { id: "news" as AdminTab, label: "নিউজ", icon: Newspaper },
+      { id: "slider" as AdminTab, label: "স্লাইডার", icon: SlidersHorizontal },
+      { id: "advertisements" as AdminTab, label: "বিজ্ঞাপন", icon: ImageIcon },
+      { id: "about" as AdminTab, label: "সম্পর্কে", icon: Info },
       { id: "emergency" as AdminTab, label: "জরুরি কল", icon: Phone },
       { id: "blood" as AdminTab, label: "রক্তদাতা", icon: Droplets },
       { id: "donations" as AdminTab, label: "অনুদান", icon: Heart },
       { id: "offices" as AdminTab, label: "অফিস", icon: Building2 },
-    ],
-  },
-  {
-    label: "কন্টেন্ট",
-    icon: Newspaper,
-    items: [
-      { id: "news" as AdminTab, label: "নিউজ", icon: Newspaper },
-      { id: "notifications" as AdminTab, label: "নোটিফিকেশন", icon: Bell },
       { id: "announcements" as AdminTab, label: "ঘোষণা", icon: Megaphone },
-      { id: "slider" as AdminTab, label: "স্লাইডার", icon: SlidersHorizontal },
-      { id: "advertisements" as AdminTab, label: "বিজ্ঞাপন", icon: ImageIcon },
-      { id: "about" as AdminTab, label: "সম্পর্কে", icon: Info },
       { id: "timeline" as AdminTab, label: "টাইমলাইন", icon: History },
     ],
   },
@@ -59,12 +56,12 @@ const tabGroups = [
     items: [
       { id: "site_settings" as AdminTab, label: "সাইট সেটিং", icon: Settings },
       { id: "app_settings" as AdminTab, label: "অ্যাপ সেটিং", icon: Globe },
+      { id: "notifications" as AdminTab, label: "নোটিফিকেশন", icon: Bell },
       { id: "users" as AdminTab, label: "ইউজার", icon: Users },
       { id: "activity" as AdminTab, label: "অ্যাক্টিভিটি লগ", icon: Activity },
     ],
   },
 ];
-
 interface AdminLayoutProps {
   activeTab: AdminTab;
   onTabChange: (tab: AdminTab) => void;
@@ -258,14 +255,17 @@ const AdminLayout = ({ activeTab, onTabChange, currentUser, pendingCount, childr
       {/* Admin Bottom Navigation - Mobile Only */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-card/80 backdrop-blur-2xl border-t-2 border-border/40" style={{ borderTopLeftRadius: 15, borderTopRightRadius: 15 }}>
         <div className="flex items-center justify-around px-1 py-1.5 max-w-lg mx-auto">
-          {([
-            { id: "dashboard" as AdminTab, label: "ড্যাশবোর্ড", icon: LayoutDashboard },
-            { id: "services" as AdminTab, label: "সেবা", icon: Globe },
-            { id: "pending" as AdminTab, label: "পেন্ডিং", icon: Clock, badge: pendingCount },
-            { id: "news" as AdminTab, label: "নিউজ", icon: Newspaper },
-            { id: "notifications" as AdminTab, label: "নোটিফিকেশন", icon: Bell },
-          ]).map(item => {
-            const isActive = activeTab === item.id;
+          {bottomNavItems.map(item => {
+            // "all_services" is active if current tab is any service-related tab
+            const serviceSubTabs: AdminTab[] = ["all_services", "services", "pending", "categories", "service_grid", "news", "slider", "advertisements", "about", "timeline", "emergency", "blood", "donations", "offices", "announcements"];
+            const settingsSubTabs: AdminTab[] = ["all_settings", "site_settings", "app_settings", "notifications", "users", "activity"];
+            
+            const isActive = item.id === "all_services"
+              ? serviceSubTabs.includes(activeTab)
+              : item.id === "all_settings"
+              ? settingsSubTabs.includes(activeTab)
+              : activeTab === item.id;
+
             return (
               <button
                 key={item.id}
@@ -284,9 +284,9 @@ const AdminLayout = ({ activeTab, onTabChange, currentUser, pendingCount, childr
                 <span className={`text-[9px] font-semibold transition-colors leading-tight ${
                   isActive ? "text-primary" : "text-muted-foreground"
                 }`}>{item.label}</span>
-                {item.badge && item.badge > 0 && (
+                {item.id === "all_services" && pendingCount > 0 && (
                   <span className="absolute top-0.5 right-0.5 min-w-[16px] h-4 bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full flex items-center justify-center px-1 animate-pulse">
-                    {item.badge}
+                    {pendingCount}
                   </span>
                 )}
               </button>
