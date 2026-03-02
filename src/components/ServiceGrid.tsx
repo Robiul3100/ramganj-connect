@@ -693,17 +693,18 @@ const ServiceGrid = () => {
                 style={{ border: `0.8px solid ${bColor}` }}
               >
                 <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center relative overflow-hidden"
+                  className="w-14 h-14 rounded-xl flex items-center justify-center relative overflow-hidden"
                   style={{
-                    background: iconData.bg,
-                    boxShadow: `0 4px 12px -2px ${bColor}55, inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.08)`,
+                    boxShadow: `0 4px 12px -2px ${bColor}33, inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.05)`,
                   }}
                 >
-                  {/* Top-left bevel highlight */}
+                  {/* Background at 30% opacity */}
+                  <div className="absolute inset-0 rounded-xl" style={{ background: iconData.bg, opacity: 0.3 }} />
+                  {/* Bevel highlight */}
                   <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 50%, rgba(0,0,0,0.06) 100%)",
+                    background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 50%, rgba(0,0,0,0.04) 100%)",
                   }} />
-                  <div className="relative" style={{ filter: "url(#icon-3d)" }}>
+                  <div className="relative" style={{ filter: "url(#icon-3d)", transform: "scale(1.15)" }}>
                     {iconData.svg}
                   </div>
                 </div>
@@ -730,16 +731,16 @@ const ServiceGrid = () => {
                   style={{ border: `0.8px solid ${bColor}` }}
                 >
                   <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden"
+                    className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden"
                     style={{
-                      background: iconData.bg,
-                      boxShadow: `0 4px 12px -2px ${bColor}55, inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.08)`,
+                      boxShadow: `0 4px 12px -2px ${bColor}33, inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.05)`,
                     }}
                   >
+                    <div className="absolute inset-0 rounded-xl" style={{ background: iconData.bg, opacity: 0.3 }} />
                     <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
-                      background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 50%, rgba(0,0,0,0.06) 100%)",
+                      background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 50%, rgba(0,0,0,0.04) 100%)",
                     }} />
-                    <div className="relative" style={{ filter: "url(#icon-3d)" }}>
+                    <div className="relative" style={{ filter: "url(#icon-3d)", transform: "scale(1.15)" }}>
                       {iconData.svg}
                     </div>
                   </div>
