@@ -5,7 +5,8 @@ import {
   LogOut, LayoutDashboard, Shield, Users, TrendingUp,
   Clock, Newspaper, Bell, Globe, Layers, Phone, Droplets,
   Heart, Building2, Megaphone, SlidersHorizontal, Info, History,
-  Settings, Activity, Menu, X, Image as ImageIcon, Home, ChevronDown, ChevronRight
+  Settings, Activity, Menu, X, Image as ImageIcon, Home, ChevronDown, ChevronRight,
+  Zap, Plus
 } from "lucide-react";
 
 export type AdminTab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications" | "app_settings" | "service_grid";
@@ -242,7 +243,7 @@ const AdminLayout = ({ activeTab, onTabChange, currentUser, pendingCount, childr
         )}
 
         {/* Main Content */}
-        <main className="flex-1 min-w-0 p-4 lg:p-6">
+        <main className="flex-1 min-w-0 p-4 pb-24 lg:p-6 lg:pb-6">
           {/* Mobile tab title */}
           <div className="lg:hidden mb-4">
             <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
@@ -253,6 +254,46 @@ const AdminLayout = ({ activeTab, onTabChange, currentUser, pendingCount, childr
           {children}
         </main>
       </div>
+
+      {/* Admin Bottom Navigation - Mobile Only */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-card/80 backdrop-blur-2xl border-t-2 border-border/40" style={{ borderTopLeftRadius: 15, borderTopRightRadius: 15 }}>
+        <div className="flex items-center justify-around px-1 py-1.5 max-w-lg mx-auto">
+          {([
+            { id: "dashboard" as AdminTab, label: "ড্যাশবোর্ড", icon: LayoutDashboard },
+            { id: "services" as AdminTab, label: "সেবা", icon: Globe },
+            { id: "pending" as AdminTab, label: "পেন্ডিং", icon: Clock, badge: pendingCount },
+            { id: "news" as AdminTab, label: "নিউজ", icon: Newspaper },
+            { id: "notifications" as AdminTab, label: "নোটিফিকেশন", icon: Bell },
+          ]).map(item => {
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => onTabChange(item.id)}
+                className="flex flex-col items-center gap-0.5 py-1.5 px-2 rounded-xl transition-all relative min-w-[56px]"
+              >
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                  isActive
+                    ? "bg-primary shadow-md shadow-primary/25 scale-105"
+                    : "bg-transparent"
+                }`}>
+                  <item.icon className={`w-[18px] h-[18px] transition-colors ${
+                    isActive ? "text-primary-foreground" : "text-muted-foreground"
+                  }`} />
+                </div>
+                <span className={`text-[9px] font-semibold transition-colors leading-tight ${
+                  isActive ? "text-primary" : "text-muted-foreground"
+                }`}>{item.label}</span>
+                {item.badge && item.badge > 0 && (
+                  <span className="absolute top-0.5 right-0.5 min-w-[16px] h-4 bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full flex items-center justify-center px-1 animate-pulse">
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 };
