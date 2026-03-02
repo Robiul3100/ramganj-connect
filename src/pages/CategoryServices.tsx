@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { Phone, MapPin, Share2, MessageCircle, Star, GraduationCap, Building2, Briefcase, Clock, User, Award, Stethoscope, BadgeCheck, CalendarClock, Banknote, Filter, ChevronDown, Eye, Calendar, Search, X } from "lucide-react";
+import { Phone, MapPin, Share2, MessageCircle, Star, GraduationCap, Building2, Briefcase, Clock, User, Award, Stethoscope, BadgeCheck, CalendarClock, Banknote, Filter, ChevronDown, Eye, Calendar, Search, X, Navigation, ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
 import SubmitFormDialog from "@/components/SubmitFormDialog";
@@ -111,6 +111,20 @@ const getCategoryFormFields = (slug: string) => {
         { name: "area", label: "এলাকা" },
         { name: "image_url", label: "ডাক্তারের ছবি (URL)", placeholder: "https://example.com/photo.jpg" },
       ];
+    case "hospitals":
+      return [
+        { name: "title", label: "হাসপাতালের নাম", required: true, placeholder: "যেমন: রামগঞ্জ জেনারেল হাসপাতাল" },
+        { name: "slogan", label: "স্লোগান", placeholder: "যেমন: সেবাই আমাদের ধর্ম" },
+        { name: "open_hours", label: "সময়সূচি", placeholder: "যেমন: সকাল ৮টা - রাত ১০টা" },
+        { name: "is_24hours", label: "২৪ ঘণ্টা খোলা?", type: "select" as const, options: ["হ্যাঁ", "না"] },
+        { name: "description", label: "বিস্তারিত বিবরণ", type: "textarea" as const },
+        { name: "phone", label: "ফোন নাম্বার", type: "tel" as const, required: true },
+        { name: "whatsapp", label: "WhatsApp নাম্বার", type: "tel" as const },
+        { name: "address", label: "ঠিকানা", required: true },
+        { name: "area", label: "এলাকা" },
+        { name: "map_url", label: "Google Maps লিংক", placeholder: "https://maps.google.com/..." },
+        { name: "image_url", label: "হাসপাতালের ছবি (URL)", placeholder: "https://example.com/photo.jpg" },
+      ];
     case "education":
       return [
         { name: "title", label: "প্রতিষ্ঠানের নাম", required: true },
@@ -168,6 +182,12 @@ const buildMetadata = (slug: string, data: Record<string, string>) => {
       if (data.consultation_fee) meta.consultation_fee = data.consultation_fee;
       if (data.rating) meta.rating = parseFloat(data.rating) || 0;
       if (data.available_today) meta.available_today = data.available_today === "হ্যাঁ";
+      break;
+    case "hospitals":
+      if (data.slogan) meta.slogan = data.slogan;
+      if (data.open_hours) meta.open_hours = data.open_hours;
+      if (data.is_24hours) meta.is_24hours = data.is_24hours === "হ্যাঁ";
+      if (data.map_url) meta.map_url = data.map_url;
       break;
     case "education":
       if (data.edu_type) meta.edu_category = data.edu_type;
@@ -397,6 +417,130 @@ const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: stri
         ) : (
           <div className="py-2.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 bg-muted/40 text-muted-foreground cursor-not-allowed">
             <Calendar className="w-3.5 h-3.5" /> অ্যাপয়েন্টমেন্ট
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ──── Hospital Card (Premium Healthcare Design) ────
+const HospitalCard = ({ s, colors }: { s: Service; colors: { accent: string; bg: string; gradient: string } }) => {
+  const m = s.metadata || {};
+  const slogan = m.slogan || "";
+  const openHours = m.open_hours || "";
+  const is24h = m.is_24hours === true;
+  const mapUrl = m.map_url || "";
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="rounded-[16px] bg-card overflow-hidden border border-border/40 transition-all duration-300 hover:shadow-xl group">
+      {/* Hospital image with gradient overlay */}
+      <div className="relative w-full aspect-video overflow-hidden">
+        {s.image_url ? (
+          <img
+            src={s.image_url}
+            alt={s.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${colors.bg}, hsl(0,0%,96%))` }}>
+            <Building2 className="w-16 h-16" style={{ color: colors.accent, opacity: 0.4 }} />
+          </div>
+        )}
+        {/* Bottom gradient overlay */}
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-card to-transparent" />
+
+        {/* 24h badge or open hours */}
+        {is24h && (
+          <div className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/90 shadow-lg z-10">
+            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+            <span className="text-[11px] font-extrabold text-white">২৪ ঘণ্টা খোলা</span>
+          </div>
+        )}
+
+        {/* Featured badge */}
+        {s.is_featured && (
+          <div className="absolute top-3 left-3 flex items-center gap-1 px-3 py-1.5 rounded-full shadow-lg z-10"
+            style={{ background: "linear-gradient(135deg, hsl(45,90%,50%), hsl(35,85%,55%))" }}>
+            <Star className="w-3 h-3 text-white fill-white" />
+            <span className="text-[10px] font-extrabold text-white tracking-wide">ফিচার্ড</span>
+          </div>
+        )}
+      </div>
+
+      {/* Info section */}
+      <div className="px-4 pt-3 pb-3">
+        <h3 className="font-extrabold text-foreground text-[17px] sm:text-[19px] leading-snug line-clamp-2">{s.title}</h3>
+        {slogan && (
+          <p className="text-[12px] italic text-muted-foreground mt-0.5 line-clamp-1">"{slogan}"</p>
+        )}
+
+        {/* Location */}
+        {s.address && (
+          <div className="flex items-center gap-2 mt-2.5">
+            <MapPin className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
+            <p className="text-[12px] text-muted-foreground line-clamp-1">{s.address}{s.area ? `, ${s.area}` : ""}</p>
+          </div>
+        )}
+
+        {/* Open hours (non-24h) */}
+        {openHours && !is24h && (
+          <div className="flex items-center gap-2 mt-1.5">
+            <Clock className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
+            <p className="text-[12px] text-muted-foreground">{openHours}</p>
+          </div>
+        )}
+
+        {/* Expandable description */}
+        {s.description && (
+          <div className="mt-3">
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="flex items-center gap-2 w-full px-3 py-2 rounded-xl bg-muted/50 border border-border/40 text-[12px] font-bold text-foreground hover:bg-muted transition-colors"
+            >
+              <Eye className="w-3.5 h-3.5" style={{ color: colors.accent }} />
+              <span>বিস্তারিত দেখুন</span>
+              <ChevronDown className={`w-4 h-4 ml-auto text-muted-foreground transition-transform duration-300 ${expanded ? "rotate-180" : ""}`} />
+            </button>
+            <div
+              className="overflow-hidden transition-all duration-300 ease-in-out"
+              style={{ maxHeight: expanded ? "500px" : "0px", opacity: expanded ? 1 : 0 }}
+            >
+              <p className="text-[12px] text-muted-foreground leading-relaxed pt-3 px-1">{s.description}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Action buttons */}
+      <div className="px-4 pb-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {s.phone ? (
+          <a
+            href={`tel:${s.phone}`}
+            className="py-3 rounded-xl text-[13px] font-bold flex items-center justify-center gap-2 text-white active:scale-[0.97] transition-transform"
+            style={{ background: colors.gradient }}
+          >
+            <Phone className="w-4 h-4" /> কল করুন
+          </a>
+        ) : (
+          <div className="py-3 rounded-xl text-[13px] font-bold flex items-center justify-center gap-2 bg-muted/40 text-muted-foreground cursor-not-allowed">
+            <Phone className="w-4 h-4" /> কল করুন
+          </div>
+        )}
+        {mapUrl ? (
+          <a
+            href={mapUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="py-3 rounded-xl text-[13px] font-bold flex items-center justify-center gap-2 border-2 active:scale-[0.97] transition-transform"
+            style={{ borderColor: colors.accent, color: colors.accent }}
+          >
+            <Navigation className="w-4 h-4" /> ম্যাপ দেখুন
+          </a>
+        ) : (
+          <div className="py-3 rounded-xl text-[13px] font-bold flex items-center justify-center gap-2 bg-muted/40 text-muted-foreground cursor-not-allowed">
+            <Navigation className="w-4 h-4" /> ম্যাপ দেখুন
           </div>
         )}
       </div>
@@ -851,6 +995,8 @@ const CategoryServices = () => {
     switch (slug) {
       case "doctors":
         return <DoctorCard key={s.id} s={s} colors={colors} onShare={() => handleShare(s)} />;
+      case "hospitals":
+        return <HospitalCard key={s.id} s={s} colors={colors} />;
       case "education":
         return <EducationCard key={s.id} s={s} colors={colors} />;
       case "jobs":
