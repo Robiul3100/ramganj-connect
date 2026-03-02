@@ -14,15 +14,30 @@ interface BloodDonor {
   is_available: boolean;
 }
 
+const DonorSkeleton = () => (
+  <div className="glass-card p-4 flex items-center gap-3">
+    <div className="w-16 h-16 rounded-2xl skeleton-shimmer shrink-0" />
+    <div className="flex-1 space-y-2">
+      <div className="h-4 w-2/3 rounded-md skeleton-shimmer" />
+      <div className="h-3 w-1/2 rounded skeleton-shimmer" />
+      <div className="h-3 w-1/3 rounded skeleton-shimmer" />
+    </div>
+    <div className="w-12 h-12 rounded-full skeleton-shimmer shrink-0" />
+  </div>
+);
+
 const BloodBank = () => {
   const [donors, setDonors] = useState<BloodDonor[]>([]);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetch = async () => {
+      setLoading(true);
       const { data } = await (supabase.from as any)("blood_donors").select("*").eq("is_approved", true).order("created_at", { ascending: false });
       if (data) setDonors(data);
+      setLoading(false);
     };
     fetch();
     const ch = supabase.channel("blood_rt").on("postgres_changes", { event: "*", schema: "public", table: "blood_donors" }, () => fetch()).subscribe();
@@ -64,44 +79,48 @@ const BloodBank = () => {
         </div>
 
         <div className="space-y-3 pb-6">
-          {filtered.map((donor) => {
-            const daysLeft = getDaysUntilAvailable(donor.last_donation_date);
-            return (
-              <div key={donor.id} className="glass-card p-4 flex items-center gap-3">
-                <div className="w-16 h-16 rounded-2xl bg-destructive flex flex-col items-center justify-center text-white shrink-0">
-                  <span className="text-lg font-bold leading-none">{donor.blood_group}</span>
-                  <span className="text-[10px] opacity-80">গ্রুপ</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-bold text-foreground">{donor.name}</h3>
-                    {donor.is_available && !daysLeft ? (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/15 text-green-600 dark:text-green-400 flex items-center gap-1">
-                        <CheckCircle className="w-3 h-3" /> রক্ত দিতে পারবে
-                      </span>
-                    ) : daysLeft ? (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-600 dark:text-orange-400 flex items-center gap-1">
-                        <Clock className="w-3 h-3" /> {daysLeft} দিন বাকি
-                      </span>
-                    ) : null}
+          {loading ? (
+            Array.from({ length: 5 }).map((_, i) => <DonorSkeleton key={i} />)
+          ) : (
+            filtered.map((donor) => {
+              const daysLeft = getDaysUntilAvailable(donor.last_donation_date);
+              return (
+                <div key={donor.id} className="glass-card p-4 flex items-center gap-3">
+                  <div className="w-16 h-16 rounded-2xl bg-destructive flex flex-col items-center justify-center text-white shrink-0">
+                    <span className="text-lg font-bold leading-none">{donor.blood_group}</span>
+                    <span className="text-[10px] opacity-80">গ্রুপ</span>
                   </div>
-                  {donor.address && (
-                    <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
-                      <MapPin className="w-3 h-3" /> {donor.address}
-                    </p>
-                  )}
-                  {donor.last_donation_date && (
-                    <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                      <Calendar className="w-3 h-3" /> শেষ দান: {new Date(donor.last_donation_date).toLocaleDateString("bn-BD")}
-                    </p>
-                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-bold text-foreground">{donor.name}</h3>
+                      {donor.is_available && !daysLeft ? (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/15 text-green-600 dark:text-green-400 flex items-center gap-1">
+                          <CheckCircle className="w-3 h-3" /> রক্ত দিতে পারবে
+                        </span>
+                      ) : daysLeft ? (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-600 dark:text-orange-400 flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> {daysLeft} দিন বাকি
+                        </span>
+                      ) : null}
+                    </div>
+                    {donor.address && (
+                      <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
+                        <MapPin className="w-3 h-3" /> {donor.address}
+                      </p>
+                    )}
+                    {donor.last_donation_date && (
+                      <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                        <Calendar className="w-3 h-3" /> শেষ দান: {new Date(donor.last_donation_date).toLocaleDateString("bn-BD")}
+                      </p>
+                    )}
+                  </div>
+                  <a href={`tel:${donor.phone}`} className="w-12 h-12 rounded-full border-2 border-destructive/20 flex items-center justify-center shrink-0">
+                    <Phone className="w-5 h-5 text-destructive" />
+                  </a>
                 </div>
-                <a href={`tel:${donor.phone}`} className="w-12 h-12 rounded-full border-2 border-destructive/20 flex items-center justify-center shrink-0">
-                  <Phone className="w-5 h-5 text-destructive" />
-                </a>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </div>
 

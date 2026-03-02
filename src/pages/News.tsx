@@ -13,6 +13,21 @@ interface NewsItem {
   view_count: number;
 }
 
+const NewsCardSkeleton = () => (
+  <div className="glass-card overflow-hidden border border-border/30">
+    <div className="w-full aspect-video skeleton-shimmer" />
+    <div className="p-3 space-y-2.5">
+      <div className="h-4 w-11/12 rounded-md skeleton-shimmer" />
+      <div className="h-4 w-3/4 rounded-md skeleton-shimmer" />
+      <div className="flex items-center gap-3 pt-1">
+        <div className="h-3 w-24 rounded skeleton-shimmer" />
+        <div className="h-3 w-16 rounded skeleton-shimmer" />
+        <div className="h-3 w-14 rounded skeleton-shimmer" />
+      </div>
+    </div>
+  </div>
+);
+
 const News = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,9 +88,8 @@ const News = () => {
 
       <div className="px-4 pt-3 space-y-4">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm text-muted-foreground mt-3">লোড হচ্ছে...</p>
+          <div className="space-y-4">
+            {Array.from({ length: 4 }).map((_, i) => <NewsCardSkeleton key={i} />)}
           </div>
         ) : filtered.length === 0 ? (
           <div className="glass-card border-dashed flex flex-col items-center justify-center py-16 text-center">
@@ -92,7 +106,6 @@ const News = () => {
               key={item.id}
               className="glass-card overflow-hidden block group transition-all duration-200 hover:shadow-lg hover:scale-[1.01] border border-primary/10"
             >
-              {/* Full-width 16:9 thumbnail */}
               <div className="w-full aspect-video bg-muted overflow-hidden relative">
                 {item.thumbnail_url ? (
                   <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
@@ -101,13 +114,11 @@ const News = () => {
                     <Newspaper className="w-12 h-12 text-muted-foreground/20" />
                   </div>
                 )}
-                {/* View count badge */}
                 <div className="absolute top-3 right-3 bg-background/90 backdrop-blur-sm rounded-full px-2.5 py-1 flex items-center gap-1 shadow-sm">
                   <Eye className="w-3.5 h-3.5 text-destructive" />
                   <span className="text-xs font-bold text-foreground">{item.view_count}</span>
                 </div>
               </div>
-              {/* Content below thumbnail */}
               <div className="p-3 space-y-2">
                 <h3 className="font-bold text-foreground text-base leading-snug group-hover:text-primary transition-colors">{item.title}</h3>
                 <div className="flex items-center gap-3 text-[11px] text-muted-foreground pt-1">
