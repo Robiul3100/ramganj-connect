@@ -553,7 +553,7 @@ const IconFilterDefs = () => (
   </svg>
 );
 
-const newsItem = { id: "news-static", name: "খবর ও সংবাদ", slug: "news", icon: "Newspaper", sort_order: -1, description: "সকল খবর ও সংবাদ", view_count: 0 };
+
 
 interface Ad {
   id: string;
@@ -611,7 +611,7 @@ const ServiceGrid = () => {
     fetchData();
   }, []);
 
-  const allItems = [newsItem as Category, ...categories];
+  const allItems = categories;
 
   const staticRoutes: Record<string, string> = {
     news: "/news",
@@ -619,10 +619,8 @@ const ServiceGrid = () => {
 
   const handleNavigate = async (cat: Category) => {
     if (navigator.vibrate) navigator.vibrate(30);
-    if (cat.id !== "news-static") {
-      await supabase.rpc("increment_category_view", { cat_id: cat.id });
-      setCategories(prev => prev.map(c => c.id === cat.id ? { ...c, view_count: (c.view_count ?? 0) + 1 } : c));
-    }
+    await supabase.rpc("increment_category_view", { cat_id: cat.id });
+    setCategories(prev => prev.map(c => c.id === cat.id ? { ...c, view_count: (c.view_count ?? 0) + 1 } : c));
     const route = staticRoutes[cat.slug] || `/service/${cat.slug}`;
     navigate(route);
   };
