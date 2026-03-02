@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Calendar, Clock, Newspaper, Eye, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
+import PageAdBanner from "@/components/PageAdBanner";
 
 interface NewsItem {
   id: string;
@@ -130,6 +131,9 @@ const NewsDetail = () => {
       </div>
 
       <div className="px-4 -mt-2 space-y-4">
+        {/* Ad Banner */}
+        <PageAdBanner pageSlug="news-detail" />
+
         {/* Thumbnail */}
         {news.thumbnail_url && (
           <div className="rounded-2xl overflow-hidden border border-border/30 shadow-sm">

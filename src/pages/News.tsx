@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Newspaper, Search, Eye, Calendar, Clock, TrendingUp } from "lucide-react";
+import { Newspaper, Eye, Calendar, Clock, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
+import PageAdBanner from "@/components/PageAdBanner";
 import BottomNav from "@/components/BottomNav";
 
 interface NewsItem {
@@ -37,7 +38,6 @@ const NewsCardSkeleton = () => (
 const News = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -59,7 +59,7 @@ const News = () => {
     return () => { supabase.removeChannel(ch); };
   }, []);
 
-  const filtered = news.filter((n) => n.title.toLowerCase().includes(search.toLowerCase()));
+  const filtered = news;
 
   const totalViews = news.reduce((sum, n) => sum + n.view_count, 0);
 
@@ -90,17 +90,8 @@ const News = () => {
           </div>
         </div>
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="খবর খুঁজুন..."
-            className="search-input pl-12"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+        {/* Ad Banner */}
+        <PageAdBanner pageSlug="news" />
 
         {/* Content */}
         {loading ? (

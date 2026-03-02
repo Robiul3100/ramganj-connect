@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Search, Phone, MapPin, Share2, MessageCircle, Star, GraduationCap, Building2, Briefcase, Clock, User, Award, Stethoscope, BadgeCheck, CalendarClock, Banknote } from "lucide-react";
+import { Phone, MapPin, Share2, MessageCircle, Star, GraduationCap, Building2, Briefcase, Clock, User, Award, Stethoscope, BadgeCheck, CalendarClock, Banknote } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
 import SubmitFormDialog from "@/components/SubmitFormDialog";
+import PageAdBanner from "@/components/PageAdBanner";
 import BottomNav from "@/components/BottomNav";
 
 interface Service {
@@ -568,7 +569,7 @@ const CategoryServices = () => {
   const { slug } = useParams<{ slug: string }>();
   const [services, setServices] = useState<Service[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
-  const [search, setSearch] = useState("");
+  
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -598,11 +599,7 @@ const CategoryServices = () => {
     return () => { supabase.removeChannel(ch); };
   }, [slug]);
 
-  const filtered = services.filter(s =>
-    s.title.toLowerCase().includes(search.toLowerCase()) ||
-    (s.description || "").toLowerCase().includes(search.toLowerCase()) ||
-    (s.address || "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = services;
 
   const handleShare = (service: Service) => {
     if (navigator.share) {
@@ -648,10 +645,8 @@ const CategoryServices = () => {
       <PageHeader title={category?.name || "সেবাসমূহ"} color={colors.gradient} onAdd={() => setShowForm(true)} />
 
       <div className="px-4 -mt-2 space-y-3">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <input type="text" placeholder="নাম, ঠিকানা দিয়ে খুঁজুন..." className="search-input pl-12" value={search} onChange={(e) => setSearch(e.target.value)} />
-        </div>
+        {/* Ad Banner */}
+        <PageAdBanner pageSlug={slug || "services"} />
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
