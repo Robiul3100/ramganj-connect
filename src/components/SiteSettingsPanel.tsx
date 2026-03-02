@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Megaphone, RefreshCw, ToggleLeft, ToggleRight, Wrench, Save, Shield, SlidersHorizontal, Layers, Newspaper, Star } from "lucide-react";
+import { Megaphone, RefreshCw, ToggleLeft, ToggleRight, Wrench, Save, Shield, SlidersHorizontal, Layers, Newspaper, Star, Clock } from "lucide-react";
 
 interface Setting {
   key: string;
@@ -57,6 +57,14 @@ const SiteSettingsPanel = () => {
   };
 
   const configs = [
+    {
+      key: "prayer_times_enabled",
+      label: "নামাজের সময়সূচি",
+      description: "হোমপেজে নামাজের সময়সূচি উইজেট দেখানো হবে",
+      icon: <Clock className="w-5 h-5" />,
+      color: "from-teal-500/10 to-cyan-500/10",
+      iconColor: "text-teal-500",
+    },
     {
       key: "announcement_bar_enabled",
       label: "নোটিশ বার (Marquee)",
