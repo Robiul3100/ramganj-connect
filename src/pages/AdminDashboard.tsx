@@ -2,22 +2,21 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  LogOut, LayoutDashboard, Shield, Activity, Users, TrendingUp,
-  CheckCircle, XCircle, Trash2, Search, Edit3, Save, X,
-  Eye, Clock, AlertTriangle, Star, StarOff, Filter, Newspaper, Plus,
-  Image as ImageIcon, ChevronRight, Bell, Settings, Zap, BarChart3,
-  Menu, XIcon, Globe, FileText, Phone, Droplets, Heart, Megaphone,
-  SlidersHorizontal, Info, History, ChevronDown, ArrowUpRight, Sparkles,
-  RefreshCw, MoreHorizontal, CalendarDays, Hash, Layers,
+  Shield, TrendingUp, CheckCircle, XCircle, Trash2, Search, Edit3, Save, X,
+  Eye, Clock, AlertTriangle, Star, StarOff, Filter, Plus,
+  Image as ImageIcon, ChevronRight, Bell, Zap,
+  Globe, FileText, Phone, Droplets, Heart, Megaphone,
+  SlidersHorizontal, Info, History, Hash, Layers,
   Stethoscope, Building2, Pill, GraduationCap, Store, ShoppingBag,
   Briefcase, SearchX, CalendarHeart, Plane, Ambulance, ShieldAlert,
   Flame, Bus, Lightbulb, Scale, Landmark, UsersRound, MapPin,
   Package, Tractor, Home, BookOpen, UtensilsCrossed, Wrench,
   ScrollText, HeartHandshake, Microscope, Car, Building, Rocket,
-  Hotel, Coffee, Video, Flower2, type LucideIcon, ArrowLeft,
-  PanelLeftClose, PanelLeft, ChevronUp
+  Hotel, Coffee, Video, Flower2, type LucideIcon,
+  Newspaper, Settings, Activity, CalendarDays, ArrowUpRight, RefreshCw
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import AdminLayout, { type AdminTab } from "@/components/admin/AdminLayout";
 import SiteSettingsPanel from "@/components/SiteSettingsPanel";
 import AnalyticsCharts from "@/components/AnalyticsCharts";
 import AddServiceForm from "@/components/admin/AddServiceForm";
@@ -26,68 +25,15 @@ import AdminNotificationPanel from "@/components/admin/AdminNotificationPanel";
 import AppSettingsPanel from "@/components/admin/AppSettingsPanel";
 import ServiceGridManager from "@/components/admin/ServiceGridManager";
 import TrendCharts from "@/components/admin/TrendCharts";
-import Navbar from "@/components/Navbar";
-import DrawerMenu from "@/components/DrawerMenu";
-
-type Tab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications" | "app_settings" | "service_grid";
-
-const tabGroups = [
-  {
-    label: "প্রধান",
-    items: [
-      { id: "dashboard" as Tab, label: "ড্যাশবোর্ড", icon: LayoutDashboard },
-      { id: "pending" as Tab, label: "অপেক্ষমান", icon: Clock },
-      { id: "news" as Tab, label: "নিউজ", icon: Newspaper },
-      { id: "notifications" as Tab, label: "নোটিফিকেশন", icon: Bell },
-    ],
-  },
-  {
-    label: "সেবা ম্যানেজমেন্ট",
-    items: [
-      { id: "services" as Tab, label: "সেবাসমূহ", icon: Globe },
-      { id: "categories" as Tab, label: "ক্যাটাগরি", icon: Layers },
-      { id: "service_grid" as Tab, label: "সার্ভিস গ্রিড", icon: SlidersHorizontal },
-    ],
-  },
-  {
-    label: "কমিউনিটি",
-    items: [
-      { id: "emergency" as Tab, label: "জরুরি কল", icon: Phone },
-      { id: "blood" as Tab, label: "রক্তদাতা", icon: Droplets },
-      { id: "donations" as Tab, label: "অনুদান", icon: Heart },
-      { id: "offices" as Tab, label: "অফিস", icon: Building2 },
-    ],
-  },
-  {
-    label: "কন্টেন্ট",
-    items: [
-      { id: "announcements" as Tab, label: "ঘোষণা", icon: Megaphone },
-      { id: "slider" as Tab, label: "স্লাইডার", icon: SlidersHorizontal },
-      { id: "advertisements" as Tab, label: "বিজ্ঞাপন", icon: ImageIcon },
-      { id: "about" as Tab, label: "সম্পর্কে", icon: Info },
-      { id: "timeline" as Tab, label: "টাইমলাইন", icon: History },
-    ],
-  },
-  {
-    label: "সিস্টেম",
-    items: [
-      { id: "analytics" as Tab, label: "ভিজিটর", icon: TrendingUp },
-      { id: "site_settings" as Tab, label: "সাইট সেটিং", icon: Settings },
-      { id: "app_settings" as Tab, label: "অ্যাপ সেটিং", icon: Globe },
-      { id: "users" as Tab, label: "ইউজার", icon: Users },
-      { id: "activity" as Tab, label: "অ্যাক্টিভিটি", icon: Activity },
-      { id: "activity" as Tab, label: "অ্যাক্টিভিটি", icon: Activity },
-    ],
-  },
-];
-
-const allTabs = tabGroups.flatMap(g => g.items);
+import AdminNewsManager from "@/components/admin/AdminNewsManager";
+import AdminSliderManager from "@/components/admin/AdminSliderManager";
+import AdminAdsManager from "@/components/admin/AdminAdsManager";
+import AdminAboutManager from "@/components/admin/AdminAboutManager";
 
 // Legacy table configs for CRUD
 const legacyTableConfig: Record<string, { table: string; fields: { name: string; label: string; type?: string; options?: string[] }[]; nameKey: string }> = {
   emergency: {
-    table: "emergency_calls",
-    nameKey: "name",
+    table: "emergency_calls", nameKey: "name",
     fields: [
       { name: "name", label: "নাম" },
       { name: "phone", label: "ফোন নম্বর" },
@@ -96,8 +42,7 @@ const legacyTableConfig: Record<string, { table: string; fields: { name: string;
     ],
   },
   blood: {
-    table: "blood_donors",
-    nameKey: "name",
+    table: "blood_donors", nameKey: "name",
     fields: [
       { name: "name", label: "নাম" },
       { name: "phone", label: "ফোন নম্বর" },
@@ -106,15 +51,11 @@ const legacyTableConfig: Record<string, { table: string; fields: { name: string;
     ],
   },
   announcements: {
-    table: "announcements",
-    nameKey: "text",
-    fields: [
-      { name: "text", label: "ঘোষণার টেক্সট" },
-    ],
+    table: "announcements", nameKey: "text",
+    fields: [{ name: "text", label: "ঘোষণার টেক্সট" }],
   },
   timeline: {
-    table: "timeline_events",
-    nameKey: "title",
+    table: "timeline_events", nameKey: "title",
     fields: [
       { name: "title", label: "শিরোনাম" },
       { name: "year", label: "সাল", type: "number" },
@@ -123,8 +64,7 @@ const legacyTableConfig: Record<string, { table: string; fields: { name: string;
     ],
   },
   offices: {
-    table: "offices",
-    nameKey: "name",
+    table: "offices", nameKey: "name",
     fields: [
       { name: "name", label: "অফিসের নাম" },
       { name: "designation", label: "পদবী" },
@@ -171,14 +111,46 @@ const slugIconMap: Record<string, { icon: LucideIcon; gradient: string }> = {
   "municipal": { icon: Building, gradient: "from-slate-500 to-zinc-600" },
   "entrepreneur": { icon: Rocket, gradient: "from-orange-500 to-amber-500" },
   "hotel": { icon: Hotel, gradient: "from-indigo-500 to-violet-500" },
-  "restaurant": { icon: Coffee, gradient: "from-amber-600 to-brown-500" },
+  "restaurant": { icon: Coffee, gradient: "from-amber-600 to-yellow-600" },
   "video": { icon: Video, gradient: "from-red-600 to-rose-600" },
   "nursery": { icon: Flower2, gradient: "from-green-500 to-lime-500" },
 };
 
+// Shared UI components
+const StatusBadge = ({ status }: { status: string }) => {
+  const cfg: Record<string, string> = {
+    approved: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+    pending: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    rejected: "bg-red-500/10 text-red-600 dark:text-red-400",
+  };
+  return <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold ${cfg[status] || cfg.pending}`}>{status === "approved" ? "✅ অনুমোদিত" : status === "rejected" ? "❌ প্রত্যাখ্যাত" : "🕐 অপেক্ষমান"}</span>;
+};
+
+const ActionBtn = ({ variant, onClick, icon, label }: { variant: string; onClick: () => void; icon: React.ReactNode; label: string }) => {
+  const styles: Record<string, string> = {
+    success: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15",
+    danger: "bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/15",
+    warning: "bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/15",
+    info: "bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/15",
+  };
+  return (
+    <button onClick={onClick} className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-colors flex items-center gap-1 ${styles[variant]}`}>
+      {icon} {label}
+    </button>
+  );
+};
+
+const LoadingState = () => (
+  <div className="space-y-3">{[1, 2, 3].map(i => <div key={i} className="bg-card border border-border/60 rounded-2xl p-4 animate-pulse"><div className="h-4 bg-muted rounded w-2/3 mb-2" /><div className="h-3 bg-muted rounded w-1/3" /></div>)}</div>
+);
+
+const EmptyState = () => (
+  <div className="text-center py-12"><p className="text-muted-foreground text-sm">কোন ডেটা নেই</p></div>
+);
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<Tab>("dashboard");
+  const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [services, setServices] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -192,36 +164,16 @@ const AdminDashboard = () => {
   const [activityLog, setActivityLog] = useState<any[]>([]);
   const [usersList, setUsersList] = useState<any[]>([]);
   const [legacyData, setLegacyData] = useState<any[]>([]);
-  const [newsItems, setNewsItems] = useState<any[]>([]);
-  const [newsForm, setNewsForm] = useState({ title: "", body: "", thumbnail_url: "", published_at: "" });
-  const [newsEditId, setNewsEditId] = useState<string | null>(null);
-  const [newsUploading, setNewsUploading] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [sliderItems, setSliderItems] = useState<any[]>([]);
-  const [sliderForm, setSliderForm] = useState({ title: "", image_url: "", sort_order: 0 });
-  const [sliderEditId, setSliderEditId] = useState<string | null>(null);
-  const [sliderUploading, setSliderUploading] = useState(false);
-  const [adItems, setAdItems] = useState<any[]>([]);
-  const [adForm, setAdForm] = useState({ title: "", description: "", image_url: "", link_url: "", sort_order: 0, expire_at: "", target_pages: [] as string[] });
-  const [adEditId, setAdEditId] = useState<string | null>(null);
-  const [adUploading, setAdUploading] = useState(false);
   const [showAddService, setShowAddService] = useState(false);
   const [addServiceCategoryId, setAddServiceCategoryId] = useState<string>("");
   const [showLegacyForm, setShowLegacyForm] = useState(false);
   const [legacyForm, setLegacyForm] = useState<Record<string, string>>({});
   const [legacyEditId, setLegacyEditId] = useState<string | null>(null);
-  const [aboutForm, setAboutForm] = useState({ article_title: "", article_body: "", meta_description: "" });
-  const [aboutLoaded, setAboutLoaded] = useState(false);
-  const [aboutSaving, setAboutSaving] = useState(false);
-  const [galleryItems, setGalleryItems] = useState<any[]>([]);
-  const [galleryForm, setGalleryForm] = useState({ image_url: "", caption: "", sort_order: 0 });
-  const [galleryEditId, setGalleryEditId] = useState<string | null>(null);
-  const [galleryUploading, setGalleryUploading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [todayStats, setTodayStats] = useState({ visitors: 0, newSubmissions: 0 });
+  const [adItems, setAdItems] = useState<any[]>([]);
 
-  // --- All business logic remains exactly the same ---
+  // Auth check
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -274,34 +226,21 @@ const AdminDashboard = () => {
     else if (activeTab === "services") setFilterStatus("all");
   }, [activeTab]);
 
+  // Realtime subscriptions
   useEffect(() => {
     const ch = supabase.channel("admin_services_rt").on("postgres_changes", { event: "*", schema: "public", table: "services" }, (payload: any) => {
       fetchServices(); fetchCounts();
       if (payload.eventType === "INSERT" && payload.new?.status === "pending") {
-        toast({ title: "🔔 নতুন সেবা সাবমিশন!", description: payload.new?.title || "একটি নতুন সেবা অনুমোদনের জন্য অপেক্ষা করছে" });
+        toast({ title: "🔔 নতুন সেবা সাবমিশন!", description: payload.new?.title || "" });
       }
     }).subscribe();
-    const chNews = supabase.channel("admin_news_rt").on("postgres_changes", { event: "INSERT", schema: "public", table: "news" }, (payload: any) => {
-      toast({ title: "📰 নতুন নিউজ প্রকাশিত!", description: payload.new?.title || "" });
-    }).subscribe();
-    const chBlood = supabase.channel("admin_blood_rt").on("postgres_changes", { event: "INSERT", schema: "public", table: "blood_donors" }, (payload: any) => {
-      toast({ title: "🩸 নতুন রক্তদাতা রেজিস্ট্রেশন!", description: payload.new?.name || "" });
-    }).subscribe();
-    const chDonation = supabase.channel("admin_donation_rt").on("postgres_changes", { event: "INSERT", schema: "public", table: "donations" }, (payload: any) => {
-      toast({ title: "💚 নতুন অনুদান এসেছে!", description: `${payload.new?.donor_name || ""} — ৳${payload.new?.amount || ""}` });
-    }).subscribe();
-    return () => { 
-      supabase.removeChannel(ch); 
-      supabase.removeChannel(chNews);
-      supabase.removeChannel(chBlood);
-      supabase.removeChannel(chDonation);
-    };
+    return () => { supabase.removeChannel(ch); };
   }, [fetchServices, fetchCounts]);
 
   const fetchLegacyData = useCallback(async (tabName: string) => {
     const legacyTabs: Record<string, string> = {
       emergency: "emergency_calls", blood: "blood_donors", donations: "donations",
-      announcements: "announcements", about: "about_content", timeline: "timeline_events",
+      announcements: "announcements", timeline: "timeline_events",
     };
     if (!legacyTabs[tabName]) return;
     setLoading(true);
@@ -334,52 +273,13 @@ const AdminDashboard = () => {
     }
     const legacyTabs: Record<string, string> = {
       emergency: "emergency_calls", blood: "blood_donors", donations: "donations",
-      announcements: "announcements", about: "about_content", timeline: "timeline_events",
+      announcements: "announcements",
     };
-    if (legacyTabs[activeTab]) {
-      fetchLegacyData(activeTab);
-    }
-    if (activeTab === "about") {
-      if (!aboutLoaded) {
-        const fetchAbout = async () => {
-          const { data } = await (supabase.from as any)("about_content").select("*").limit(1).single();
-          if (data) {
-            setAboutForm({ article_title: data.article_title || "", article_body: data.article_body || "", meta_description: data.meta_description || "" });
-            setAboutLoaded(true);
-          }
-        };
-        fetchAbout();
-      }
-      const fetchGallery = async () => {
-        const { data } = await (supabase.from as any)("about_gallery").select("*").order("sort_order");
-        setGalleryItems(data || []);
-      };
-      fetchGallery();
-    }
-    if (activeTab === "news") {
-      const fetchNews = async () => {
-        setLoading(true);
-        const { data } = await supabase.from("news").select("*").order("published_at", { ascending: false });
-        setNewsItems(data || []);
-        setLoading(false);
-      };
-      fetchNews();
-    }
-    if (activeTab === "slider") {
-      const fetchSlider = async () => {
-        setLoading(true);
-        const { data } = await (supabase.from as any)("slider_items").select("*").order("sort_order");
-        setSliderItems(data || []);
-        setLoading(false);
-      };
-      fetchSlider();
-    }
-    if (activeTab === "advertisements" || activeTab === "dashboard") {
+    if (legacyTabs[activeTab]) fetchLegacyData(activeTab);
+    if (activeTab === "dashboard") {
       const fetchAds = async () => {
-        setLoading(true);
         const { data } = await (supabase.from as any)("advertisements").select("*").order("sort_order");
         setAdItems(data || []);
-        setLoading(false);
       };
       fetchAds();
     }
@@ -396,7 +296,6 @@ const AdminDashboard = () => {
     });
   }, [currentUser]);
 
-  // Fetch today's stats
   const fetchTodayStats = useCallback(async () => {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -405,14 +304,12 @@ const AdminDashboard = () => {
       supabase.from("page_views").select("*", { count: "exact", head: true }).gte("created_at", iso),
       supabase.from("services").select("*", { count: "exact", head: true }).gte("created_at", iso),
     ]);
-    setTodayStats({
-      visitors: visitorsRes.count || 0,
-      newSubmissions: submissionsRes.count || 0,
-    });
+    setTodayStats({ visitors: visitorsRes.count || 0, newSubmissions: submissionsRes.count || 0 });
   }, []);
 
   useEffect(() => { fetchTodayStats(); }, [fetchTodayStats]);
 
+  // Service actions
   const updateServiceStatus = async (id: string, status: string, title: string) => {
     await supabase.from("services").update({ status }).eq("id", id);
     await logActivity(status, "services", id, title);
@@ -420,64 +317,38 @@ const AdminDashboard = () => {
     fetchCounts();
   };
 
-  // Bulk actions
   const toggleSelect = (id: string) => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
+    setSelectedIds(prev => { const next = new Set(prev); if (next.has(id)) next.delete(id); else next.add(id); return next; });
   };
-
   const toggleSelectAll = () => {
-    if (selectedIds.size === filteredServices.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(filteredServices.map((s: any) => s.id)));
-    }
+    if (selectedIds.size === filteredServices.length) setSelectedIds(new Set());
+    else setSelectedIds(new Set(filteredServices.map((s: any) => s.id)));
   };
-
   const bulkUpdateStatus = async (status: string) => {
     if (selectedIds.size === 0) return;
-    const label = status === "approved" ? "অনুমোদন" : "প্রত্যাখ্যান";
-    if (!confirm(`${selectedIds.size}টি সেবা ${label} করতে চান?`)) return;
-    for (const id of selectedIds) {
-      await supabase.from("services").update({ status }).eq("id", id);
-    }
-    await logActivity(`bulk_${status}`, "services", undefined, `${selectedIds.size} items`);
-    toast({ title: `${selectedIds.size}টি সেবা ${label} করা হয়েছে ✅` });
-    setSelectedIds(new Set());
-    fetchServices();
-    fetchCounts();
+    if (!confirm(`${selectedIds.size}টি সেবা ${status === "approved" ? "অনুমোদন" : "প্রত্যাখ্যান"} করতে চান?`)) return;
+    for (const id of selectedIds) await supabase.from("services").update({ status }).eq("id", id);
+    toast({ title: `${selectedIds.size}টি সেবা আপডেট হয়েছে ✅` });
+    setSelectedIds(new Set()); fetchServices(); fetchCounts();
   };
-
   const bulkDelete = async () => {
     if (selectedIds.size === 0) return;
-    if (!confirm(`${selectedIds.size}টি সেবা মুছে ফেলতে চান? এটি ফিরিয়ে আনা যাবে না!`)) return;
-    for (const id of selectedIds) {
-      await supabase.from("services").delete().eq("id", id);
-    }
-    await logActivity("bulk_deleted", "services", undefined, `${selectedIds.size} items`);
+    if (!confirm(`${selectedIds.size}টি সেবা মুছে ফেলতে চান?`)) return;
+    for (const id of selectedIds) await supabase.from("services").delete().eq("id", id);
     toast({ title: `${selectedIds.size}টি সেবা মুছে ফেলা হয়েছে` });
-    setSelectedIds(new Set());
-    fetchServices();
-    fetchCounts();
+    setSelectedIds(new Set()); fetchServices(); fetchCounts();
   };
-
   const toggleFeatured = async (id: string, current: boolean, title: string) => {
     await supabase.from("services").update({ is_featured: !current }).eq("id", id);
     await logActivity(!current ? "featured" : "unfeatured", "services", id, title);
     toast({ title: !current ? "ফিচার্ড ✨" : "আনফিচার্ড" });
   };
-
   const deleteService = async (id: string, title: string) => {
     if (!confirm("মুছে ফেলতে চান?")) return;
     await supabase.from("services").delete().eq("id", id);
     await logActivity("deleted", "services", id, title);
-    toast({ title: "মুছে ফেলা হয়েছে" });
-    fetchCounts();
+    toast({ title: "মুছে ফেলা হয়েছে" }); fetchCounts();
   };
-
   const startEdit = (item: any) => {
     setEditingId(item.id);
     const meta = item.metadata || {};
@@ -485,55 +356,27 @@ const AdminDashboard = () => {
       title: item.title, description: item.description || "", phone: item.phone || "",
       whatsapp: item.whatsapp || "", address: item.address || "", area: item.area || "",
       category_id: item.category_id || "", image_url: item.image_url || "",
-      meta_degrees: (meta.degrees || []).join(", "),
-      meta_specialty: meta.specialty || "",
-      meta_hospital_name: meta.hospital_name || "",
-      meta_registration_no: meta.registration_no || "",
-      meta_experience: meta.experience || "",
-      meta_chamber_time: meta.chamber_time || "",
-      meta_consultation_fee: meta.consultation_fee || "",
-      meta_shop_category: meta.shop_category || "",
-      meta_owner_name: meta.owner_name || "",
-      meta_edu_category: meta.edu_category || "",
-      meta_established_year: meta.established_year || "",
-      meta_principal_name: meta.principal_name || "",
-      meta_company: meta.company || "",
-      meta_job_category: meta.job_category || "",
-      meta_salary_range: meta.salary_range || "",
-      meta_deadline: meta.deadline || "",
+      meta_degrees: (meta.degrees || []).join(", "), meta_specialty: meta.specialty || "",
+      meta_hospital_name: meta.hospital_name || "", meta_registration_no: meta.registration_no || "",
+      meta_experience: meta.experience || "", meta_chamber_time: meta.chamber_time || "",
+      meta_consultation_fee: meta.consultation_fee || "", meta_shop_category: meta.shop_category || "",
+      meta_owner_name: meta.owner_name || "", meta_edu_category: meta.edu_category || "",
+      meta_established_year: meta.established_year || "", meta_principal_name: meta.principal_name || "",
+      meta_company: meta.company || "", meta_job_category: meta.job_category || "",
+      meta_salary_range: meta.salary_range || "", meta_deadline: meta.deadline || "",
     });
   };
-
   const saveEdit = async (id: string) => {
     const metadata: Record<string, any> = {};
     if (editData.meta_degrees) metadata.degrees = editData.meta_degrees.split(",").map((d: string) => d.trim()).filter(Boolean);
-    if (editData.meta_specialty) metadata.specialty = editData.meta_specialty;
-    if (editData.meta_hospital_name) metadata.hospital_name = editData.meta_hospital_name;
-    if (editData.meta_registration_no) metadata.registration_no = editData.meta_registration_no;
-    if (editData.meta_experience) metadata.experience = editData.meta_experience;
-    if (editData.meta_chamber_time) metadata.chamber_time = editData.meta_chamber_time;
-    if (editData.meta_consultation_fee) metadata.consultation_fee = editData.meta_consultation_fee;
-    if (editData.meta_shop_category) metadata.shop_category = editData.meta_shop_category;
-    if (editData.meta_owner_name) metadata.owner_name = editData.meta_owner_name;
-    if (editData.meta_edu_category) metadata.edu_category = editData.meta_edu_category;
-    if (editData.meta_established_year) metadata.established_year = editData.meta_established_year;
-    if (editData.meta_principal_name) metadata.principal_name = editData.meta_principal_name;
-    if (editData.meta_company) metadata.company = editData.meta_company;
-    if (editData.meta_job_category) metadata.job_category = editData.meta_job_category;
-    if (editData.meta_salary_range) metadata.salary_range = editData.meta_salary_range;
-    if (editData.meta_deadline) metadata.deadline = editData.meta_deadline;
-
+    ["specialty", "hospital_name", "registration_no", "experience", "chamber_time", "consultation_fee", "shop_category", "owner_name", "edu_category", "established_year", "principal_name", "company", "job_category", "salary_range", "deadline"].forEach(k => {
+      if (editData[`meta_${k}`]) metadata[k] = editData[`meta_${k}`];
+    });
     const { meta_degrees, meta_specialty, meta_hospital_name, meta_registration_no, meta_experience, meta_chamber_time, meta_consultation_fee, meta_shop_category, meta_owner_name, meta_edu_category, meta_established_year, meta_principal_name, meta_company, meta_job_category, meta_salary_range, meta_deadline, ...baseData } = editData;
     await supabase.from("services").update({ ...baseData, metadata }).eq("id", id);
     await logActivity("edited", "services", id, editData.title);
     setEditingId(null);
     toast({ title: "আপডেট হয়েছে ✅" });
-  };
-
-  const handleLogout = async () => {
-    await logActivity("logout");
-    await supabase.auth.signOut();
-    navigate("/admin-login");
   };
 
   const filteredServices = services.filter(s =>
@@ -542,49 +385,11 @@ const AdminDashboard = () => {
     (s.address || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleNewsUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setNewsUploading(true);
-    const ext = file.name.split(".").pop();
-    const path = `news/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("media").upload(path, file);
-    if (error) { toast({ title: "আপলোড ব্যর্থ", variant: "destructive" }); setNewsUploading(false); return; }
-    const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
-    setNewsForm({ ...newsForm, thumbnail_url: urlData.publicUrl });
-    setNewsUploading(false);
-  };
-
-  const saveNews = async () => {
-    if (!newsForm.title.trim()) { toast({ title: "শিরোনাম দিন", variant: "destructive" }); return; }
-    const publishedAt = newsForm.published_at ? new Date(newsForm.published_at).toISOString() : new Date().toISOString();
-    if (newsEditId) {
-      await supabase.from("news").update({ title: newsForm.title, body: newsForm.body, thumbnail_url: newsForm.thumbnail_url || null, published_at: publishedAt }).eq("id", newsEditId);
-      await logActivity("edited", "news", newsEditId, newsForm.title);
-      toast({ title: "নিউজ আপডেট হয়েছে ✅" });
-    } else {
-      await supabase.from("news").insert({ title: newsForm.title, body: newsForm.body, thumbnail_url: newsForm.thumbnail_url || null, published_at: publishedAt });
-      await logActivity("created", "news", undefined, newsForm.title);
-      toast({ title: "নিউজ প্রকাশিত হয়েছে ✅" });
-    }
-    setNewsForm({ title: "", body: "", thumbnail_url: "", published_at: "" });
-    setNewsEditId(null);
-    const { data } = await supabase.from("news").select("*").order("published_at", { ascending: false });
-    setNewsItems(data || []);
-  };
-
-  const deleteNews = async (id: string, title: string) => {
-    if (!confirm("মুছে ফেলতে চান?")) return;
-    await supabase.from("news").delete().eq("id", id);
-    await logActivity("deleted", "news", id, title);
-    toast({ title: "মুছে ফেলা হয়েছে" });
-    setNewsItems(newsItems.filter((n) => n.id !== id));
-  };
-
-  const toggleNewsActive = async (id: string, current: boolean) => {
-    await supabase.from("news").update({ is_active: !current }).eq("id", id);
-    setNewsItems(newsItems.map((n) => n.id === id ? { ...n, is_active: !current } : n));
-    toast({ title: !current ? "সক্রিয় করা হয়েছে" : "নিষ্ক্রিয় করা হয়েছে" });
+  const openAddServiceForCategory = (categoryId: string) => {
+    setAddServiceCategoryId(categoryId);
+    setShowAddService(true);
+    setActiveTab("services");
+    setFilterCategory(categoryId);
   };
 
   // Legacy CRUD
@@ -592,10 +397,7 @@ const AdminDashboard = () => {
     const config = legacyTableConfig[activeTab];
     if (!config) return;
     const requiredField = config.fields[0].name;
-    if (!legacyForm[requiredField]?.trim()) {
-      toast({ title: `${config.fields[0].label} দিন`, variant: "destructive" });
-      return;
-    }
+    if (!legacyForm[requiredField]?.trim()) { toast({ title: `${config.fields[0].label} দিন`, variant: "destructive" }); return; }
     const insertData: Record<string, any> = {};
     config.fields.forEach(f => {
       if (legacyForm[f.name] !== undefined && legacyForm[f.name] !== "") {
@@ -604,87 +406,61 @@ const AdminDashboard = () => {
     });
     if (activeTab === "blood") insertData.is_approved = true;
     if (activeTab === "emergency") insertData.is_active = true;
-
     if (legacyEditId) {
       await (supabase.from as any)(config.table).update(insertData).eq("id", legacyEditId);
-      await logActivity("edited", config.table, legacyEditId, legacyForm[requiredField]);
       toast({ title: "আপডেট হয়েছে ✅" });
     } else {
       await (supabase.from as any)(config.table).insert(insertData);
-      await logActivity("created", config.table, undefined, legacyForm[requiredField]);
-      toast({ title: "সফলভাবে যোগ হয়েছে ✅" });
+      toast({ title: "যোগ হয়েছে ✅" });
     }
-    setShowLegacyForm(false);
-    setLegacyForm({});
-    setLegacyEditId(null);
+    setShowLegacyForm(false); setLegacyForm({}); setLegacyEditId(null);
     fetchLegacyData(activeTab);
   };
-
   const deleteLegacyItem = async (id: string, name: string) => {
     const config = legacyTableConfig[activeTab];
     if (!config) return;
     if (!confirm("মুছে ফেলতে চান?")) return;
     await (supabase.from as any)(config.table).delete().eq("id", id);
-    await logActivity("deleted", config.table, id, name);
     toast({ title: "মুছে ফেলা হয়েছে" });
     setLegacyData(legacyData.filter(d => d.id !== id));
   };
-
   const startLegacyEdit = (item: any) => {
     const config = legacyTableConfig[activeTab];
     if (!config) return;
     const formData: Record<string, string> = {};
-    config.fields.forEach(f => {
-      formData[f.name] = item[f.name]?.toString() || "";
-    });
-    setLegacyForm(formData);
-    setLegacyEditId(item.id);
-    setShowLegacyForm(true);
+    config.fields.forEach(f => { formData[f.name] = item[f.name]?.toString() || ""; });
+    setLegacyForm(formData); setLegacyEditId(item.id); setShowLegacyForm(true);
   };
 
-  const activeTabData = allTabs.find(t => t.id === activeTab);
-
-  const openAddServiceForCategory = (categoryId: string) => {
-    setAddServiceCategoryId(categoryId);
-    setShowAddService(true);
-    setActiveTab("services");
-    setFilterCategory(categoryId);
-    setSidebarOpen(false);
-  };
-
-  // ===================== RENDER SECTIONS =====================
+  // ============ RENDER SECTIONS ============
 
   const renderDashboard = () => (
     <div className="space-y-5">
-      {/* Welcome Banner */}
+      {/* Welcome */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-accent/5 to-background border border-border/50 p-5">
-        <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-primary/5 -translate-y-1/2 translate-x-1/2" />
-        <div className="relative">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h2 className="text-base font-bold text-foreground">স্বাগতম, অ্যাডমিন</h2>
-              <p className="text-xs text-muted-foreground">{currentUser?.email}</p>
-            </div>
+        <div className="relative flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
+            <Shield className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-base font-bold text-foreground">স্বাগতম, অ্যাডমিন</h2>
+            <p className="text-xs text-muted-foreground">{currentUser?.email}</p>
           </div>
         </div>
       </div>
 
-      {/* Today's Live Counters */}
+      {/* Stats */}
       <div className="grid grid-cols-3 gap-2.5">
         {[
           { label: "আজকের ভিজিটর", count: todayStats.visitors, icon: TrendingUp, gradient: "from-cyan-500 to-blue-500" },
           { label: "নতুন সাবমিশন", count: todayStats.newSubmissions, icon: Plus, gradient: "from-emerald-500 to-green-500" },
           { label: "পেন্ডিং অ্যাকশন", count: counts.pending, icon: AlertTriangle, gradient: "from-amber-500 to-orange-500" },
-        ].map((s) => (
-          <div key={s.label} className="relative overflow-hidden rounded-2xl bg-card border border-border/60 p-3.5 group hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-            <div className={`absolute top-0 right-0 w-14 h-14 rounded-full bg-gradient-to-br ${s.gradient} opacity-[0.08] -translate-y-1/3 translate-x-1/3 group-hover:opacity-[0.14] transition-opacity`} />
+        ].map(s => (
+          <div key={s.label} className="relative overflow-hidden rounded-2xl bg-card border border-border/60 p-3.5 group hover:shadow-md transition-all">
             <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center mb-2 shadow-sm`}>
               <s.icon className="w-3.5 h-3.5 text-white" />
             </div>
-            <p className="text-xl font-extrabold text-foreground tracking-tight">{s.count}</p>
+            <p className="text-xl font-extrabold text-foreground">{s.count}</p>
             <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{s.label}</p>
           </div>
         ))}
@@ -693,7 +469,7 @@ const AdminDashboard = () => {
       {/* Pending Alert */}
       {counts.pending > 0 && (
         <button onClick={() => setActiveTab("pending")} className="w-full group">
-          <div className="flex items-center gap-4 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 hover:border-amber-300 dark:hover:border-amber-700 transition-all">
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 transition-all">
             <div className="w-11 h-11 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
               <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             </div>
@@ -707,105 +483,45 @@ const AdminDashboard = () => {
       )}
 
       {/* Stats Grid */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-primary" /> পরিসংখ্যান
-          </h3>
-          <button onClick={() => fetchCounts()} className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors">
-            <RefreshCw className="w-3 h-3" /> রিফ্রেশ
-          </button>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {[
-            { label: "মোট সেবা", count: counts.total, icon: Globe, gradient: "from-blue-500 to-cyan-500" },
-            { label: "অনুমোদিত", count: counts.approved, icon: CheckCircle, gradient: "from-emerald-500 to-teal-500" },
-            { label: "অপেক্ষমান", count: counts.pending, icon: Clock, gradient: "from-amber-500 to-orange-500" },
-            { label: "প্রত্যাখ্যাত", count: counts.rejected, icon: XCircle, gradient: "from-rose-500 to-red-500" },
-            { label: "ফিচার্ড", count: counts.featured, icon: Star, gradient: "from-yellow-500 to-amber-500" },
-            { label: "ক্যাটাগরি", count: counts.categories, icon: Layers, gradient: "from-violet-500 to-purple-500" },
-          ].map((s) => (
-            <div key={s.label} className="relative overflow-hidden rounded-2xl bg-card border border-border/60 p-4 group hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-              <div className={`absolute top-0 right-0 w-16 h-16 rounded-full bg-gradient-to-br ${s.gradient} opacity-[0.08] -translate-y-1/3 translate-x-1/3 group-hover:opacity-[0.14] transition-opacity`} />
-              <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center mb-2.5 shadow-sm`}>
-                <s.icon className="w-4 h-4 text-white" />
-              </div>
-              <p className="text-2xl font-extrabold text-foreground tracking-tight">{s.count}</p>
-              <p className="text-[11px] text-muted-foreground mt-0.5 font-medium">{s.label}</p>
-            </div>
-          ))}
-        </div>
+      <div className="grid grid-cols-2 gap-2.5">
+        {[
+          { label: "মোট সেবা", count: counts.total, color: "text-primary" },
+          { label: "অনুমোদিত", count: counts.approved, color: "text-emerald-500" },
+          { label: "প্রত্যাখ্যাত", count: counts.rejected, color: "text-red-500" },
+          { label: "ফিচার্ড", count: counts.featured, color: "text-amber-500" },
+        ].map(s => (
+          <div key={s.label} className="bg-card border border-border/60 rounded-2xl p-3.5">
+            <p className={`text-lg font-extrabold ${s.color}`}>{s.count}</p>
+            <p className="text-[10px] text-muted-foreground font-medium">{s.label}</p>
+          </div>
+        ))}
       </div>
 
       {/* Trend Charts */}
       <TrendCharts />
 
-      {/* Analytics Charts */}
-      <AnalyticsCharts categories={categories} adItems={adItems} />
-
-      {/* Quick Actions */}
+      {/* Quick Category Overview */}
       <div>
         <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-          <Zap className="w-4 h-4 text-primary" /> দ্রুত অ্যাকশন
+          <Layers className="w-4 h-4 text-primary" /> ক্যাটাগরি ওভারভিউ
         </h3>
-        <div className="grid grid-cols-3 gap-2.5">
-          {[
-            { label: "অপেক্ষমান", tab: "pending" as Tab, icon: Clock, desc: "রিভিউ", gradient: "from-amber-500 to-orange-500" },
-            { label: "সকল সেবা", tab: "services" as Tab, icon: Globe, desc: "সেবা", gradient: "from-blue-500 to-cyan-500" },
-            { label: "নিউজ", tab: "news" as Tab, icon: Newspaper, desc: "প্রকাশ", gradient: "from-emerald-500 to-teal-500" },
-            { label: "ক্যাটাগরি", tab: "categories" as Tab, icon: Layers, desc: "ম্যানেজ", gradient: "from-violet-500 to-purple-500" },
-            { label: "ইউজার", tab: "users" as Tab, icon: Users, desc: "তালিকা", gradient: "from-pink-500 to-rose-500" },
-            { label: "লগ", tab: "activity" as Tab, icon: Activity, desc: "দেখুন", gradient: "from-slate-500 to-zinc-500" },
-          ].map((a) => (
-            <button key={a.label} onClick={() => { setActiveTab(a.tab); setSidebarOpen(false); }}
-              className="bg-card border border-border/60 rounded-2xl p-3.5 text-left hover:shadow-md hover:-translate-y-0.5 hover:border-primary/30 transition-all duration-200 group">
-              <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${a.gradient} flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform shadow-sm`}>
-                <a.icon className="w-4 h-4 text-white" />
-              </div>
-              <p className="text-xs font-bold text-foreground leading-tight">{a.label}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">{a.desc}</p>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Service Editors Grid */}
-      <div>
-        <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-          <Layers className="w-4 h-4 text-primary" /> সার্ভিস পেজে ডাটা যোগ করুন
-        </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-          {categories.filter((c: any) => c.is_active).map((cat: any) => {
-            const match = slugIconMap[cat.slug] || { icon: Globe, gradient: "from-gray-500 to-slate-500" };
-            const IconComp = match.icon;
+        <div className="grid grid-cols-2 gap-2.5">
+          {categories.slice(0, 8).map((cat: any) => {
+            const iconData = slugIconMap[cat.slug];
+            const Icon = iconData?.icon || Globe;
+            const gradient = iconData?.gradient || "from-primary to-primary/80";
             return (
-              <div key={cat.id} className="bg-card border border-border/60 rounded-2xl p-3.5 hover:shadow-md hover:-translate-y-0.5 hover:border-primary/30 transition-all duration-200 group relative overflow-hidden">
-                <div className={`absolute top-0 right-0 w-12 h-12 rounded-full bg-gradient-to-br ${match.gradient} opacity-[0.06] -translate-y-1/3 translate-x-1/3 group-hover:opacity-[0.12] transition-opacity`} />
-                <div className="flex items-center justify-between mb-2">
-                  <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${match.gradient} flex items-center justify-center group-hover:scale-105 transition-transform shadow-sm`}>
-                    <IconComp className="w-3.5 h-3.5 text-white" />
+              <div key={cat.id} className="bg-card border border-border/60 rounded-2xl p-3.5 hover:shadow-md transition-all group">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center shadow-sm`}>
+                    <Icon className="w-3.5 h-3.5 text-white" />
                   </div>
-                  <button
-                    onClick={() => openAddServiceForCategory(cat.id)}
-                    className="w-7 h-7 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
-                    title={`${cat.name} এ নতুন সেবা যোগ করুন`}
-                  >
-                    <Plus className="w-3.5 h-3.5 text-primary" />
-                  </button>
+                  <span className="text-xs font-bold text-foreground truncate">{cat.name}</span>
                 </div>
-                <p className="text-xs font-bold text-foreground leading-tight truncate">{cat.name}</p>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <button
-                    onClick={() => { setActiveTab("services"); setFilterCategory(cat.id); setSidebarOpen(false); }}
-                    className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-0.5 transition-colors"
-                  >
-                    <Eye className="w-2.5 h-2.5" /> দেখুন
-                  </button>
-                  <button
-                    onClick={() => openAddServiceForCategory(cat.id)}
-                    className="text-[10px] text-primary font-semibold flex items-center gap-0.5"
-                  >
-                    <Plus className="w-2.5 h-2.5" /> যোগ করুন
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Eye className="w-2.5 h-2.5" /> {cat.view_count}</span>
+                  <button onClick={() => openAddServiceForCategory(cat.id)} className="text-[10px] text-primary font-semibold flex items-center gap-0.5">
+                    <Plus className="w-2.5 h-2.5" /> যোগ
                   </button>
                 </div>
               </div>
@@ -814,31 +530,26 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Content Editors Grid */}
+      {/* Quick Content Links */}
       <div>
         <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-          <FileText className="w-4 h-4 text-primary" /> কন্টেন্ট এডিটর
+          <FileText className="w-4 h-4 text-primary" /> দ্রুত নেভিগেশন
         </h3>
         <div className="grid grid-cols-3 gap-2.5">
           {[
-            { label: "ঘোষণা", tab: "announcements" as Tab, icon: Megaphone, gradient: "from-red-500 to-rose-500" },
-            { label: "স্লাইডার", tab: "slider" as Tab, icon: SlidersHorizontal, gradient: "from-blue-500 to-sky-500" },
-            { label: "বিজ্ঞাপন", tab: "advertisements" as Tab, icon: ImageIcon, gradient: "from-yellow-500 to-orange-500" },
-            { label: "সম্পর্কে", tab: "about" as Tab, icon: Info, gradient: "from-teal-500 to-cyan-500" },
-            { label: "টাইমলাইন", tab: "timeline" as Tab, icon: History, gradient: "from-violet-500 to-indigo-500" },
-            { label: "জরুরি কল", tab: "emergency" as Tab, icon: Phone, gradient: "from-orange-500 to-amber-500" },
-            { label: "রক্তদাতা", tab: "blood" as Tab, icon: Droplets, gradient: "from-red-600 to-rose-500" },
-            { label: "অনুদান", tab: "donations" as Tab, icon: Heart, gradient: "from-pink-500 to-fuchsia-500" },
-            { label: "নিউজ", tab: "news" as Tab, icon: Newspaper, gradient: "from-emerald-500 to-green-500" },
-            { label: "সেটিংস", tab: "site_settings" as Tab, icon: Settings, gradient: "from-slate-500 to-gray-500" },
-          ].map((item) => (
-            <button key={item.label} onClick={() => { setActiveTab(item.tab); setSidebarOpen(false); }}
-              className="bg-card border border-border/60 rounded-2xl p-3.5 text-left hover:shadow-md hover:border-primary/20 transition-all duration-200 group relative overflow-hidden">
-              <div className={`absolute top-0 right-0 w-12 h-12 rounded-full bg-gradient-to-br ${item.gradient} opacity-[0.06] -translate-y-1/3 translate-x-1/3 group-hover:opacity-[0.12] transition-opacity`} />
-              <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center mb-2 group-hover:scale-105 transition-transform shadow-sm`}>
+            { label: "ঘোষণা", tab: "announcements" as AdminTab, icon: Megaphone, gradient: "from-red-500 to-rose-500" },
+            { label: "নিউজ", tab: "news" as AdminTab, icon: Newspaper, gradient: "from-emerald-500 to-green-500" },
+            { label: "সেটিংস", tab: "site_settings" as AdminTab, icon: Settings, gradient: "from-slate-500 to-gray-500" },
+            { label: "স্লাইডার", tab: "slider" as AdminTab, icon: SlidersHorizontal, gradient: "from-blue-500 to-sky-500" },
+            { label: "বিজ্ঞাপন", tab: "advertisements" as AdminTab, icon: ImageIcon, gradient: "from-yellow-500 to-orange-500" },
+            { label: "অফিস", tab: "offices" as AdminTab, icon: Building2, gradient: "from-teal-500 to-cyan-500" },
+          ].map(item => (
+            <button key={item.label} onClick={() => setActiveTab(item.tab)}
+              className="bg-card border border-border/60 rounded-2xl p-3.5 text-left hover:shadow-md transition-all group">
+              <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center mb-2 shadow-sm`}>
                 <item.icon className="w-3.5 h-3.5 text-white" />
               </div>
-              <p className="text-xs font-bold text-foreground leading-tight">{item.label}</p>
+              <p className="text-xs font-bold text-foreground">{item.label}</p>
               <p className="text-[10px] text-muted-foreground flex items-center gap-0.5 mt-0.5">
                 <ArrowUpRight className="w-2.5 h-2.5" /> ম্যানেজ
               </p>
@@ -846,6 +557,9 @@ const AdminDashboard = () => {
           ))}
         </div>
       </div>
+
+      {/* Analytics Charts */}
+      <AnalyticsCharts categories={categories} adItems={adItems} />
     </div>
   );
 
@@ -860,158 +574,88 @@ const AdminDashboard = () => {
           logActivity={logActivity}
         />
       )}
-
-      {/* Search & Filters */}
       <div className="bg-card border border-border/60 rounded-2xl p-4 space-y-3">
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input type="text" placeholder="নাম, ফোন বা ঠিকানা দিয়ে খুঁজুন..." className="w-full bg-muted/40 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none border border-border/60 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <input type="text" placeholder="নাম, ফোন বা ঠিকানা..." className="w-full bg-muted/40 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none border border-border/60 focus:border-primary/50 transition-all" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
           </div>
           {!showAddService && (
-            <button
-              onClick={() => { setShowAddService(true); setAddServiceCategoryId(filterCategory !== "all" ? filterCategory : ""); }}
-              className="shrink-0 h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center gap-1.5 hover:opacity-90 transition-opacity shadow-sm"
-            >
+            <button onClick={() => { setShowAddService(true); setAddServiceCategoryId(filterCategory !== "all" ? filterCategory : ""); }}
+              className="shrink-0 h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center gap-1.5">
               <Plus className="w-4 h-4" /> যোগ
             </button>
           )}
         </div>
         <div className="flex gap-2 flex-wrap">
           {activeTab !== "pending" && (
-            <select className="bg-muted/40 rounded-xl px-3 py-2 text-xs border border-border/60 focus:border-primary/50 outline-none transition-colors" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+            <select className="bg-muted/40 rounded-xl px-3 py-2 text-xs border border-border/60 outline-none" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
               <option value="all">সকল স্ট্যাটাস</option>
               <option value="approved">অনুমোদিত</option>
               <option value="pending">অপেক্ষমান</option>
               <option value="rejected">প্রত্যাখ্যাত</option>
             </select>
           )}
-          <select className="bg-muted/40 rounded-xl px-3 py-2 text-xs border border-border/60 focus:border-primary/50 outline-none transition-colors" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+          <select className="bg-muted/40 rounded-xl px-3 py-2 text-xs border border-border/60 outline-none" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
             <option value="all">সকল ক্যাটাগরি</option>
             {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
-          <div className="flex-1" />
-          <span className="text-xs text-muted-foreground flex items-center gap-1 bg-muted/40 px-3 py-2 rounded-xl border border-border/60">
+          <span className="text-xs text-muted-foreground flex items-center gap-1 bg-muted/40 px-3 py-2 rounded-xl border border-border/60 ml-auto">
             <Hash className="w-3 h-3" /> {filteredServices.length}টি
           </span>
         </div>
       </div>
 
-      {/* Bulk Action Bar */}
       {selectedIds.size > 0 && (
-        <div className="bg-primary/5 border-2 border-primary/20 rounded-2xl p-3.5 flex items-center gap-2 flex-wrap sticky top-[calc(4rem+6.5rem)] z-30">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full">{selectedIds.size}টি নির্বাচিত</span>
-          </div>
-          <ActionBtn variant="success" onClick={() => bulkUpdateStatus("approved")} icon={<CheckCircle className="w-3.5 h-3.5" />} label="সব অনুমোদন" />
-          <ActionBtn variant="danger" onClick={() => bulkUpdateStatus("rejected")} icon={<XCircle className="w-3.5 h-3.5" />} label="সব প্রত্যাখ্যান" />
-          <ActionBtn variant="danger" onClick={bulkDelete} icon={<Trash2 className="w-3.5 h-3.5" />} label="সব মুছুন" />
-          <button onClick={() => setSelectedIds(new Set())} className="text-xs text-muted-foreground hover:text-foreground px-2 py-1 transition-colors">
-            বাতিল
-          </button>
+        <div className="bg-primary/5 border-2 border-primary/20 rounded-2xl p-3.5 flex items-center gap-2 flex-wrap sticky top-16 z-30">
+          <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full">{selectedIds.size}টি নির্বাচিত</span>
+          <div className="flex-1" />
+          <ActionBtn variant="success" onClick={() => bulkUpdateStatus("approved")} icon={<CheckCircle className="w-3.5 h-3.5" />} label="অনুমোদন" />
+          <ActionBtn variant="danger" onClick={() => bulkUpdateStatus("rejected")} icon={<XCircle className="w-3.5 h-3.5" />} label="প্রত্যাখ্যান" />
+          <ActionBtn variant="danger" onClick={bulkDelete} icon={<Trash2 className="w-3.5 h-3.5" />} label="মুছুন" />
+          <button onClick={() => setSelectedIds(new Set())} className="text-xs text-muted-foreground hover:text-foreground px-2 py-1">বাতিল</button>
         </div>
       )}
 
       {loading ? <LoadingState /> : filteredServices.length === 0 ? <EmptyState /> : (
         <div className="space-y-3">
-          {/* Select All */}
           <div className="flex items-center gap-2 px-1">
-            <button
-              onClick={toggleSelectAll}
-              className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
-                selectedIds.size === filteredServices.length && filteredServices.length > 0
-                  ? "bg-primary border-primary" : "border-border hover:border-primary/50"
-              }`}
-            >
-              {selectedIds.size === filteredServices.length && filteredServices.length > 0 && (
-                <CheckCircle className="w-3 h-3 text-primary-foreground" />
-              )}
+            <button onClick={toggleSelectAll}
+              className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${selectedIds.size === filteredServices.length && filteredServices.length > 0 ? "bg-primary border-primary" : "border-border hover:border-primary/50"}`}>
+              {selectedIds.size === filteredServices.length && filteredServices.length > 0 && <CheckCircle className="w-3 h-3 text-primary-foreground" />}
             </button>
-            <span className="text-xs text-muted-foreground">সব নির্বাচন করুন</span>
+            <span className="text-xs text-muted-foreground">সব নির্বাচন</span>
           </div>
           {filteredServices.map((item: any) => (
-            <div key={item.id} className={`bg-card border rounded-2xl overflow-hidden hover:shadow-md transition-all duration-200 ${selectedIds.has(item.id) ? "border-primary/40 bg-primary/[0.02]" : "border-border/60"}`}>
+            <div key={item.id} className={`bg-card border rounded-2xl overflow-hidden hover:shadow-md transition-all ${selectedIds.has(item.id) ? "border-primary/40 bg-primary/[0.02]" : "border-border/60"}`}>
               {editingId === item.id ? (
                 <div className="p-4 space-y-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Edit3 className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-bold text-foreground">এডিট মোড</span>
-                  </div>
-                  <input className="w-full bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 focus:border-primary/50 focus:ring-2 focus:ring-primary/10 outline-none transition-all" value={editData.title} onChange={(e) => setEditData({ ...editData, title: e.target.value })} placeholder="শিরোনাম" />
-                  <textarea className="w-full bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 min-h-[70px] focus:border-primary/50 focus:ring-2 focus:ring-primary/10 outline-none transition-all resize-none" value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} placeholder="বিবরণ" />
+                  <span className="text-sm font-bold text-foreground flex items-center gap-2"><Edit3 className="w-4 h-4 text-primary" /> এডিট মোড</span>
+                  <input className="w-full bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 outline-none" value={editData.title} onChange={(e) => setEditData({ ...editData, title: e.target.value })} placeholder="শিরোনাম" />
+                  <textarea className="w-full bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 min-h-[70px] outline-none resize-none" value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} placeholder="বিবরণ" />
                   <div className="grid grid-cols-2 gap-2">
-                    <input className="bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 focus:border-primary/50 outline-none" value={editData.phone} onChange={(e) => setEditData({ ...editData, phone: e.target.value })} placeholder="📞 ফোন" />
-                    <input className="bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 focus:border-primary/50 outline-none" value={editData.whatsapp} onChange={(e) => setEditData({ ...editData, whatsapp: e.target.value })} placeholder="💬 WhatsApp" />
+                    <input className="bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 outline-none" value={editData.phone} onChange={(e) => setEditData({ ...editData, phone: e.target.value })} placeholder="📞 ফোন" />
+                    <input className="bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 outline-none" value={editData.whatsapp} onChange={(e) => setEditData({ ...editData, whatsapp: e.target.value })} placeholder="💬 WhatsApp" />
                   </div>
-                  <input className="w-full bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 focus:border-primary/50 outline-none" value={editData.address} onChange={(e) => setEditData({ ...editData, address: e.target.value })} placeholder="📍 ঠিকানা" />
-                  <select className="w-full bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 focus:border-primary/50 outline-none" value={editData.category_id} onChange={(e) => setEditData({ ...editData, category_id: e.target.value })}>
+                  <input className="w-full bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 outline-none" value={editData.address} onChange={(e) => setEditData({ ...editData, address: e.target.value })} placeholder="📍 ঠিকানা" />
+                  <select className="w-full bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 outline-none" value={editData.category_id} onChange={(e) => setEditData({ ...editData, category_id: e.target.value })}>
                     <option value="">ক্যাটাগরি নির্বাচন</option>
                     {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
-                  <div>
-                    <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">ছবি</label>
-                    <input className="w-full bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 focus:border-primary/50 outline-none" value={editData.image_url} onChange={(e) => setEditData({ ...editData, image_url: e.target.value })} placeholder="ছবির লিংক (URL)" />
-                    <div className="flex items-center gap-3 mt-2">
-                      <label className="inline-flex items-center gap-1.5 text-xs text-primary font-semibold cursor-pointer bg-primary/10 px-4 py-2 rounded-xl hover:bg-primary/15 transition-colors">
-                        <ImageIcon className="w-3.5 h-3.5" /> আপলোড
-                        <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          const ext = file.name.split(".").pop();
-                          const path = `services/${Date.now()}.${ext}`;
-                          const { error } = await supabase.storage.from("media").upload(path, file);
-                          if (error) { toast({ title: "আপলোড ব্যর্থ", variant: "destructive" }); return; }
-                          const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
-                          setEditData({ ...editData, image_url: urlData.publicUrl });
-                        }} />
-                      </label>
-                      {editData.image_url && <img src={editData.image_url} alt="" className="w-10 h-10 rounded-xl object-cover border border-border" />}
-                    </div>
-                  </div>
-                  {/* Metadata Fields */}
-                  <div className="border border-primary/20 rounded-xl p-3 space-y-2.5 bg-primary/5">
-                    <p className="text-xs font-bold text-primary flex items-center gap-1.5"><Stethoscope className="w-3.5 h-3.5" /> অতিরিক্ত তথ্য</p>
-                    {[
-                      { key: "meta_degrees", placeholder: "🎓 ডিগ্রি" },
-                      { key: "meta_specialty", placeholder: "🏥 বিশেষত্ব" },
-                      { key: "meta_hospital_name", placeholder: "🏨 হাসপাতাল / চেম্বার" },
-                      { key: "meta_registration_no", placeholder: "📋 BMDC রেজি. নং" },
-                      { key: "meta_experience", placeholder: "🏅 অভিজ্ঞতা" },
-                      { key: "meta_chamber_time", placeholder: "🕐 চেম্বার সময়" },
-                      { key: "meta_consultation_fee", placeholder: "💰 ভিজিট ফি" },
-                      { key: "meta_shop_category", placeholder: "🏪 দোকানের ধরন" },
-                      { key: "meta_owner_name", placeholder: "👤 মালিকের নাম" },
-                      { key: "meta_company", placeholder: "🏢 প্রতিষ্ঠান" },
-                      { key: "meta_salary_range", placeholder: "💵 বেতন সীমা" },
-                    ].map(f => (
-                      <input key={f.key} className="w-full bg-card rounded-xl px-4 py-2.5 text-sm border border-border/60 focus:border-primary/50 outline-none" value={editData[f.key] || ""} onChange={(e) => setEditData({ ...editData, [f.key]: e.target.value })} placeholder={f.placeholder} />
-                    ))}
-                  </div>
-                  <div className="flex gap-2 pt-1">
-                    <button onClick={() => saveEdit(item.id)} className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm">
-                      <Save className="w-4 h-4" /> সেভ করুন
-                    </button>
-                    <button onClick={() => setEditingId(null)} className="px-5 py-2.5 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
-                      বাতিল
-                    </button>
+                  <input className="w-full bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 outline-none" value={editData.image_url} onChange={(e) => setEditData({ ...editData, image_url: e.target.value })} placeholder="ছবির লিংক" />
+                  <div className="flex gap-2">
+                    <button onClick={() => saveEdit(item.id)} className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2"><Save className="w-4 h-4" /> সেভ</button>
+                    <button onClick={() => setEditingId(null)} className="px-5 py-2.5 rounded-xl bg-muted text-muted-foreground text-sm font-medium">বাতিল</button>
                   </div>
                 </div>
               ) : (
                 <div className="p-4">
                   <div className="flex gap-3">
-                    <button
-                      onClick={() => toggleSelect(item.id)}
-                      className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 mt-1 transition-all ${
-                        selectedIds.has(item.id) ? "bg-primary border-primary" : "border-border hover:border-primary/50"
-                      }`}
-                    >
+                    <button onClick={() => toggleSelect(item.id)}
+                      className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 mt-1 transition-all ${selectedIds.has(item.id) ? "bg-primary border-primary" : "border-border hover:border-primary/50"}`}>
                       {selectedIds.has(item.id) && <CheckCircle className="w-3 h-3 text-primary-foreground" />}
                     </button>
-                    {item.image_url && (
-                      <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-muted border border-border/40">
-                        <img src={item.image_url} alt="" className="w-full h-full object-cover" />
-                      </div>
-                    )}
+                    {item.image_url && <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-muted border border-border/40"><img src={item.image_url} alt="" className="w-full h-full object-cover" /></div>}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
@@ -1024,16 +668,11 @@ const AdminDashboard = () => {
                         <StatusBadge status={item.status} />
                       </div>
                       {item.phone && <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Phone className="w-3 h-3" /> {item.phone}</p>}
-                      {item.address && <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">📍 {item.address}</p>}
                     </div>
                   </div>
                   <div className="flex gap-1.5 mt-3 pt-3 border-t border-border/40 flex-wrap">
-                    {item.status !== "approved" && (
-                      <ActionBtn variant="success" onClick={() => updateServiceStatus(item.id, "approved", item.title)} icon={<CheckCircle className="w-3.5 h-3.5" />} label="অনুমোদন" />
-                    )}
-                    {item.status !== "rejected" && (
-                      <ActionBtn variant="danger" onClick={() => updateServiceStatus(item.id, "rejected", item.title)} icon={<XCircle className="w-3.5 h-3.5" />} label="প্রত্যাখ্যান" />
-                    )}
+                    {item.status !== "approved" && <ActionBtn variant="success" onClick={() => updateServiceStatus(item.id, "approved", item.title)} icon={<CheckCircle className="w-3.5 h-3.5" />} label="অনুমোদন" />}
+                    {item.status !== "rejected" && <ActionBtn variant="danger" onClick={() => updateServiceStatus(item.id, "rejected", item.title)} icon={<XCircle className="w-3.5 h-3.5" />} label="প্রত্যাখ্যান" />}
                     <ActionBtn variant="warning" onClick={() => toggleFeatured(item.id, item.is_featured, item.title)} icon={item.is_featured ? <StarOff className="w-3.5 h-3.5" /> : <Star className="w-3.5 h-3.5" />} label={item.is_featured ? "আনফিচার" : "ফিচার"} />
                     <ActionBtn variant="info" onClick={() => startEdit(item)} icon={<Edit3 className="w-3.5 h-3.5" />} label="এডিট" />
                     <ActionBtn variant="danger" onClick={() => deleteService(item.id, item.title)} icon={<Trash2 className="w-3.5 h-3.5" />} label="মুছুন" />
@@ -1054,22 +693,16 @@ const AdminDashboard = () => {
         <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-semibold">{categories.length}টি</span>
       </div>
       {categories.map((c: any, i: number) => (
-        <div key={c.id} className="bg-card border border-border/60 rounded-2xl p-4 flex items-center justify-between hover:shadow-md transition-all duration-200">
+        <div key={c.id} className="bg-card border border-border/60 rounded-2xl p-4 flex items-center justify-between hover:shadow-md transition-all">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center text-sm font-bold text-primary">
-              {i + 1}
-            </div>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center text-sm font-bold text-primary">{i + 1}</div>
             <div>
               <h3 className="font-bold text-sm text-foreground">{c.name}</h3>
-              <p className="text-xs text-muted-foreground">/{c.slug} • {c.icon}</p>
+              <p className="text-xs text-muted-foreground">/{c.slug}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => openAddServiceForCategory(c.id)}
-              className="w-8 h-8 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
-              title="নতুন সেবা যোগ করুন"
-            >
+            <button onClick={() => openAddServiceForCategory(c.id)} className="w-8 h-8 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="নতুন সেবা যোগ">
               <Plus className="w-4 h-4 text-primary" />
             </button>
             <span className={`text-xs px-3 py-1 rounded-full font-semibold ${c.is_active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-muted text-muted-foreground"}`}>
@@ -1083,30 +716,26 @@ const AdminDashboard = () => {
 
   const renderActivity = () => (
     <div className="space-y-3">
-      {loading ? <LoadingState /> : activityLog.length === 0 ? <EmptyState /> : (
-        activityLog.map((log: any) => (
-          <div key={log.id} className="bg-card border border-border/60 rounded-2xl p-4 flex items-start gap-3 hover:shadow-sm transition-all duration-200">
-            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-              log.action === "approved" ? "bg-emerald-500/10 text-emerald-600" : 
-              log.action === "deleted" ? "bg-red-500/10 text-red-600" : 
-              log.action === "edited" ? "bg-blue-500/10 text-blue-600" :
-              log.action === "rejected" ? "bg-orange-500/10 text-orange-600" :
-              "bg-muted text-muted-foreground"
-            }`}>
-              {log.action === "approved" ? <CheckCircle className="w-4 h-4" /> : 
-               log.action === "deleted" ? <Trash2 className="w-4 h-4" /> : 
-               log.action === "edited" ? <Edit3 className="w-4 h-4" /> :
-               log.action === "rejected" ? <XCircle className="w-4 h-4" /> :
-               <Activity className="w-4 h-4" />}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground capitalize">{log.action}</p>
-              {log.table_name && <p className="text-xs text-muted-foreground mt-0.5">{log.table_name}{log.details ? ` — ${log.details}` : ""}</p>}
-              <p className="text-[10px] text-muted-foreground/60 mt-1">{new Date(log.created_at).toLocaleString("bn-BD")}</p>
-            </div>
+      {loading ? <LoadingState /> : activityLog.length === 0 ? <EmptyState /> : activityLog.map((log: any) => (
+        <div key={log.id} className="bg-card border border-border/60 rounded-2xl p-4 flex items-start gap-3">
+          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+            log.action === "approved" ? "bg-emerald-500/10 text-emerald-600" :
+            log.action === "deleted" ? "bg-red-500/10 text-red-600" :
+            log.action === "edited" ? "bg-blue-500/10 text-blue-600" :
+            "bg-muted text-muted-foreground"
+          }`}>
+            {log.action === "approved" ? <CheckCircle className="w-4 h-4" /> :
+             log.action === "deleted" ? <Trash2 className="w-4 h-4" /> :
+             log.action === "edited" ? <Edit3 className="w-4 h-4" /> :
+             <Activity className="w-4 h-4" />}
           </div>
-        ))
-      )}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground capitalize">{log.action}</p>
+            {log.table_name && <p className="text-xs text-muted-foreground mt-0.5">{log.table_name}{log.details ? ` — ${log.details}` : ""}</p>}
+            <p className="text-[10px] text-muted-foreground/60 mt-1">{new Date(log.created_at).toLocaleString("bn-BD")}</p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 
@@ -1116,104 +745,71 @@ const AdminDashboard = () => {
         <h2 className="text-sm font-bold text-foreground">ইউজার তালিকা</h2>
         <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-semibold">{usersList.length}জন</span>
       </div>
-      {loading ? <LoadingState /> : (
-        usersList.map((user: any) => (
-          <div key={user.id} className="bg-card border border-border/60 rounded-2xl p-4 flex items-center gap-3 hover:shadow-sm transition-all duration-200">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-              <span className="text-base font-bold text-primary">{(user.display_name || "U").charAt(0)}</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-sm text-foreground truncate">{user.display_name || "No Name"}</h3>
-              <p className="text-xs text-muted-foreground">{user.phone || "—"}</p>
-            </div>
-            <div className="flex gap-1.5">
-              {user.roles.map((r: string) => (
-                <span key={r} className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wide ${
-                  r === "admin" ? "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20" : "bg-muted text-muted-foreground"
-                }`}>
-                  {r === "admin" ? "🛡️ " : "👤 "}{r}
-                </span>
-              ))}
-            </div>
+      {loading ? <LoadingState /> : usersList.map((user: any) => (
+        <div key={user.id} className="bg-card border border-border/60 rounded-2xl p-4 flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+            <span className="text-base font-bold text-primary">{(user.display_name || "U").charAt(0)}</span>
           </div>
-        ))
-      )}
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-sm text-foreground truncate">{user.display_name || "No Name"}</h3>
+            <p className="text-xs text-muted-foreground">{user.phone || "—"}</p>
+          </div>
+          <div className="flex gap-1.5">
+            {user.roles.map((r: string) => (
+              <span key={r} className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase ${r === "admin" ? "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20" : "bg-muted text-muted-foreground"}`}>
+                {r === "admin" ? "🛡️ " : "👤 "}{r}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 
   const renderLegacy = () => {
     const config = legacyTableConfig[activeTab];
     const hasCRUD = !!config;
-
     if (loading) return <LoadingState />;
-
+    const activeTabLabel = activeTab === "emergency" ? "জরুরি কল" : activeTab === "blood" ? "রক্তদাতা" : activeTab === "donations" ? "অনুদান" : activeTab === "announcements" ? "ঘোষণা" : activeTab === "offices" ? "অফিস" : "";
     return (
       <div className="space-y-4">
         {hasCRUD && (
-          <>
-            {showLegacyForm ? (
-              <div className="bg-card border-2 border-primary/20 rounded-2xl p-5 space-y-4 shadow-md">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Plus className="w-4 h-4 text-primary" />
-                    </div>
-                    <h2 className="text-sm font-bold text-foreground">
-                      {legacyEditId ? "এডিট করুন" : "নতুন যোগ করুন"}
-                    </h2>
-                  </div>
-                  <button onClick={() => { setShowLegacyForm(false); setLegacyForm({}); setLegacyEditId(null); }} className="w-8 h-8 rounded-xl bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors">
-                    <X className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                </div>
-                {config.fields.map((field) => (
-                  <div key={field.name}>
-                    <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">{field.label}</label>
-                    {field.type === "select" && field.options ? (
-                      <select
-                        className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all"
-                        value={legacyForm[field.name] || ""}
-                        onChange={(e) => setLegacyForm({ ...legacyForm, [field.name]: e.target.value })}
-                      >
-                        <option value="">নির্বাচন করুন</option>
-                        {field.options.map(o => <option key={o} value={o}>{o}</option>)}
-                      </select>
-                    ) : (
-                      <input
-                        type={field.type === "number" ? "number" : "text"}
-                        className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all"
-                        placeholder={field.label}
-                        value={legacyForm[field.name] || ""}
-                        onChange={(e) => setLegacyForm({ ...legacyForm, [field.name]: e.target.value })}
-                      />
-                    )}
-                  </div>
-                ))}
-                <button
-                  onClick={saveLegacyItem}
-                  className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm"
-                >
-                  <Save className="w-4 h-4" /> {legacyEditId ? "আপডেট করুন" : "যোগ করুন"}
+          showLegacyForm ? (
+            <div className="bg-card border-2 border-primary/20 rounded-2xl p-5 space-y-4 shadow-md">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-bold text-foreground">{legacyEditId ? "এডিট করুন" : "নতুন যোগ করুন"}</h2>
+                <button onClick={() => { setShowLegacyForm(false); setLegacyForm({}); setLegacyEditId(null); }} className="w-8 h-8 rounded-xl bg-muted hover:bg-muted/80 flex items-center justify-center">
+                  <X className="w-4 h-4 text-muted-foreground" />
                 </button>
               </div>
-            ) : (
-              <button
-                onClick={() => setShowLegacyForm(true)}
-                className="w-full py-3.5 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/10 hover:border-primary/40 transition-all"
-              >
-                <Plus className="w-4 h-4" /> নতুন {activeTabData?.label} যোগ করুন
+              {config.fields.map(field => (
+                <div key={field.name}>
+                  <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">{field.label}</label>
+                  {field.type === "select" && field.options ? (
+                    <select className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none" value={legacyForm[field.name] || ""} onChange={(e) => setLegacyForm({ ...legacyForm, [field.name]: e.target.value })}>
+                      <option value="">নির্বাচন করুন</option>
+                      {field.options.map(o => <option key={o} value={o}>{o}</option>)}
+                    </select>
+                  ) : (
+                    <input type={field.type === "number" ? "number" : "text"} className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none" placeholder={field.label} value={legacyForm[field.name] || ""} onChange={(e) => setLegacyForm({ ...legacyForm, [field.name]: e.target.value })} />
+                  )}
+                </div>
+              ))}
+              <button onClick={saveLegacyItem} className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2">
+                <Save className="w-4 h-4" /> {legacyEditId ? "আপডেট" : "যোগ করুন"}
               </button>
-            )}
-          </>
+            </div>
+          ) : (
+            <button onClick={() => setShowLegacyForm(true)} className="w-full py-3.5 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-all">
+              <Plus className="w-4 h-4" /> নতুন {activeTabLabel} যোগ করুন
+            </button>
+          )
         )}
-
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> মোট: {legacyData.length}টি</span>
-        </div>
+        <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> মোট: {legacyData.length}টি</span>
         {legacyData.length === 0 ? <EmptyState /> : legacyData.map((item: any) => {
-          const name = item.title || item.name || item.text || item.method_name || item.article_title || item.donor_name || item.item_name || `${item.year || ""}`;
+          const name = item.title || item.name || item.text || item.method_name || item.donor_name || item.item_name || `${item.year || ""}`;
           return (
-            <div key={item.id} className="bg-card border border-border/60 rounded-2xl p-4 hover:shadow-sm transition-all duration-200">
+            <div key={item.id} className="bg-card border border-border/60 rounded-2xl p-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-sm text-foreground">{name}</h3>
@@ -1221,19 +817,11 @@ const AdminDashboard = () => {
                   {item.blood_group && <p className="text-xs text-muted-foreground mt-0.5">🩸 {item.blood_group}</p>}
                   {item.address && <p className="text-xs text-muted-foreground mt-0.5">📍 {item.address}</p>}
                   {item.description && <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{item.description}</p>}
-                  {item.year && <p className="text-xs text-muted-foreground mt-0.5">📅 {item.year}</p>}
-                  <p className="text-[10px] text-muted-foreground/60 mt-1.5 flex items-center gap-1">
-                    <CalendarDays className="w-3 h-3" /> {new Date(item.created_at).toLocaleDateString("bn-BD")}
-                  </p>
+                  <p className="text-[10px] text-muted-foreground/60 mt-1.5"><CalendarDays className="w-3 h-3 inline mr-1" />{new Date(item.created_at).toLocaleDateString("bn-BD")}</p>
                 </div>
                 {item.is_active !== undefined && (
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0 ${item.is_active ? "bg-emerald-500/10 text-emerald-600" : "bg-muted text-muted-foreground"}`}>
                     {item.is_active ? "✅" : "⏸"}
-                  </span>
-                )}
-                {item.is_approved !== undefined && (
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0 ${item.is_approved ? "bg-emerald-500/10 text-emerald-600" : "bg-amber-500/10 text-amber-600"}`}>
-                    {item.is_approved ? "✅" : "🕐"}
                   </span>
                 )}
               </div>
@@ -1250,542 +838,6 @@ const AdminDashboard = () => {
     );
   };
 
-  const renderNews = () => (
-    <div className="space-y-4">
-      <div className="bg-card border border-border/60 rounded-2xl p-5 space-y-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-sm">
-            <Newspaper className="w-4 h-4 text-white" />
-          </div>
-          <h2 className="text-sm font-bold text-foreground">{newsEditId ? "নিউজ এডিট" : "নতুন নিউজ যোগ করুন"}</h2>
-        </div>
-        <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all" placeholder="নিউজ শিরোনাম" value={newsForm.title} onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })} />
-        <textarea className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none min-h-[180px] focus:border-primary/50 focus:ring-2 focus:ring-primary/10 font-mono transition-all resize-none" placeholder="বিস্তারিত নিউজ (HTML সাপোর্টেড)..." value={newsForm.body} onChange={(e) => setNewsForm({ ...newsForm, body: e.target.value })} />
-        <p className="text-[10px] text-muted-foreground">HTML কোড পেস্ট করতে পারবেন</p>
-        <div>
-          <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">প্রকাশের তারিখ</label>
-          <input type="datetime-local" className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" value={newsForm.published_at} onChange={(e) => setNewsForm({ ...newsForm, published_at: e.target.value })} />
-        </div>
-        <div className="flex items-center gap-3">
-          <label className="inline-flex items-center gap-2 text-xs text-primary font-semibold cursor-pointer bg-primary/10 px-4 py-2.5 rounded-xl hover:bg-primary/15 transition-colors">
-            <ImageIcon className="w-4 h-4" /> {newsUploading ? "আপলোড হচ্ছে..." : "থাম্বনেইল"}
-            <input type="file" accept="image/*" className="hidden" onChange={handleNewsUpload} disabled={newsUploading} />
-          </label>
-          {newsForm.thumbnail_url && <img src={newsForm.thumbnail_url} alt="thumb" className="w-14 h-14 rounded-xl object-cover border border-border" />}
-        </div>
-        <div className="flex gap-2">
-          <button onClick={saveNews} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm">
-            <Save className="w-4 h-4" /> {newsEditId ? "আপডেট" : "প্রকাশ করুন"}
-          </button>
-          {newsEditId && (
-            <button onClick={() => { setNewsEditId(null); setNewsForm({ title: "", body: "", thumbnail_url: "", published_at: "" }); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
-              বাতিল
-            </button>
-          )}
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> {newsItems.length}টি নিউজ</span>
-      </div>
-      {loading ? <LoadingState /> : newsItems.map((item: any) => (
-        <div key={item.id} className="bg-card border border-border/60 rounded-2xl p-4 flex gap-3 hover:shadow-md transition-all duration-200">
-          <div className="w-20 h-14 rounded-xl bg-muted overflow-hidden shrink-0">
-            {item.thumbnail_url ? (
-              <img src={item.thumbnail_url} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center"><Newspaper className="w-5 h-5 text-muted-foreground/30" /></div>
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-foreground text-sm line-clamp-1">{item.title}</h3>
-            <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
-              <CalendarDays className="w-3 h-3" />
-              {new Date(item.published_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
-            </p>
-            <div className="flex gap-1.5 mt-2 flex-wrap">
-              <ActionBtn variant="info" onClick={() => { setNewsEditId(item.id); setNewsForm({ title: item.title, body: item.body || "", thumbnail_url: item.thumbnail_url || "", published_at: item.published_at ? new Date(item.published_at).toISOString().slice(0, 16) : "" }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
-              <button onClick={() => toggleNewsActive(item.id, item.is_active)}
-                className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-colors ${item.is_active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
-                {item.is_active ? "✅ সক্রিয়" : "⏸ নিষ্ক্রিয়"}
-              </button>
-              <ActionBtn variant="danger" onClick={() => deleteNews(item.id, item.title)} icon={<Trash2 className="w-3 h-3" />} label="মুছুন" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  const saveAboutContent = async () => {
-    setAboutSaving(true);
-    const { data: existing } = await (supabase.from as any)("about_content").select("id").limit(1).single();
-    if (existing) {
-      await (supabase.from as any)("about_content").update({
-        article_title: aboutForm.article_title,
-        article_body: aboutForm.article_body,
-        meta_description: aboutForm.meta_description || null,
-      }).eq("id", existing.id);
-    } else {
-      await (supabase.from as any)("about_content").insert({
-        article_title: aboutForm.article_title,
-        article_body: aboutForm.article_body,
-        meta_description: aboutForm.meta_description || null,
-      });
-    }
-    await logActivity("edited", "about_content", undefined, aboutForm.article_title);
-    toast({ title: "আর্টিকেল সেভ হয়েছে ✅" });
-    setAboutSaving(false);
-  };
-
-  const refreshGallery = async () => {
-    const { data } = await (supabase.from as any)("about_gallery").select("*").order("sort_order");
-    setGalleryItems(data || []);
-  };
-
-  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setGalleryUploading(true);
-    const ext = file.name.split(".").pop();
-    const path = `gallery/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("media").upload(path, file);
-    if (error) { toast({ title: "আপলোড ব্যর্থ", variant: "destructive" }); setGalleryUploading(false); return; }
-    const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
-    setGalleryForm({ ...galleryForm, image_url: urlData.publicUrl });
-    setGalleryUploading(false);
-  };
-
-  const saveGalleryItem = async () => {
-    if (!galleryForm.image_url.trim()) { toast({ title: "ছবি দিন", variant: "destructive" }); return; }
-    if (galleryEditId) {
-      await (supabase.from as any)("about_gallery").update({ image_url: galleryForm.image_url, caption: galleryForm.caption || null, sort_order: galleryForm.sort_order }).eq("id", galleryEditId);
-      await logActivity("edited", "about_gallery", galleryEditId, galleryForm.caption || "gallery image");
-      toast({ title: "গ্যালারি আপডেট হয়েছে ✅" });
-    } else {
-      await (supabase.from as any)("about_gallery").insert({ image_url: galleryForm.image_url, caption: galleryForm.caption || null, sort_order: galleryForm.sort_order });
-      await logActivity("created", "about_gallery", undefined, galleryForm.caption || "gallery image");
-      toast({ title: "গ্যালারিতে যোগ হয়েছে ✅" });
-    }
-    setGalleryForm({ image_url: "", caption: "", sort_order: 0 });
-    setGalleryEditId(null);
-    refreshGallery();
-  };
-
-  const deleteGalleryItem = async (id: string, caption: string) => {
-    if (!confirm("এই ছবি মুছে ফেলতে চান?")) return;
-    await (supabase.from as any)("about_gallery").delete().eq("id", id);
-    await logActivity("deleted", "about_gallery", id, caption || "gallery image");
-    toast({ title: "মুছে ফেলা হয়েছে" });
-    setGalleryItems(galleryItems.filter(g => g.id !== id));
-  };
-
-  const toggleGalleryActive = async (id: string, current: boolean) => {
-    await (supabase.from as any)("about_gallery").update({ is_active: !current }).eq("id", id);
-    setGalleryItems(galleryItems.map(g => g.id === id ? { ...g, is_active: !current } : g));
-    toast({ title: !current ? "সক্রিয় করা হয়েছে" : "নিষ্ক্রিয় করা হয়েছে" });
-  };
-
-  const renderAbout = () => (
-    <div className="space-y-6">
-      <div className="bg-card border border-border/60 rounded-2xl p-5 space-y-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center shadow-sm">
-            <FileText className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-foreground">আর্টিকেল এডিট করুন</h2>
-            <p className="text-[10px] text-muted-foreground">রামগঞ্জ সম্পর্কে পেজের মূল কন্টেন্ট</p>
-          </div>
-        </div>
-        <div>
-          <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">আর্টিকেল শিরোনাম</label>
-          <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all" placeholder="যেমন: রামগঞ্জ সম্পর্কে" value={aboutForm.article_title} onChange={(e) => setAboutForm({ ...aboutForm, article_title: e.target.value })} />
-        </div>
-        <div>
-          <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">মেটা বিবরণ (SEO)</label>
-          <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="সার্চ ইঞ্জিনে দেখানো হবে (ঐচ্ছিক)" value={aboutForm.meta_description} onChange={(e) => setAboutForm({ ...aboutForm, meta_description: e.target.value })} />
-        </div>
-        <div>
-          <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">আর্টিকেল বডি</label>
-          <textarea className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none min-h-[250px] focus:border-primary/50 focus:ring-2 focus:ring-primary/10 font-mono transition-all resize-y" placeholder="রামগঞ্জ সম্পর্কে বিস্তারিত লিখুন..." value={aboutForm.article_body} onChange={(e) => setAboutForm({ ...aboutForm, article_body: e.target.value })} />
-        </div>
-        <button onClick={saveAboutContent} disabled={aboutSaving} className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 shadow-sm">
-          <Save className="w-4 h-4" /> {aboutSaving ? "সেভ হচ্ছে..." : "আর্টিকেল সেভ করুন"}
-        </button>
-      </div>
-
-      {/* Gallery */}
-      <div className="bg-card border border-border/60 rounded-2xl p-5 space-y-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-sm">
-            <ImageIcon className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-foreground">গ্যালারি ম্যানেজমেন্ট</h2>
-            <p className="text-[10px] text-muted-foreground">About পেজের ইমেজ স্লাইডার</p>
-          </div>
-        </div>
-
-        <div className="space-y-3 bg-muted/20 rounded-xl p-4 border border-border/40">
-          <div>
-            <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">ছবি</label>
-            <input className="w-full bg-background rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ছবির লিংক (URL)" value={galleryForm.image_url} onChange={(e) => setGalleryForm({ ...galleryForm, image_url: e.target.value })} />
-            <div className="flex items-center gap-3 mt-2">
-              <label className="inline-flex items-center gap-2 text-xs text-primary font-semibold cursor-pointer bg-primary/10 px-4 py-2.5 rounded-xl hover:bg-primary/15 transition-colors">
-                <ImageIcon className="w-4 h-4" /> {galleryUploading ? "আপলোড হচ্ছে..." : "ছবি আপলোড"}
-                <input type="file" accept="image/*" className="hidden" onChange={handleGalleryUpload} disabled={galleryUploading} />
-              </label>
-              {galleryForm.image_url && <img src={galleryForm.image_url} alt="preview" className="w-16 h-12 rounded-xl object-cover border border-border" />}
-            </div>
-          </div>
-          <input className="w-full bg-background rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ক্যাপশন (ঐচ্ছিক)" value={galleryForm.caption} onChange={(e) => setGalleryForm({ ...galleryForm, caption: e.target.value })} />
-          <input type="number" className="w-full bg-background rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ক্রম" value={galleryForm.sort_order} onChange={(e) => setGalleryForm({ ...galleryForm, sort_order: parseInt(e.target.value) || 0 })} />
-          <div className="flex gap-2">
-            <button onClick={saveGalleryItem} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm">
-              <Save className="w-4 h-4" /> {galleryEditId ? "আপডেট" : "যোগ করুন"}
-            </button>
-            {galleryEditId && (
-              <button onClick={() => { setGalleryEditId(null); setGalleryForm({ image_url: "", caption: "", sort_order: 0 }); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
-                বাতিল
-              </button>
-            )}
-          </div>
-        </div>
-
-        <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> {galleryItems.length}টি ছবি</span>
-        {galleryItems.length === 0 ? (
-          <p className="text-xs text-muted-foreground text-center py-6">কোন গ্যালারি ছবি নেই</p>
-        ) : (
-          <div className="grid grid-cols-2 gap-3">
-            {galleryItems.map((item: any) => (
-              <div key={item.id} className="bg-muted/20 rounded-xl overflow-hidden border border-border/40 group">
-                <div className="aspect-[16/10] relative">
-                  <img src={item.image_url} alt={item.caption || ""} className="w-full h-full object-cover" />
-                  <div className="absolute top-1.5 right-1.5">
-                    <button onClick={() => toggleGalleryActive(item.id, item.is_active)} className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] ${item.is_active ? "bg-emerald-500 text-white" : "bg-muted text-muted-foreground"}`}>
-                      {item.is_active ? "✅" : "⏸"}
-                    </button>
-                  </div>
-                </div>
-                <div className="p-2.5">
-                  {item.caption && <p className="text-[11px] text-foreground font-medium line-clamp-1">{item.caption}</p>}
-                  <div className="flex gap-1.5 mt-2">
-                    <ActionBtn variant="info" onClick={() => { setGalleryEditId(item.id); setGalleryForm({ image_url: item.image_url, caption: item.caption || "", sort_order: item.sort_order }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
-                    <ActionBtn variant="danger" onClick={() => deleteGalleryItem(item.id, item.caption || "")} icon={<Trash2 className="w-3 h-3" />} label="মুছুন" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Timeline */}
-      <div className="bg-card border border-border/60 rounded-2xl p-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center shadow-sm">
-              <History className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <h2 className="text-sm font-bold text-foreground">টাইমলাইন ম্যানেজমেন্ট</h2>
-              <p className="text-[10px] text-muted-foreground">ঐতিহাসিক ইভেন্ট যোগ/এডিট করুন</p>
-            </div>
-          </div>
-          <button onClick={() => { setActiveTab("timeline"); }} className="text-xs text-primary font-semibold flex items-center gap-1 hover:underline">
-            সব দেখুন <ChevronRight className="w-3 h-3" />
-          </button>
-        </div>
-        <button onClick={() => { setActiveTab("timeline"); setShowLegacyForm(true); }} className="w-full py-3 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors">
-          <Plus className="w-4 h-4" /> নতুন টাইমলাইন ইভেন্ট যোগ করুন
-        </button>
-      </div>
-    </div>
-  );
-
-  const renderSiteSettings = () => <SiteSettingsPanel />;
-  const renderAppSettings = () => <AppSettingsPanel />;
-  const renderNotifications = () => <AdminNotificationPanel />;
-
-  const refreshSliderItems = async () => {
-    const { data } = await (supabase.from as any)("slider_items").select("*").order("sort_order");
-    setSliderItems(data || []);
-  };
-
-  const handleSliderUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setSliderUploading(true);
-    const ext = file.name.split(".").pop();
-    const path = `slider/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("slider-images").upload(path, file);
-    if (error) { toast({ title: "আপলোড ব্যর্থ", variant: "destructive" }); setSliderUploading(false); return; }
-    const { data: urlData } = supabase.storage.from("slider-images").getPublicUrl(path);
-    setSliderForm({ ...sliderForm, image_url: urlData.publicUrl });
-    setSliderUploading(false);
-  };
-
-  const saveSlider = async () => {
-    if (!sliderForm.title.trim() || !sliderForm.image_url.trim()) {
-      toast({ title: "শিরোনাম ও ছবি দিন", variant: "destructive" }); return;
-    }
-    if (sliderEditId) {
-      await (supabase.from as any)("slider_items").update({ title: sliderForm.title, image_url: sliderForm.image_url, sort_order: sliderForm.sort_order }).eq("id", sliderEditId);
-      await logActivity("edited", "slider_items", sliderEditId, sliderForm.title);
-      toast({ title: "স্লাইডার আপডেট হয়েছে ✅" });
-    } else {
-      await (supabase.from as any)("slider_items").insert({ title: sliderForm.title, image_url: sliderForm.image_url, sort_order: sliderForm.sort_order });
-      await logActivity("created", "slider_items", undefined, sliderForm.title);
-      toast({ title: "নতুন স্লাইড যোগ হয়েছে ✅" });
-    }
-    setSliderForm({ title: "", image_url: "", sort_order: 0 });
-    setSliderEditId(null);
-    refreshSliderItems();
-  };
-
-  const deleteSlider = async (id: string, title: string) => {
-    if (!confirm("এই স্লাইড মুছে ফেলতে চান?")) return;
-    await (supabase.from as any)("slider_items").delete().eq("id", id);
-    await logActivity("deleted", "slider_items", id, title);
-    toast({ title: "মুছে ফেলা হয়েছে" });
-    setSliderItems(sliderItems.filter((s) => s.id !== id));
-  };
-
-  const toggleSliderActive = async (id: string, current: boolean) => {
-    await (supabase.from as any)("slider_items").update({ is_active: !current }).eq("id", id);
-    setSliderItems(sliderItems.map((s) => s.id === id ? { ...s, is_active: !current } : s));
-    toast({ title: !current ? "সক্রিয় করা হয়েছে" : "নিষ্ক্রিয় করা হয়েছে" });
-  };
-
-  const renderSlider = () => (
-    <div className="space-y-4">
-      <div className="bg-card border border-border/60 rounded-2xl p-5 space-y-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-sky-500 flex items-center justify-center shadow-sm">
-            <SlidersHorizontal className="w-4 h-4 text-white" />
-          </div>
-          <h2 className="text-sm font-bold text-foreground">{sliderEditId ? "স্লাইড এডিট" : "নতুন স্লাইড যোগ করুন"}</h2>
-        </div>
-        <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="স্লাইড শিরোনাম" value={sliderForm.title} onChange={(e) => setSliderForm({ ...sliderForm, title: e.target.value })} />
-        <input type="number" className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ক্রম" value={sliderForm.sort_order} onChange={(e) => setSliderForm({ ...sliderForm, sort_order: parseInt(e.target.value) || 0 })} />
-        <div>
-          <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">ছবি</label>
-          <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ছবির লিংক (URL)" value={sliderForm.image_url} onChange={(e) => setSliderForm({ ...sliderForm, image_url: e.target.value })} />
-          <div className="flex items-center gap-3 mt-2">
-            <label className="inline-flex items-center gap-2 text-xs text-primary font-semibold cursor-pointer bg-primary/10 px-4 py-2.5 rounded-xl hover:bg-primary/15 transition-colors">
-              <ImageIcon className="w-4 h-4" /> {sliderUploading ? "আপলোড হচ্ছে..." : "ছবি আপলোড"}
-              <input type="file" accept="image/*" className="hidden" onChange={handleSliderUpload} disabled={sliderUploading} />
-            </label>
-            {sliderForm.image_url && <img src={sliderForm.image_url} alt="preview" className="w-20 h-12 rounded-xl object-cover border border-border" />}
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <button onClick={saveSlider} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm">
-            <Save className="w-4 h-4" /> {sliderEditId ? "আপডেট" : "যোগ করুন"}
-          </button>
-          {sliderEditId && (
-            <button onClick={() => { setSliderEditId(null); setSliderForm({ title: "", image_url: "", sort_order: 0 }); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
-              বাতিল
-            </button>
-          )}
-        </div>
-      </div>
-
-      <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> {sliderItems.length}টি স্লাইড</span>
-      {loading ? <LoadingState /> : sliderItems.length === 0 ? <EmptyState /> : sliderItems.map((item: any) => (
-        <div key={item.id} className="bg-card border border-border/60 rounded-2xl p-4 flex gap-3 hover:shadow-md transition-all duration-200">
-          <div className="w-24 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
-            <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-foreground text-sm line-clamp-1">{item.title}</h3>
-            <p className="text-[10px] text-muted-foreground mt-0.5">ক্রম: {item.sort_order}</p>
-            <div className="flex gap-1.5 mt-2 flex-wrap">
-              <ActionBtn variant="info" onClick={() => { setSliderEditId(item.id); setSliderForm({ title: item.title, image_url: item.image_url, sort_order: item.sort_order }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
-              <button onClick={() => toggleSliderActive(item.id, item.is_active)}
-                className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-colors ${item.is_active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
-                {item.is_active ? "✅ সক্রিয়" : "⏸ নিষ্ক্রিয়"}
-              </button>
-              <ActionBtn variant="danger" onClick={() => deleteSlider(item.id, item.title)} icon={<Trash2 className="w-3 h-3" />} label="মুছুন" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  // ========== ADVERTISEMENTS CRUD ==========
-  const handleAdUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setAdUploading(true);
-    const ext = file.name.split(".").pop();
-    const path = `ads/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("media").upload(path, file);
-    if (error) { toast({ title: "আপলোড ব্যর্থ", variant: "destructive" }); setAdUploading(false); return; }
-    const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
-    setAdForm({ ...adForm, image_url: urlData.publicUrl });
-    setAdUploading(false);
-  };
-
-  const saveAd = async () => {
-    if (!adForm.title.trim()) { toast({ title: "শিরোনাম দিন", variant: "destructive" }); return; }
-    const expireVal = adForm.expire_at ? new Date(adForm.expire_at).toISOString() : null;
-    if (adEditId) {
-      await (supabase.from as any)("advertisements").update({ title: adForm.title, description: adForm.description || null, image_url: adForm.image_url || null, link_url: adForm.link_url || null, sort_order: adForm.sort_order, expire_at: expireVal, target_pages: adForm.target_pages }).eq("id", adEditId);
-      await logActivity("edited", "advertisements", adEditId, adForm.title);
-      toast({ title: "বিজ্ঞাপন আপডেট হয়েছে ✅" });
-    } else {
-      await (supabase.from as any)("advertisements").insert({ title: adForm.title, description: adForm.description || null, image_url: adForm.image_url || null, link_url: adForm.link_url || null, sort_order: adForm.sort_order, expire_at: expireVal, target_pages: adForm.target_pages });
-      await logActivity("created", "advertisements", undefined, adForm.title);
-      toast({ title: "বিজ্ঞাপন যোগ হয়েছে ✅" });
-    }
-    setAdForm({ title: "", description: "", image_url: "", link_url: "", sort_order: 0, expire_at: "", target_pages: [] });
-    setAdEditId(null);
-    const { data } = await (supabase.from as any)("advertisements").select("*").order("sort_order");
-    setAdItems(data || []);
-  };
-
-  const deleteAd = async (id: string, title: string) => {
-    if (!confirm("এই বিজ্ঞাপন মুছে ফেলতে চান?")) return;
-    await (supabase.from as any)("advertisements").delete().eq("id", id);
-    await logActivity("deleted", "advertisements", id, title);
-    toast({ title: "মুছে ফেলা হয়েছে" });
-    setAdItems(adItems.filter((a) => a.id !== id));
-  };
-
-  const toggleAdActive = async (id: string, current: boolean) => {
-    await (supabase.from as any)("advertisements").update({ is_active: !current }).eq("id", id);
-    setAdItems(adItems.map((a) => a.id === id ? { ...a, is_active: !current } : a));
-    toast({ title: !current ? "সক্রিয় করা হয়েছে" : "নিষ্ক্রিয় করা হয়েছে" });
-  };
-
-  const renderAdvertisements = () => (
-    <div className="space-y-4">
-      <div className="bg-card border border-border/60 rounded-2xl p-5 space-y-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-sm">
-            <ImageIcon className="w-4 h-4 text-white" />
-          </div>
-          <h2 className="text-sm font-bold text-foreground">{adEditId ? "বিজ্ঞাপন এডিট" : "নতুন বিজ্ঞাপন যোগ করুন"}</h2>
-        </div>
-        <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="বিজ্ঞাপনের শিরোনাম" value={adForm.title} onChange={(e) => setAdForm({ ...adForm, title: e.target.value })} />
-        <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="বিবরণ (ঐচ্ছিক)" value={adForm.description} onChange={(e) => setAdForm({ ...adForm, description: e.target.value })} />
-        <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="লিংক URL (ঐচ্ছিক)" value={adForm.link_url} onChange={(e) => setAdForm({ ...adForm, link_url: e.target.value })} />
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">ক্রম</label>
-            <input type="number" className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="0" value={adForm.sort_order} onChange={(e) => setAdForm({ ...adForm, sort_order: parseInt(e.target.value) || 0 })} />
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">মেয়াদ শেষ</label>
-            <input type="datetime-local" className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" value={adForm.expire_at} onChange={(e) => setAdForm({ ...adForm, expire_at: e.target.value })} />
-          </div>
-        </div>
-        <div>
-          <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">ছবি</label>
-          <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder="ছবির লিংক (URL)" value={adForm.image_url} onChange={(e) => setAdForm({ ...adForm, image_url: e.target.value })} />
-          <div className="flex items-center gap-3 mt-2">
-            <label className="inline-flex items-center gap-2 text-xs text-primary font-semibold cursor-pointer bg-primary/10 px-4 py-2.5 rounded-xl hover:bg-primary/15 transition-colors">
-              <ImageIcon className="w-4 h-4" /> {adUploading ? "আপলোড হচ্ছে..." : "ছবি আপলোড"}
-              <input type="file" accept="image/*" className="hidden" onChange={handleAdUpload} disabled={adUploading} />
-            </label>
-            {adForm.image_url && <img src={adForm.image_url} alt="preview" className="w-20 h-14 rounded-xl object-cover border border-border" />}
-          </div>
-        </div>
-        {/* Target Pages */}
-        <div>
-          <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">কোন পেজে দেখাবে (খালি রাখলে সব পেজে দেখাবে)</label>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { value: "news", label: "খবর ও সংবাদ" },
-              { value: "news-detail", label: "সংবাদ বিস্তারিত" },
-              { value: "blood-bank", label: "ব্লাড ব্যাংক" },
-              { value: "emergency", label: "জরুরি কল" },
-              { value: "offices", label: "অফিস" },
-              { value: "donation", label: "অনুদান" },
-              { value: "tuition", label: "টিউশন মিডিয়া" },
-              { value: "doctors", label: "ডাক্তার" },
-              { value: "education", label: "শিক্ষা প্রতিষ্ঠান" },
-              { value: "shops", label: "দোকান" },
-              { value: "jobs", label: "চাকরি" },
-              { value: "marketplace", label: "মার্কেটপ্লেস" },
-              { value: "services", label: "সেবা গ্রিড" },
-            ].map((page) => (
-              <button
-                key={page.value}
-                type="button"
-                onClick={() => {
-                  const pages = adForm.target_pages.includes(page.value)
-                    ? adForm.target_pages.filter((p) => p !== page.value)
-                    : [...adForm.target_pages, page.value];
-                  setAdForm({ ...adForm, target_pages: pages });
-                }}
-                className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-colors ${adForm.target_pages.includes(page.value) ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-              >
-                {page.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <button onClick={saveAd} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm">
-            <Save className="w-4 h-4" /> {adEditId ? "আপডেট" : "যোগ করুন"}
-          </button>
-          {adEditId && (
-            <button onClick={() => { setAdEditId(null); setAdForm({ title: "", description: "", image_url: "", link_url: "", sort_order: 0, expire_at: "", target_pages: [] }); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
-              বাতিল
-            </button>
-          )}
-        </div>
-      </div>
-
-      <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> {adItems.length}টি বিজ্ঞাপন</span>
-      {loading ? <LoadingState /> : adItems.length === 0 ? <EmptyState /> : adItems.map((item: any) => (
-        <div key={item.id} className="bg-card border border-border/60 rounded-2xl p-4 flex gap-3 hover:shadow-md transition-all duration-200">
-          {item.image_url ? (
-            <div className="w-24 h-16 rounded-xl bg-muted overflow-hidden shrink-0">
-              <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" />
-            </div>
-          ) : (
-            <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <ImageIcon className="w-6 h-6 text-primary/40" />
-            </div>
-          )}
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-foreground text-sm line-clamp-1">{item.title}</h3>
-            {item.description && <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{item.description}</p>}
-            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-              <p className="text-[10px] text-muted-foreground">ক্রম: {item.sort_order}</p>
-              <span className="text-[10px] text-muted-foreground">• 👆 {item.click_count ?? 0} ক্লিক</span>
-              {item.expire_at && (
-                <span className={`text-[10px] ${new Date(item.expire_at) < new Date() ? "text-red-500 font-semibold" : "text-muted-foreground"}`}>
-                  • ⏰ {new Date(item.expire_at) < new Date() ? "মেয়াদ শেষ" : new Date(item.expire_at).toLocaleDateString("bn-BD")}
-                </span>
-              )}
-            </div>
-            {item.target_pages && item.target_pages.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-1">
-                {item.target_pages.map((p: string) => (
-                  <span key={p} className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium">{p}</span>
-                ))}
-              </div>
-            )}
-            <div className="flex gap-1.5 mt-2 flex-wrap">
-              <ActionBtn variant="info" onClick={() => { setAdEditId(item.id); setAdForm({ title: item.title, description: item.description || "", image_url: item.image_url || "", link_url: item.link_url || "", sort_order: item.sort_order, expire_at: item.expire_at ? new Date(item.expire_at).toISOString().slice(0, 16) : "", target_pages: item.target_pages || [] }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
-              <button onClick={() => toggleAdActive(item.id, item.is_active)}
-                className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-colors ${item.is_active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
-                {item.is_active ? "✅ সক্রিয়" : "⏸ নিষ্ক্রিয়"}
-              </button>
-              <ActionBtn variant="danger" onClick={() => deleteAd(item.id, item.title)} icon={<Trash2 className="w-3 h-3" />} label="মুছুন" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard": return renderDashboard();
@@ -1793,243 +845,39 @@ const AdminDashboard = () => {
       case "categories": return renderCategories();
       case "activity": return renderActivity();
       case "users": return renderUsers();
-      case "news": return renderNews();
-      case "slider": return renderSlider();
-      case "advertisements": return renderAdvertisements();
-      case "about": return renderAbout();
-      case "site_settings": return renderSiteSettings();
-      case "app_settings": return renderAppSettings();
-      case "notifications": return renderNotifications();
+      case "news": return <AdminNewsManager logActivity={logActivity} />;
+      case "slider": return <AdminSliderManager logActivity={logActivity} />;
+      case "advertisements": return <AdminAdsManager logActivity={logActivity} />;
+      case "about": case "timeline": return <AdminAboutManager logActivity={logActivity} />;
+      case "site_settings": return <SiteSettingsPanel />;
+      case "app_settings": return <AppSettingsPanel />;
+      case "notifications": return <AdminNotificationPanel />;
       case "analytics": return <VisitorAnalytics />;
       case "service_grid": return <ServiceGridManager />;
       default: return renderLegacy();
     }
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Homepage Navbar - Same as main site */}
-      <Navbar onMenuClick={() => setDrawerOpen(true)} />
-      <DrawerMenu open={drawerOpen} onClose={() => setDrawerOpen(false)} />
-
-      {/* Admin Sub-header */}
-      <div className="bg-card/60 backdrop-blur-md border-b border-border/40">
-        <div className="flex items-center justify-between px-4 py-2.5 max-w-6xl mx-auto">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm">
-              <Shield className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-sm font-bold text-foreground leading-tight">অ্যাডমিন ড্যাশবোর্ড</h1>
-              <p className="text-[10px] text-muted-foreground">রামগঞ্জ সেবা ম্যানেজমেন্ট</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <button onClick={() => setSidebarOpen(true)} className="lg:hidden w-9 h-9 rounded-xl bg-muted/60 hover:bg-muted flex items-center justify-center transition-colors">
-              <Menu className="w-4.5 h-4.5 text-foreground" />
-            </button>
-            {counts.pending > 0 && (
-              <button onClick={() => setActiveTab("pending")} className="relative w-9 h-9 rounded-xl bg-muted/60 hover:bg-muted flex items-center justify-center transition-colors">
-                <Bell className="w-4.5 h-4.5 text-foreground" />
-                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full flex items-center justify-center animate-pulse">{counts.pending}</span>
-              </button>
-            )}
-            <button onClick={handleLogout} className="w-9 h-9 rounded-xl bg-muted/60 hover:bg-destructive/10 hover:text-destructive flex items-center justify-center transition-colors" title="লগআউট">
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary/20" />
+          <div><div className="h-4 bg-muted rounded w-32 mb-2" /><div className="h-3 bg-muted rounded w-24" /></div>
         </div>
       </div>
+    );
+  }
 
-      <div className="flex max-w-6xl mx-auto">
-        {/* Desktop Sidebar */}
-        <aside className="hidden lg:flex flex-col w-[240px] shrink-0 sticky top-[calc(4rem+3.25rem)] h-[calc(100vh-4rem-3.25rem)] border-r border-border/40 bg-card/30">
-          <nav className="flex-1 overflow-y-auto p-3 space-y-4 pt-3">
-            {tabGroups.map(group => (
-              <div key={group.label}>
-                <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/60 font-bold px-3 mb-1.5">{group.label}</p>
-                <div className="space-y-0.5">
-                  {group.items.map(tab => {
-                    const Icon = tab.icon;
-                    const isActive = activeTab === tab.id;
-                    return (
-                      <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-200 ${
-                          isActive 
-                            ? "bg-primary text-primary-foreground shadow-sm" 
-                            : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-                        }`}>
-                        <Icon className="w-4 h-4 shrink-0" />
-                        <span className="truncate">{tab.label}</span>
-                        {tab.id === "pending" && counts.pending > 0 && (
-                          <span className={`ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ${isActive ? "bg-primary-foreground/20" : "bg-destructive text-destructive-foreground"}`}>{counts.pending}</span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </nav>
-          <div className="p-3 border-t border-border/40">
-            <div className="px-3 py-2">
-              <p className="text-[10px] text-muted-foreground/70 truncate">{currentUser?.email}</p>
-              <p className="text-[10px] text-emerald-500 font-medium flex items-center gap-1 mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> অনলাইন
-              </p>
-            </div>
-          </div>
-        </aside>
-
-        {/* Mobile Sidebar Overlay */}
-        {sidebarOpen && (
-          <div className="fixed inset-0 z-50 lg:hidden">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-            <aside className="absolute left-0 top-0 bottom-0 w-[280px] bg-card border-r border-border flex flex-col" style={{ animation: "slideInLeft 0.2s ease-out" }}>
-              <div className="flex items-center justify-between p-4 border-b border-border/60">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm">
-                    <Shield className="w-4 h-4 text-primary-foreground" />
-                  </div>
-                  <span className="text-sm font-bold text-foreground">এডমিন প্যানেল</span>
-                </div>
-                <button onClick={() => setSidebarOpen(false)} className="w-8 h-8 rounded-xl bg-muted/80 hover:bg-muted flex items-center justify-center transition-colors">
-                  <XIcon className="w-4 h-4 text-foreground" />
-                </button>
-              </div>
-              <nav className="flex-1 overflow-y-auto p-3 space-y-4">
-                {tabGroups.map(group => (
-                  <div key={group.label}>
-                    <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/60 font-bold px-3 mb-1.5">{group.label}</p>
-                    <div className="space-y-0.5">
-                      {group.items.map(tab => {
-                        const Icon = tab.icon;
-                        const isActive = activeTab === tab.id;
-                        return (
-                          <button key={tab.id} onClick={() => { setActiveTab(tab.id); setSidebarOpen(false); }}
-                            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 ${
-                              isActive 
-                                ? "bg-primary text-primary-foreground shadow-sm" 
-                                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-                            }`}>
-                            <Icon className="w-4 h-4 shrink-0" />
-                            <span>{tab.label}</span>
-                            {tab.id === "pending" && counts.pending > 0 && (
-                              <span className={`ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isActive ? "bg-primary-foreground/20" : "bg-destructive text-destructive-foreground"}`}>{counts.pending}</span>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </nav>
-              <div className="p-4 border-t border-border/60">
-                <p className="text-xs text-muted-foreground truncate px-1">{currentUser?.email}</p>
-                <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors mt-2">
-                  <LogOut className="w-4 h-4" /> লগআউট
-                </button>
-              </div>
-            </aside>
-          </div>
-        )}
-
-        {/* Main Content */}
-        <main className="flex-1 min-w-0">
-          {/* Mobile Tab Scroller */}
-          <div className="lg:hidden sticky top-[calc(4rem+3.25rem)] z-40 bg-background/90 backdrop-blur-xl border-b border-border/40">
-            <div className="px-3 py-2 overflow-x-auto">
-              <div className="flex gap-1.5 min-w-max">
-                {allTabs.map((tab) => {
-                  const Icon = tab.icon;
-                  return (
-                    <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all duration-200 ${
-                        activeTab === tab.id 
-                          ? "bg-primary text-primary-foreground shadow-sm" 
-                          : "bg-card text-muted-foreground border border-border/60 hover:bg-muted/50"
-                      }`}>
-                      <Icon className="w-3.5 h-3.5" />
-                      {tab.label}
-                      {tab.id === "pending" && counts.pending > 0 && (
-                        <span className={`text-[10px] font-bold px-1 rounded-full ${activeTab === tab.id ? "bg-primary-foreground/20" : "bg-destructive text-destructive-foreground"}`}>{counts.pending}</span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Page Header */}
-          {activeTab !== "dashboard" && activeTabData && (
-            <div className="px-5 pt-5 pb-1">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <activeTabData.icon className="w-4.5 h-4.5 text-primary" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold text-foreground leading-tight">{activeTabData.label}</h2>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="p-4 sm:p-5">
-            {renderContent()}
-          </div>
-        </main>
-      </div>
-    </div>
-  );
-};
-
-// ===================== UTILITY COMPONENTS =====================
-
-const LoadingState = () => (
-  <div className="flex flex-col items-center justify-center py-16">
-    <div className="w-10 h-10 border-[3px] border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
-    <p className="text-sm text-muted-foreground font-medium">লোড হচ্ছে...</p>
-  </div>
-);
-
-const EmptyState = () => (
-  <div className="flex flex-col items-center justify-center py-16">
-    <div className="w-14 h-14 rounded-2xl bg-muted/60 flex items-center justify-center mb-4">
-      <FileText className="w-7 h-7 text-muted-foreground/40" />
-    </div>
-    <p className="text-sm text-muted-foreground font-medium">কোন ডাটা নেই</p>
-    <p className="text-xs text-muted-foreground/60 mt-1">নতুন কন্টেন্ট যোগ করুন</p>
-  </div>
-);
-
-const StatusBadge = ({ status }: { status: string }) => {
-  const config: Record<string, { bg: string; icon: string }> = {
-    approved: { bg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20", icon: "✅" },
-    rejected: { bg: "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20", icon: "❌" },
-    pending: { bg: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20", icon: "🕐" },
-  };
-  const c = config[status] || config.pending;
   return (
-    <span className={`text-[10px] px-2.5 py-1 rounded-full font-semibold shrink-0 ${c.bg}`}>
-      {c.icon} {status === "approved" ? "অনুমোদিত" : status === "rejected" ? "প্রত্যাখ্যাত" : "অপেক্ষমান"}
-    </span>
-  );
-};
-
-type ActionVariant = "success" | "danger" | "warning" | "info";
-
-const ActionBtn = ({ variant, onClick, icon, label }: { variant: ActionVariant; onClick: () => void; icon: React.ReactNode; label: string }) => {
-  const variantMap: Record<ActionVariant, string> = {
-    success: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20",
-    danger: "bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 border border-red-500/20",
-    warning: "bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 border border-amber-500/20",
-    info: "bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 border border-blue-500/20",
-  };
-  return (
-    <button onClick={onClick} className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all duration-200 ${variantMap[variant]}`}>
-      {icon}{label}
-    </button>
+    <AdminLayout
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      currentUser={currentUser}
+      pendingCount={counts.pending}
+    >
+      {renderContent()}
+    </AdminLayout>
   );
 };
 
