@@ -525,6 +525,32 @@ interface Category {
   view_count?: number;
 }
 
+/* Shared SVG filter definitions for 3D icon effects */
+const IconFilterDefs = () => (
+  <svg width="0" height="0" style={{ position: "absolute" }}>
+    <defs>
+      {/* Drop shadow + inner glow combined */}
+      <filter id="icon-3d" x="-20%" y="-20%" width="140%" height="140%">
+        {/* Outer drop shadow for depth */}
+        <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="rgba(0,0,0,0.18)" />
+        {/* Inner highlight (top-left bevel) */}
+        <feComponentTransfer>
+          <feFuncA type="linear" slope="1" />
+        </feComponentTransfer>
+      </filter>
+      {/* Bevel/emboss effect */}
+      <filter id="icon-bevel" x="-10%" y="-10%" width="120%" height="120%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="1.5" result="blur" />
+        <feSpecularLighting in="blur" surfaceScale="4" specularConstant="0.8" specularExponent="20" result="spec">
+          <fePointLight x="10" y="8" z="25" />
+        </feSpecularLighting>
+        <feComposite in="spec" in2="SourceAlpha" operator="in" result="specOut" />
+        <feComposite in="SourceGraphic" in2="specOut" operator="arithmetic" k1="0" k2="1" k3="0.6" k4="0" />
+      </filter>
+    </defs>
+  </svg>
+);
+
 const newsItem = { id: "news-static", name: "খবর ও সংবাদ", slug: "news", icon: "Newspaper", sort_order: -1, description: "সকল খবর ও সংবাদ", view_count: 0 };
 
 interface Ad {
@@ -610,6 +636,7 @@ const ServiceGrid = () => {
 
   return (
     <section className="px-4">
+      <IconFilterDefs />
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-foreground">সেবাসমূহ</h2>
         <div className="flex items-center gap-1 bg-muted rounded-full p-0.5">
@@ -666,10 +693,19 @@ const ServiceGrid = () => {
                 style={{ border: `0.8px solid ${bColor}` }}
               >
                 <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm"
-                  style={{ background: iconData.bg }}
+                  className="w-12 h-12 rounded-xl flex items-center justify-center relative overflow-hidden"
+                  style={{
+                    background: iconData.bg,
+                    boxShadow: `0 4px 12px -2px ${bColor}55, inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.08)`,
+                  }}
                 >
-                  {iconData.svg}
+                  {/* Top-left bevel highlight */}
+                  <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
+                    background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 50%, rgba(0,0,0,0.06) 100%)",
+                  }} />
+                  <div className="relative" style={{ filter: "url(#icon-3d)" }}>
+                    {iconData.svg}
+                  </div>
                 </div>
                 <span className="text-[11px] font-semibold text-foreground text-center leading-tight line-clamp-2">
                   {cat.name}
@@ -694,10 +730,18 @@ const ServiceGrid = () => {
                   style={{ border: `0.8px solid ${bColor}` }}
                 >
                   <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
-                    style={{ background: iconData.bg }}
+                    className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden"
+                    style={{
+                      background: iconData.bg,
+                      boxShadow: `0 4px 12px -2px ${bColor}55, inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.08)`,
+                    }}
                   >
-                    {iconData.svg}
+                    <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
+                      background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 50%, rgba(0,0,0,0.06) 100%)",
+                    }} />
+                    <div className="relative" style={{ filter: "url(#icon-3d)" }}>
+                      {iconData.svg}
+                    </div>
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-bold text-foreground leading-tight">{cat.name}</h3>
