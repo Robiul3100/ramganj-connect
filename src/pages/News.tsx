@@ -115,9 +115,6 @@ const News = () => {
                 className="rounded-2xl overflow-hidden bg-card border transition-all duration-200 hover:shadow-lg hover:scale-[1.01] active:scale-[0.98] group"
                 style={{ borderColor: newsColors.accent + "30" }}
               >
-                {/* Accent top bar */}
-                <div className="h-1 w-full" style={{ background: newsColors.gradient }} />
-
                 {/* Thumbnail */}
                 <div className="w-full aspect-video bg-muted overflow-hidden relative">
                   {item.thumbnail_url ? (
@@ -163,6 +160,8 @@ const News = () => {
                     <span>{new Date(item.published_at).toLocaleDateString("bn-BD", { weekday: "long" })}</span>
                   </div>
                 </div>
+                {/* Accent bottom bar */}
+                <div className="h-1 w-full" style={{ background: newsColors.gradient }} />
               </Link>
             ))}
           </div>
