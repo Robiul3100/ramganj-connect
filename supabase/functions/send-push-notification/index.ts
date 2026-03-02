@@ -8,7 +8,6 @@ const corsHeaders = {
 
 /**
  * Create a JWT from a Google Service Account for FCM HTTP v1 API.
- * Uses the Web Crypto API available in Deno.
  */
 async function getAccessToken(clientEmail: string, privateKeyPem: string): Promise<string> {
   const now = Math.floor(Date.now() / 1000);
@@ -32,7 +31,6 @@ async function getAccessToken(clientEmail: string, privateKeyPem: string): Promi
   const payloadB64 = encode(payload);
   const signingInput = `${headerB64}.${payloadB64}`;
 
-  // Import the PEM private key
   const pemBody = privateKeyPem
     .replace(/-----BEGIN PRIVATE KEY-----/g, "")
     .replace(/-----END PRIVATE KEY-----/g, "")
@@ -61,7 +59,6 @@ async function getAccessToken(clientEmail: string, privateKeyPem: string): Promi
 
   const jwt = `${signingInput}.${sigB64}`;
 
-  // Exchange JWT for access token
   const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -81,7 +78,10 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Auth check - only admins
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    // Auth check - verify user is admin
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -90,28 +90,30 @@ Deno.serve(async (req) => {
       });
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    // User client to verify identity
+    const userClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
       global: { headers: { Authorization: authHeader } },
     });
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
+    const { data: { user }, error: userError } = await userClient.auth.getUser(token);
+
+    if (userError || !user) {
+      console.error("Auth error:", userError?.message);
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const userId = claimsData.claims.sub;
+    // Service role client for DB operations (bypasses RLS)
+    const adminClient = createClient(supabaseUrl, serviceRoleKey);
 
     // Check admin role
-    const { data: roleData } = await supabase
+    const { data: roleData } = await adminClient
       .from("user_roles")
       .select("role")
-      .eq("user_id", userId)
+      .eq("user_id", user.id)
       .eq("role", "admin")
       .maybeSingle();
 
@@ -122,22 +124,19 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Get service account credentials from secrets
+    // Get service account credentials
     const firebaseClientEmail = Deno.env.get("FIREBASE_CLIENT_EMAIL");
     const firebasePrivateKey = Deno.env.get("FIREBASE_PRIVATE_KEY");
     const firebaseProjectId = Deno.env.get("FIREBASE_PROJECT_ID");
 
     if (!firebaseClientEmail || !firebasePrivateKey || !firebaseProjectId) {
       return new Response(
-        JSON.stringify({ error: "Firebase service account not configured. Add FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY, and FIREBASE_PROJECT_ID secrets." }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        JSON.stringify({ error: "Firebase service account not configured" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Get OAuth2 access token using service account
+    // Get OAuth2 access token
     const accessToken = await getAccessToken(
       firebaseClientEmail,
       firebasePrivateKey.replace(/\\n/g, "\n")
@@ -154,19 +153,25 @@ Deno.serve(async (req) => {
       target_value,
     } = body;
 
-    // Get FCM tokens
-    const { data: subscriptions } = await supabase
+    console.log("Sending notification:", { title, target_type, notification_id });
+
+    // Get FCM tokens using admin client
+    const { data: subscriptions, error: subError } = await adminClient
       .from("push_subscriptions")
       .select("fcm_token")
       .eq("is_active", true);
+
+    if (subError) {
+      console.error("Error fetching subscriptions:", subError.message);
+    }
 
     const tokens = (subscriptions || []).map((s: any) => s.fcm_token);
 
     if (tokens.length === 0) {
       if (notification_id) {
-        await supabase
+        await adminClient
           .from("admin_notifications")
-          .update({ status: "sent", sent_count: 0 })
+          .update({ status: "sent", sent_count: 0, is_draft: false })
           .eq("id", notification_id);
       }
       return new Response(
@@ -175,13 +180,12 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Send via FCM HTTP v1 API (one request per token)
+    // Send via FCM HTTP v1 API
     const fcmUrl = `https://fcm.googleapis.com/v1/projects/${firebaseProjectId}/messages:send`;
     let sentCount = 0;
     let failedCount = 0;
     const invalidTokens: string[] = [];
 
-    // Process in parallel batches of 50
     const batchSize = 50;
     for (let i = 0; i < tokens.length; i += batchSize) {
       const batch = tokens.slice(i, i + batchSize);
@@ -191,14 +195,9 @@ Deno.serve(async (req) => {
           const message: any = {
             message: {
               token: fcmToken,
-              notification: {
-                title,
-                body: notifBody || "",
-              },
+              notification: { title, body: notifBody || "" },
               webpush: {
-                fcm_options: {
-                  link: redirect_url || "/",
-                },
+                fcm_options: { link: redirect_url || "/" },
                 notification: {
                   icon: "/favicon.ico",
                   badge: "/favicon.ico",
@@ -223,12 +222,10 @@ Deno.serve(async (req) => {
 
           if (!res.ok) {
             const errBody = await res.json();
+            console.error("FCM error for token:", fcmToken.substring(0, 20) + "...", errBody);
             const errorCode = errBody?.error?.details?.[0]?.errorCode ||
               errBody?.error?.status || "";
-            if (
-              errorCode === "UNREGISTERED" ||
-              errorCode === "INVALID_ARGUMENT"
-            ) {
+            if (errorCode === "UNREGISTERED" || errorCode === "INVALID_ARGUMENT") {
               invalidTokens.push(fcmToken);
             }
             throw new Error(JSON.stringify(errBody));
@@ -245,7 +242,7 @@ Deno.serve(async (req) => {
 
     // Deactivate invalid tokens
     if (invalidTokens.length > 0) {
-      await supabase
+      await adminClient
         .from("push_subscriptions")
         .update({ is_active: false })
         .in("fcm_token", invalidTokens);
@@ -253,15 +250,18 @@ Deno.serve(async (req) => {
 
     // Update notification record
     if (notification_id) {
-      await supabase
+      await adminClient
         .from("admin_notifications")
         .update({
           status: failedCount > 0 && sentCount === 0 ? "failed" : "sent",
           sent_count: sentCount,
           failed_count: failedCount,
+          is_draft: false,
         })
         .eq("id", notification_id);
     }
+
+    console.log(`Notification sent: ${sentCount} success, ${failedCount} failed`);
 
     return new Response(
       JSON.stringify({ success: true, sent: sentCount, failed: failedCount }),
