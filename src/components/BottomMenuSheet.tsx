@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 interface BottomMenuSheetProps {
   open: boolean;
@@ -44,6 +45,7 @@ const BottomMenuSheet = ({ open, onOpenChange }: BottomMenuSheetProps) => {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const { prefs, setPref, requestNotificationPermission } = useUserPreferences();
+  const { subscribe, unsubscribe } = usePushNotifications();
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
@@ -284,6 +286,9 @@ const BottomMenuSheet = ({ open, onOpenChange }: BottomMenuSheetProps) => {
                   if (v) {
                     const granted = await requestNotificationPermission();
                     if (!granted) return;
+                    subscribe();
+                  } else {
+                    unsubscribe();
                   }
                   setPref("notificationsEnabled", v);
                 }}
