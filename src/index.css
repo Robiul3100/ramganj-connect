@@ -1,5 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
 
+/* font-display: swap for preloaded fonts */
+@font-face {
+  font-family: 'SolaimanLipi';
+  src: url('https://banglawebfonts.pages.dev/fonts/solaiman-lipi/solaiman-lipi-regular.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Bensen Handwriting';
+  src: url('https://banglawebfonts.pages.dev/fonts/bensen-handwriting/bensen-handwriting-regular.woff2') format('woff2');
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -100,7 +112,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Bensen Handwriting', 'Hind Siliguri', sans-serif;
+    font-family: 'SolaimanLipi', 'Bensen Handwriting', 'Hind Siliguri', sans-serif;
   }
 }
 
