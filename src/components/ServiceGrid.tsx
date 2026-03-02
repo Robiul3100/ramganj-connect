@@ -523,6 +523,8 @@ interface Category {
   is_active: boolean;
   description?: string | null;
   view_count?: number;
+  svg_icon?: string | null;
+  accent_color?: string | null;
 }
 
 /* Shared SVG filter definitions for 3D icon effects */
@@ -684,7 +686,8 @@ const ServiceGrid = () => {
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
           {allItems.map((cat) => {
             const iconData = SvgIcons[cat.icon] || SvgIcons["Tag"];
-            const bColor = borderColorMap[cat.icon] || "hsl(210,60%,72%)";
+            const bColor = cat.accent_color || borderColorMap[cat.icon] || "hsl(210,60%,72%)";
+            const hasDynamicSvg = !!cat.svg_icon;
             return (
               <button
                 key={cat.id}
@@ -698,15 +701,26 @@ const ServiceGrid = () => {
                     boxShadow: `0 4px 12px -2px ${bColor}33, inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.05)`,
                   }}
                 >
-                  {/* Background at 30% opacity */}
-                  <div className="absolute inset-0 rounded-xl" style={{ background: iconData.bg, opacity: 0.3 }} />
-                  {/* Bevel highlight */}
-                  <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 50%, rgba(0,0,0,0.04) 100%)",
-                  }} />
-                  <div className="relative" style={{ filter: "url(#icon-3d)", transform: "scale(1.15)" }}>
-                    {iconData.svg}
-                  </div>
+                  {hasDynamicSvg ? (
+                    <>
+                      <div className="absolute inset-0 rounded-xl" style={{ background: `linear-gradient(135deg, ${bColor}22, ${bColor}11)`, opacity: 0.3 }} />
+                      <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
+                        background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 50%, rgba(0,0,0,0.04) 100%)",
+                      }} />
+                      <div className="relative w-7 h-7" style={{ filter: "url(#icon-3d)", transform: "scale(1.15)" }}
+                        dangerouslySetInnerHTML={{ __html: cat.svg_icon! }} />
+                    </>
+                  ) : (
+                    <>
+                      <div className="absolute inset-0 rounded-xl" style={{ background: iconData.bg, opacity: 0.3 }} />
+                      <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
+                        background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 50%, rgba(0,0,0,0.04) 100%)",
+                      }} />
+                      <div className="relative" style={{ filter: "url(#icon-3d)", transform: "scale(1.15)" }}>
+                        {iconData.svg}
+                      </div>
+                    </>
+                  )}
                 </div>
                 <span className="text-[11px] font-semibold text-foreground text-center leading-tight line-clamp-2">
                   {cat.name}
@@ -722,7 +736,8 @@ const ServiceGrid = () => {
         <div className="flex flex-col gap-2.5">
           {allItems.map((cat, index) => {
             const iconData = SvgIcons[cat.icon] || SvgIcons["Tag"];
-            const bColor = borderColorMap[cat.icon] || "hsl(210,60%,72%)";
+            const bColor = cat.accent_color || borderColorMap[cat.icon] || "hsl(210,60%,72%)";
+            const hasDynamicSvg = !!cat.svg_icon;
             return (
               <div key={cat.id}>
                 <button
@@ -736,13 +751,26 @@ const ServiceGrid = () => {
                       boxShadow: `0 4px 12px -2px ${bColor}33, inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.05)`,
                     }}
                   >
-                    <div className="absolute inset-0 rounded-xl" style={{ background: iconData.bg, opacity: 0.3 }} />
-                    <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
-                      background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 50%, rgba(0,0,0,0.04) 100%)",
-                    }} />
-                    <div className="relative" style={{ filter: "url(#icon-3d)", transform: "scale(1.15)" }}>
-                      {iconData.svg}
-                    </div>
+                    {hasDynamicSvg ? (
+                      <>
+                        <div className="absolute inset-0 rounded-xl" style={{ background: `linear-gradient(135deg, ${bColor}22, ${bColor}11)`, opacity: 0.3 }} />
+                        <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
+                          background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 50%, rgba(0,0,0,0.04) 100%)",
+                        }} />
+                        <div className="relative w-7 h-7" style={{ filter: "url(#icon-3d)", transform: "scale(1.15)" }}
+                          dangerouslySetInnerHTML={{ __html: cat.svg_icon! }} />
+                      </>
+                    ) : (
+                      <>
+                        <div className="absolute inset-0 rounded-xl" style={{ background: iconData.bg, opacity: 0.3 }} />
+                        <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
+                          background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 50%, rgba(0,0,0,0.04) 100%)",
+                        }} />
+                        <div className="relative" style={{ filter: "url(#icon-3d)", transform: "scale(1.15)" }}>
+                          {iconData.svg}
+                        </div>
+                      </>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-bold text-foreground leading-tight">{cat.name}</h3>
