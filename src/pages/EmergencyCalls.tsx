@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Phone, Search } from "lucide-react";
+import { Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
+import PageAdBanner from "@/components/PageAdBanner";
 
 interface EmergencyCall {
   id: string;
@@ -23,7 +24,6 @@ const EmergencyCallSkeleton = () => (
 
 const EmergencyCalls = () => {
   const [calls, setCalls] = useState<EmergencyCall[]>([]);
-  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,25 +45,15 @@ const EmergencyCalls = () => {
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  const filtered = calls.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search)
-  );
+  const filtered = calls;
 
   return (
     <div className="min-h-screen bg-background max-w-4xl mx-auto">
       <PageHeader title="জরুরি কল" color="linear-gradient(135deg, hsl(0,70%,50%), hsl(0,80%,60%))" />
       
       <div className="px-4 -mt-2 space-y-4">
-        <div className="relative">
-          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="সেবার নাম বা নম্বর খুঁজুন..."
-            className="search-input pl-12"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+        {/* Ad Banner */}
+        <PageAdBanner pageSlug="emergency" />
 
         <div className="space-y-3 pb-6">
           {loading ? (

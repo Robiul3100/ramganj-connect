@@ -203,7 +203,7 @@ const AdminDashboard = () => {
   const [sliderEditId, setSliderEditId] = useState<string | null>(null);
   const [sliderUploading, setSliderUploading] = useState(false);
   const [adItems, setAdItems] = useState<any[]>([]);
-  const [adForm, setAdForm] = useState({ title: "", description: "", image_url: "", link_url: "", sort_order: 0, expire_at: "" });
+  const [adForm, setAdForm] = useState({ title: "", description: "", image_url: "", link_url: "", sort_order: 0, expire_at: "", target_pages: [] as string[] });
   const [adEditId, setAdEditId] = useState<string | null>(null);
   const [adUploading, setAdUploading] = useState(false);
   const [showAddService, setShowAddService] = useState(false);
@@ -1633,15 +1633,15 @@ const AdminDashboard = () => {
     if (!adForm.title.trim()) { toast({ title: "শিরোনাম দিন", variant: "destructive" }); return; }
     const expireVal = adForm.expire_at ? new Date(adForm.expire_at).toISOString() : null;
     if (adEditId) {
-      await (supabase.from as any)("advertisements").update({ title: adForm.title, description: adForm.description || null, image_url: adForm.image_url || null, link_url: adForm.link_url || null, sort_order: adForm.sort_order, expire_at: expireVal }).eq("id", adEditId);
+      await (supabase.from as any)("advertisements").update({ title: adForm.title, description: adForm.description || null, image_url: adForm.image_url || null, link_url: adForm.link_url || null, sort_order: adForm.sort_order, expire_at: expireVal, target_pages: adForm.target_pages }).eq("id", adEditId);
       await logActivity("edited", "advertisements", adEditId, adForm.title);
       toast({ title: "বিজ্ঞাপন আপডেট হয়েছে ✅" });
     } else {
-      await (supabase.from as any)("advertisements").insert({ title: adForm.title, description: adForm.description || null, image_url: adForm.image_url || null, link_url: adForm.link_url || null, sort_order: adForm.sort_order, expire_at: expireVal });
+      await (supabase.from as any)("advertisements").insert({ title: adForm.title, description: adForm.description || null, image_url: adForm.image_url || null, link_url: adForm.link_url || null, sort_order: adForm.sort_order, expire_at: expireVal, target_pages: adForm.target_pages });
       await logActivity("created", "advertisements", undefined, adForm.title);
       toast({ title: "বিজ্ঞাপন যোগ হয়েছে ✅" });
     }
-    setAdForm({ title: "", description: "", image_url: "", link_url: "", sort_order: 0, expire_at: "" });
+    setAdForm({ title: "", description: "", image_url: "", link_url: "", sort_order: 0, expire_at: "", target_pages: [] });
     setAdEditId(null);
     const { data } = await (supabase.from as any)("advertisements").select("*").order("sort_order");
     setAdItems(data || []);
@@ -1694,12 +1694,47 @@ const AdminDashboard = () => {
             {adForm.image_url && <img src={adForm.image_url} alt="preview" className="w-20 h-14 rounded-xl object-cover border border-border" />}
           </div>
         </div>
+        {/* Target Pages */}
+        <div>
+          <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">কোন পেজে দেখাবে (খালি রাখলে সব পেজে দেখাবে)</label>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { value: "news", label: "খবর ও সংবাদ" },
+              { value: "news-detail", label: "সংবাদ বিস্তারিত" },
+              { value: "blood-bank", label: "ব্লাড ব্যাংক" },
+              { value: "emergency", label: "জরুরি কল" },
+              { value: "offices", label: "অফিস" },
+              { value: "donation", label: "অনুদান" },
+              { value: "tuition", label: "টিউশন মিডিয়া" },
+              { value: "doctors", label: "ডাক্তার" },
+              { value: "education", label: "শিক্ষা প্রতিষ্ঠান" },
+              { value: "shops", label: "দোকান" },
+              { value: "jobs", label: "চাকরি" },
+              { value: "marketplace", label: "মার্কেটপ্লেস" },
+              { value: "services", label: "সেবা গ্রিড" },
+            ].map((page) => (
+              <button
+                key={page.value}
+                type="button"
+                onClick={() => {
+                  const pages = adForm.target_pages.includes(page.value)
+                    ? adForm.target_pages.filter((p) => p !== page.value)
+                    : [...adForm.target_pages, page.value];
+                  setAdForm({ ...adForm, target_pages: pages });
+                }}
+                className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-colors ${adForm.target_pages.includes(page.value) ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+              >
+                {page.label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="flex gap-2">
           <button onClick={saveAd} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-sm">
             <Save className="w-4 h-4" /> {adEditId ? "আপডেট" : "যোগ করুন"}
           </button>
           {adEditId && (
-            <button onClick={() => { setAdEditId(null); setAdForm({ title: "", description: "", image_url: "", link_url: "", sort_order: 0, expire_at: "" }); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
+            <button onClick={() => { setAdEditId(null); setAdForm({ title: "", description: "", image_url: "", link_url: "", sort_order: 0, expire_at: "", target_pages: [] }); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
               বাতিল
             </button>
           )}
@@ -1730,8 +1765,15 @@ const AdminDashboard = () => {
                 </span>
               )}
             </div>
+            {item.target_pages && item.target_pages.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-1">
+                {item.target_pages.map((p: string) => (
+                  <span key={p} className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium">{p}</span>
+                ))}
+              </div>
+            )}
             <div className="flex gap-1.5 mt-2 flex-wrap">
-              <ActionBtn variant="info" onClick={() => { setAdEditId(item.id); setAdForm({ title: item.title, description: item.description || "", image_url: item.image_url || "", link_url: item.link_url || "", sort_order: item.sort_order, expire_at: item.expire_at ? new Date(item.expire_at).toISOString().slice(0, 16) : "" }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
+              <ActionBtn variant="info" onClick={() => { setAdEditId(item.id); setAdForm({ title: item.title, description: item.description || "", image_url: item.image_url || "", link_url: item.link_url || "", sort_order: item.sort_order, expire_at: item.expire_at ? new Date(item.expire_at).toISOString().slice(0, 16) : "", target_pages: item.target_pages || [] }); }} icon={<Edit3 className="w-3 h-3" />} label="এডিট" />
               <button onClick={() => toggleAdActive(item.id, item.is_active)}
                 className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-colors ${item.is_active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
                 {item.is_active ? "✅ সক্রিয়" : "⏸ নিষ্ক্রিয়"}

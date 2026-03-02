@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Phone, Search, MapPin, Calendar, CheckCircle, Clock } from "lucide-react";
+import { Phone, MapPin, Calendar, CheckCircle, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
+import PageAdBanner from "@/components/PageAdBanner";
 import SubmitFormDialog from "@/components/SubmitFormDialog";
 
 interface BloodDonor {
@@ -28,7 +29,6 @@ const DonorSkeleton = () => (
 
 const BloodBank = () => {
   const [donors, setDonors] = useState<BloodDonor[]>([]);
-  const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -44,11 +44,7 @@ const BloodBank = () => {
     return () => { supabase.removeChannel(ch); };
   }, []);
 
-  const filtered = donors.filter(d =>
-    d.name.toLowerCase().includes(search.toLowerCase()) ||
-    d.blood_group.toLowerCase().includes(search.toLowerCase()) ||
-    (d.address || "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = donors;
 
   const getDaysUntilAvailable = (lastDate: string | null) => {
     if (!lastDate) return null;
@@ -73,10 +69,8 @@ const BloodBank = () => {
       <PageHeader title="ব্লাড ব্যাংক ও ডোনার" color="linear-gradient(135deg, hsl(0,70%,50%), hsl(0,80%,60%))" onAdd={() => setShowForm(true)} />
       
       <div className="px-4 -mt-2 space-y-3">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <input type="text" placeholder="রক্তের গ্রুপ বা এলাকা খুঁজুন..." className="search-input pl-12" value={search} onChange={(e) => setSearch(e.target.value)} />
-        </div>
+        {/* Ad Banner */}
+        <PageAdBanner pageSlug="blood-bank" />
 
         <div className="space-y-3 pb-6">
           {loading ? (

@@ -3,6 +3,7 @@ import { ArrowLeft, Heart, Copy, Send, Shield, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import PageAdBanner from "@/components/PageAdBanner";
 
 interface DonationMethod {
   id: string;
@@ -95,6 +96,9 @@ const Donation = () => {
       </div>
 
       <div className="px-4 space-y-5 pb-8">
+        {/* Ad Banner */}
+        <PageAdBanner pageSlug="donation" />
+
         {/* Info card */}
         <div className="glass-card p-6 text-center">
           <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-3">

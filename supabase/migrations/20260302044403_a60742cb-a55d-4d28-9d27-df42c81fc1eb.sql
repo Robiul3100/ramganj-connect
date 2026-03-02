@@ -1,0 +1,1 @@
+ALTER TABLE public.advertisements ADD COLUMN target_pages text[] NOT NULL DEFAULT '{}'::text[];

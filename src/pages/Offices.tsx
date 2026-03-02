@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Building2, Phone, MapPin, Clock, Search } from "lucide-react";
+import { Building2, Phone, MapPin, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
+import PageAdBanner from "@/components/PageAdBanner";
 import BottomNav from "@/components/BottomNav";
 
 interface Office {
@@ -45,7 +46,6 @@ const OfficeSkeleton = () => (
 
 const Offices = () => {
   const [offices, setOffices] = useState<Office[]>([]);
-  const [search, setSearch] = useState("");
   const [selectedCat, setSelectedCat] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -71,10 +71,8 @@ const Offices = () => {
   const categories = [...new Set(offices.map((o) => o.category))];
 
   const filtered = offices.filter((o) => {
-    const matchSearch = o.name.toLowerCase().includes(search.toLowerCase()) ||
-      (o.phone || "").includes(search);
     const matchCat = !selectedCat || o.category === selectedCat;
-    return matchSearch && matchCat;
+    return matchCat;
   });
 
   return (
@@ -82,10 +80,8 @@ const Offices = () => {
       <PageHeader title="অফিস ডিরেক্টরি" color="linear-gradient(135deg, hsl(160,70%,45%), hsl(180,80%,40%))" />
 
       <div className="px-4 -mt-2 space-y-4">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <input type="text" placeholder="অফিসের নাম বা নম্বর খুঁজুন..." className="search-input pl-12" value={search} onChange={(e) => setSearch(e.target.value)} />
-        </div>
+        {/* Ad Banner */}
+        <PageAdBanner pageSlug="offices" />
 
         {!loading && (
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">

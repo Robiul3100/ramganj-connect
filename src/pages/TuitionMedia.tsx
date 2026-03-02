@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Search, Phone, MapPin, Share2, MessageCircle, Star, BookOpen, GraduationCap, Calendar, DollarSign, User } from "lucide-react";
+import { Phone, MapPin, Share2, MessageCircle, Star, BookOpen, GraduationCap, Calendar, DollarSign, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
 import SubmitFormDialog from "@/components/SubmitFormDialog";
+import PageAdBanner from "@/components/PageAdBanner";
 import BottomNav from "@/components/BottomNav";
 
 interface Service {
@@ -28,7 +29,7 @@ const colors = {
 const TuitionMedia = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
+  
   const [filter, setFilter] = useState<"all" | "teach" | "need">("all");
   const [showTeachForm, setShowTeachForm] = useState(false);
   const [showNeedForm, setShowNeedForm] = useState(false);
@@ -60,12 +61,7 @@ const TuitionMedia = () => {
     const m = s.metadata || {};
     if (filter === "teach" && m.tuition_type !== "teach") return false;
     if (filter === "need" && m.tuition_type !== "need") return false;
-    return (
-      s.title.toLowerCase().includes(search.toLowerCase()) ||
-      (s.description || "").toLowerCase().includes(search.toLowerCase()) ||
-      (s.address || "").toLowerCase().includes(search.toLowerCase()) ||
-      (m.subject || "").toLowerCase().includes(search.toLowerCase())
-    );
+    return true;
   });
 
   const handleShare = (s: Service) => {
@@ -142,11 +138,8 @@ const TuitionMedia = () => {
           </button>
         </div>
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <input type="text" placeholder="নাম, সাবজেক্ট, ঠিকানা দিয়ে খুঁজুন..." className="search-input pl-12" value={search} onChange={(e) => setSearch(e.target.value)} />
-        </div>
+        {/* Ad Banner */}
+        <PageAdBanner pageSlug="tuition" />
 
         {/* Filter tabs */}
         <div className="flex gap-2">
