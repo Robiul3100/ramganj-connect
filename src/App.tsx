@@ -9,6 +9,8 @@ import { UserPreferencesProvider } from "@/hooks/useUserPreferences";
 import SplashScreen from "@/components/SplashScreen";
 import NotificationListener from "@/components/NotificationListener";
 import MaintenanceGuard from "@/components/MaintenanceGuard";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import useNetworkStatus from "@/hooks/useNetworkStatus";
 import PageTracker from "@/components/PageTracker";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -32,6 +34,7 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const [splashDone, setSplashDone] = useState(false);
+  useNetworkStatus();
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="ramganj-theme">
@@ -43,6 +46,7 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <NotificationListener />
+            <PWAInstallPrompt />
             <MaintenanceGuard>
               <PageTracker />
               <Routes>
