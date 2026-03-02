@@ -335,9 +335,6 @@ const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: stri
             <MessageCircle className="w-4 h-4" /> হোয়াটসঅ্যাপ
           </a>
         )}
-        <button onClick={onShare} className="w-10 h-10 rounded-xl bg-muted/60 flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors shrink-0">
-          <Share2 className="w-4 h-4" />
-        </button>
       </div>
     </div>
   );
