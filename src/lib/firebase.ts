@@ -16,15 +16,16 @@
 // REPLACE THESE VALUES WITH YOUR FIREBASE PROJECT CONFIG
 // ============================================================
 export const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: "",
+  apiKey: "AIzaSyD7u0j2ZAw8scYtQrIwIcACqDuzLdObtx4",
+  authDomain: "ramganj-city.firebaseapp.com",
+  projectId: "ramganj-city",
+  storageBucket: "ramganj-city.firebasestorage.app",
+  messagingSenderId: "59033055734",
+  appId: "1:59033055734:web:1c927f31afd7409cc857d7",
 };
 
 // Your VAPID key from Firebase Console > Project Settings > Cloud Messaging > Web Push certificates
+// You need to generate this from Firebase Console > Project Settings > Cloud Messaging > Web Push certificates
 export const VAPID_KEY = "";
 
 /**
