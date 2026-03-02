@@ -2,36 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/components/ThemeProvider";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { Drawer } from "vaul";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import {
-  User,
-  Moon,
-  Sun,
-  Monitor,
-  Shield,
-  Phone,
-  Heart,
-  Info,
-  Newspaper,
-  Building2,
-  MessageSquare,
-  LogOut,
-  ChevronRight,
-  Palette,
-  Type,
-  LayoutGrid,
-  Bell,
-  BellOff,
-  Star,
-  Rows3,
-  Columns3,
-  Sparkles,
-  Download,
+  User, Moon, Sun, Monitor, Shield, Phone, Heart, Info,
+  Newspaper, Building2, MessageSquare, LogOut, ChevronRight,
+  Palette, Type, LayoutGrid, Bell, BellOff, Star, Rows3,
+  Columns3, Sparkles, Download,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
@@ -115,228 +91,222 @@ const BottomMenuSheet = ({ open, onOpenChange }: BottomMenuSheetProps) => {
   );
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto px-0 pb-8">
-        <SheetHeader className="px-5 pb-3">
-          <SheetTitle className="text-base font-bold text-foreground">মেন্যু ও সেটিংস</SheetTitle>
-        </SheetHeader>
-
-        {/* User card */}
-        <div className="mx-4 mb-4 rounded-2xl bg-muted/50 dark:bg-muted/30 p-4 flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <User className="w-6 h-6 text-primary" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-bold text-sm text-foreground truncate">
-              {user?.email || "অতিথি ব্যবহারকারী"}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {user ? "লগইন হয়েছে" : "লগইন করুন"}
-            </p>
-          </div>
-        </div>
-
-        {/* Theme picker */}
-        <div className="mx-4 mb-4">
-          <SectionLabel icon={Palette} label="থিম" />
-          <div className="grid grid-cols-3 gap-2">
-            {themeOptions.map((t) => {
-              const active = theme === t.value;
-              return (
-                <button
-                  key={t.value}
-                  onClick={() => { vibrate(); setTheme(t.value); }}
-                  className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border transition-all text-xs font-semibold ${
-                    active
-                      ? "border-primary bg-primary/10 text-primary dark:bg-primary/15"
-                      : "border-border/50 bg-card/60 text-muted-foreground hover:bg-muted/50"
-                  }`}
-                >
-                  <t.icon className="w-5 h-5" />
-                  {t.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Font size */}
-        <div className="mx-4 mb-4">
-          <SectionLabel icon={Type} label="ফন্ট সাইজ" />
-          <div className="grid grid-cols-3 gap-2">
-            {fontSizeOptions.map((f) => {
-              const active = prefs.fontSize === f.value;
-              return (
-                <button
-                  key={f.value}
-                  onClick={() => { vibrate(); setPref("fontSize", f.value); }}
-                  className={`flex flex-col items-center gap-1 py-3 rounded-xl border transition-all font-semibold ${f.size} ${
-                    active
-                      ? "border-primary bg-primary/10 text-primary dark:bg-primary/15"
-                      : "border-border/50 bg-card/60 text-muted-foreground hover:bg-muted/50"
-                  }`}
-                >
-                  <Type className="w-4 h-4" />
-                  {f.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Layout */}
-        <div className="mx-4 mb-4">
-          <SectionLabel icon={LayoutGrid} label="লেআউট" />
-          <div className="grid grid-cols-2 gap-2">
-            {([
-              { value: "comfortable" as const, icon: Rows3, label: "আরামদায়ক" },
-              { value: "compact" as const, icon: Columns3, label: "কম্প্যাক্ট" },
-            ]).map((l) => {
-              const active = prefs.layout === l.value;
-              return (
-                <button
-                  key={l.value}
-                  onClick={() => { vibrate(); setPref("layout", l.value); }}
-                  className={`flex items-center justify-center gap-2 py-3 rounded-xl border transition-all text-xs font-semibold ${
-                    active
-                      ? "border-primary bg-primary/10 text-primary dark:bg-primary/15"
-                      : "border-border/50 bg-card/60 text-muted-foreground hover:bg-muted/50"
-                  }`}
-                >
-                  <l.icon className="w-4 h-4" />
-                  {l.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Toggle settings */}
-        <div className="mx-4 mb-4 space-y-1">
-          <SectionLabel icon={Sparkles} label="কাস্টমাইজেশন" />
-          <div className="rounded-2xl border border-border/50 overflow-hidden divide-y divide-border/30">
-            {/* Auto theme color */}
-            <div className="flex items-center justify-between px-4 py-3 bg-card/60">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Palette className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">অটো থিম কালার</p>
-                  <p className="text-[10px] text-muted-foreground">সময় অনুযায়ী থিম বদলাবে</p>
-                </div>
-              </div>
-              <Switch
-                checked={prefs.autoThemeColor}
-                onCheckedChange={(v) => { vibrate(); setPref("autoThemeColor", v); }}
-              />
+    <Drawer.Root open={open} onOpenChange={onOpenChange}>
+      <Drawer.Portal>
+        <Drawer.Overlay className="fixed inset-0 bg-black/40 z-50" />
+        <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 outline-none">
+          <div className="bg-background rounded-t-3xl max-h-[85vh] overflow-y-auto pb-8">
+            {/* Drag handle */}
+            <div className="flex justify-center pt-3 pb-2 sticky top-0 bg-background rounded-t-3xl z-10">
+              <div className="w-10 h-1.5 rounded-full bg-muted-foreground/30" />
             </div>
 
-            {/* Featured cards */}
-            <div className="flex items-center justify-between px-4 py-3 bg-card/60">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                  <Star className="w-4 h-4 text-amber-500" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">ফিচার্ড কার্ড</p>
-                  <p className="text-[10px] text-muted-foreground">হোমপেজে ফিচার্ড সেবা দেখান</p>
-                </div>
-              </div>
-              <Switch
-                checked={prefs.showFeaturedCards}
-                onCheckedChange={(v) => { vibrate(); setPref("showFeaturedCards", v); }}
-              />
+            {/* Title */}
+            <div className="px-5 pb-3">
+              <Drawer.Title className="text-base font-bold text-foreground">মেন্যু ও সেটিংস</Drawer.Title>
             </div>
 
-            {/* News cards */}
-            <div className="flex items-center justify-between px-4 py-3 bg-card/60">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                  <Newspaper className="w-4 h-4 text-emerald-500" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">নিউজ কার্ড</p>
-                  <p className="text-[10px] text-muted-foreground">হোমপেজে সংবাদ সেকশন দেখান</p>
-                </div>
+            {/* User card */}
+            <div className="mx-4 mb-4 rounded-2xl bg-muted/50 dark:bg-muted/30 p-4 flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <User className="w-6 h-6 text-primary" />
               </div>
-              <Switch
-                checked={prefs.showNewsCards}
-                onCheckedChange={(v) => { vibrate(); setPref("showNewsCards", v); }}
-              />
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-sm text-foreground truncate">
+                  {user?.email || "অতিথি ব্যবহারকারী"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {user ? "লগইন হয়েছে" : "লগইন করুন"}
+                </p>
+              </div>
             </div>
 
-            {/* Notifications */}
-            <div className="flex items-center justify-between px-4 py-3 bg-card/60">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                  {prefs.notificationsEnabled ? (
-                    <Bell className="w-4 h-4 text-blue-500" />
-                  ) : (
-                    <BellOff className="w-4 h-4 text-blue-500" />
-                  )}
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">নোটিফিকেশন</p>
-                  <p className="text-[10px] text-muted-foreground">পুশ নোটিফিকেশন চালু/বন্ধ</p>
-                </div>
+            {/* Theme picker */}
+            <div className="mx-4 mb-4">
+              <SectionLabel icon={Palette} label="থিম" />
+              <div className="grid grid-cols-3 gap-2">
+                {themeOptions.map((t) => {
+                  const active = theme === t.value;
+                  return (
+                    <button
+                      key={t.value}
+                      onClick={() => { vibrate(); setTheme(t.value); }}
+                      className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border transition-all text-xs font-semibold ${
+                        active
+                          ? "border-primary bg-primary/10 text-primary dark:bg-primary/15"
+                          : "border-border/50 bg-card/60 text-muted-foreground hover:bg-muted/50"
+                      }`}
+                    >
+                      <t.icon className="w-5 h-5" />
+                      {t.label}
+                    </button>
+                  );
+                })}
               </div>
-              <Switch
-                checked={prefs.notificationsEnabled}
-                onCheckedChange={async (v) => {
-                  vibrate();
-                  if (v) {
-                    const granted = await requestNotificationPermission();
-                    if (!granted) return;
-                    subscribe();
-                  } else {
-                    unsubscribe();
-                  }
-                  setPref("notificationsEnabled", v);
-                }}
-              />
             </div>
-          </div>
-        </div>
 
-        {/* Menu sections */}
-        {menuSections.map((section) => (
-          <div key={section.title} className="mb-3">
-            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 px-5">
-              {section.title}
-            </p>
-            <div className="space-y-0.5">
-              {section.items.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={item.action}
-                  className="w-full flex items-center gap-3 px-5 py-3 hover:bg-muted/50 active:bg-muted/70 transition-colors"
-                >
-                  <div className="w-9 h-9 rounded-xl bg-primary/8 dark:bg-primary/12 flex items-center justify-center shrink-0">
-                    <item.icon className="w-4.5 h-4.5 text-primary" />
+            {/* Font size */}
+            <div className="mx-4 mb-4">
+              <SectionLabel icon={Type} label="ফন্ট সাইজ" />
+              <div className="grid grid-cols-3 gap-2">
+                {fontSizeOptions.map((f) => {
+                  const active = prefs.fontSize === f.value;
+                  return (
+                    <button
+                      key={f.value}
+                      onClick={() => { vibrate(); setPref("fontSize", f.value); }}
+                      className={`flex flex-col items-center gap-1 py-3 rounded-xl border transition-all font-semibold ${f.size} ${
+                        active
+                          ? "border-primary bg-primary/10 text-primary dark:bg-primary/15"
+                          : "border-border/50 bg-card/60 text-muted-foreground hover:bg-muted/50"
+                      }`}
+                    >
+                      <Type className="w-4 h-4" />
+                      {f.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Layout */}
+            <div className="mx-4 mb-4">
+              <SectionLabel icon={LayoutGrid} label="লেআউট" />
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { value: "comfortable" as const, icon: Rows3, label: "আরামদায়ক" },
+                  { value: "compact" as const, icon: Columns3, label: "কম্প্যাক্ট" },
+                ]).map((l) => {
+                  const active = prefs.layout === l.value;
+                  return (
+                    <button
+                      key={l.value}
+                      onClick={() => { vibrate(); setPref("layout", l.value); }}
+                      className={`flex items-center justify-center gap-2 py-3 rounded-xl border transition-all text-xs font-semibold ${
+                        active
+                          ? "border-primary bg-primary/10 text-primary dark:bg-primary/15"
+                          : "border-border/50 bg-card/60 text-muted-foreground hover:bg-muted/50"
+                      }`}
+                    >
+                      <l.icon className="w-4 h-4" />
+                      {l.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Toggle settings */}
+            <div className="mx-4 mb-4 space-y-1">
+              <SectionLabel icon={Sparkles} label="কাস্টমাইজেশন" />
+              <div className="rounded-2xl border border-border/50 overflow-hidden divide-y divide-border/30">
+                <div className="flex items-center justify-between px-4 py-3 bg-card/60">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Palette className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">অটো থিম কালার</p>
+                      <p className="text-[10px] text-muted-foreground">সময় অনুযায়ী থিম বদলাবে</p>
+                    </div>
                   </div>
-                  <span className="flex-1 text-left text-sm font-medium text-foreground">{item.label}</span>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
+                  <Switch checked={prefs.autoThemeColor} onCheckedChange={(v) => { vibrate(); setPref("autoThemeColor", v); }} />
+                </div>
 
-        {/* Logout */}
-        {user && (
-          <div className="mx-4 mt-2">
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-destructive/10 text-destructive font-semibold text-sm hover:bg-destructive/15 transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-              লগআউট করুন
-            </button>
+                <div className="flex items-center justify-between px-4 py-3 bg-card/60">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                      <Star className="w-4 h-4 text-amber-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">ফিচার্ড কার্ড</p>
+                      <p className="text-[10px] text-muted-foreground">হোমপেজে ফিচার্ড সেবা দেখান</p>
+                    </div>
+                  </div>
+                  <Switch checked={prefs.showFeaturedCards} onCheckedChange={(v) => { vibrate(); setPref("showFeaturedCards", v); }} />
+                </div>
+
+                <div className="flex items-center justify-between px-4 py-3 bg-card/60">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                      <Newspaper className="w-4 h-4 text-emerald-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">নিউজ কার্ড</p>
+                      <p className="text-[10px] text-muted-foreground">হোমপেজে সংবাদ সেকশন দেখান</p>
+                    </div>
+                  </div>
+                  <Switch checked={prefs.showNewsCards} onCheckedChange={(v) => { vibrate(); setPref("showNewsCards", v); }} />
+                </div>
+
+                <div className="flex items-center justify-between px-4 py-3 bg-card/60">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                      {prefs.notificationsEnabled ? <Bell className="w-4 h-4 text-blue-500" /> : <BellOff className="w-4 h-4 text-blue-500" />}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">নোটিফিকেশন</p>
+                      <p className="text-[10px] text-muted-foreground">পুশ নোটিফিকেশন চালু/বন্ধ</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={prefs.notificationsEnabled}
+                    onCheckedChange={async (v) => {
+                      vibrate();
+                      if (v) {
+                        const granted = await requestNotificationPermission();
+                        if (!granted) return;
+                        subscribe();
+                      } else {
+                        unsubscribe();
+                      }
+                      setPref("notificationsEnabled", v);
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Menu sections */}
+            {menuSections.map((section) => (
+              <div key={section.title} className="mb-3">
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 px-5">
+                  {section.title}
+                </p>
+                <div className="space-y-0.5">
+                  {section.items.map((item) => (
+                    <button
+                      key={item.label}
+                      onClick={item.action}
+                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-muted/50 active:bg-muted/70 transition-colors"
+                    >
+                      <div className="w-9 h-9 rounded-xl bg-primary/8 dark:bg-primary/12 flex items-center justify-center shrink-0">
+                        <item.icon className="w-4.5 h-4.5 text-primary" />
+                      </div>
+                      <span className="flex-1 text-left text-sm font-medium text-foreground">{item.label}</span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            {/* Logout */}
+            {user && (
+              <div className="mx-4 mt-2">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-destructive/10 text-destructive font-semibold text-sm hover:bg-destructive/15 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  লগআউট করুন
+                </button>
+              </div>
+            )}
           </div>
-        )}
-      </SheetContent>
-    </Sheet>
+        </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
   );
 };
 
