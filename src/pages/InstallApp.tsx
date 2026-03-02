@@ -60,16 +60,77 @@ const InstallPage = () => {
           <ArrowLeft className="w-4 h-4" /> পেছনে যান
         </button>
 
-        {/* Hero */}
-        <div className="text-center mb-6">
-          <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg mb-4">
-            <Download className="w-9 h-9 text-primary-foreground" />
+        {/* Phone Install Animation */}
+        <div className="flex justify-center mb-6">
+          <div className="relative w-44 h-72">
+            {/* Phone frame */}
+            <div className="absolute inset-0 rounded-[2rem] border-[3px] border-foreground/20 bg-card shadow-xl overflow-hidden">
+              {/* Status bar */}
+              <div className="h-6 bg-foreground/5 flex items-center justify-center">
+                <div className="w-16 h-1.5 rounded-full bg-foreground/15" />
+              </div>
+              {/* Screen content */}
+              <div className="p-3 flex flex-col items-center pt-6">
+                {/* App icon dropping in */}
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg"
+                  style={{ animation: "app-icon-drop 2s ease-out infinite" }}>
+                  <Download className="w-6 h-6 text-primary-foreground" />
+                </div>
+                {/* App name */}
+                <div className="mt-2 w-16 h-1.5 rounded bg-foreground/15"
+                  style={{ animation: "app-label-in 2s ease-out 0.4s infinite", opacity: 0 }} />
+                {/* Progress bar */}
+                <div className="mt-5 w-full h-1.5 rounded-full bg-foreground/10 overflow-hidden">
+                  <div className="h-full rounded-full bg-primary"
+                    style={{ animation: "install-progress 2s ease-in-out infinite" }} />
+                </div>
+                {/* Installing text */}
+                <div className="mt-2 w-20 h-1 rounded bg-foreground/10"
+                  style={{ animation: "app-label-in 2s ease-out 0.6s infinite", opacity: 0 }} />
+                {/* Checkmark */}
+                <div className="mt-4" style={{ animation: "check-pop 2s ease-out 1.6s infinite", opacity: 0 }}>
+                  <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+                </div>
+              </div>
+            </div>
+            {/* Home indicator */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full bg-foreground/15" />
           </div>
+        </div>
+
+        {/* Title */}
+        <div className="text-center mb-6">
           <h1 className="text-xl font-bold text-foreground">রামগঞ্জ সিটি অ্যাপ ইনস্টল করুন</h1>
           <p className="text-sm text-muted-foreground mt-1.5">
             বিনামূল্যে ইনস্টল করুন — কোনো অ্যাপ স্টোর লাগবে না!
           </p>
         </div>
+
+        <style>{`
+          @keyframes app-icon-drop {
+            0% { transform: translateY(-30px) scale(0.5); opacity: 0; }
+            20% { transform: translateY(0) scale(1); opacity: 1; }
+            80% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+          }
+          @keyframes app-label-in {
+            0%, 15% { opacity: 0; transform: translateY(4px); }
+            25% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; }
+            100% { opacity: 1; }
+          }
+          @keyframes install-progress {
+            0%, 15% { width: 0%; }
+            70% { width: 100%; }
+            100% { width: 100%; }
+          }
+          @keyframes check-pop {
+            0%, 75% { opacity: 0; transform: scale(0.3); }
+            85% { opacity: 1; transform: scale(1.15); }
+            90% { transform: scale(1); }
+            100% { opacity: 1; transform: scale(1); }
+          }
+        `}</style>
 
         {/* Already installed */}
         {isStandalone && (
