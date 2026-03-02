@@ -29,6 +29,7 @@ import AdminNewsManager from "@/components/admin/AdminNewsManager";
 import AdminSliderManager from "@/components/admin/AdminSliderManager";
 import AdminAdsManager from "@/components/admin/AdminAdsManager";
 import AdminAboutManager from "@/components/admin/AdminAboutManager";
+import SwipeUpEditor from "@/components/admin/SwipeUpEditor";
 
 // Legacy table configs for CRUD
 const legacyTableConfig: Record<string, { table: string; fields: { name: string; label: string; type?: string; options?: string[] }[]; nameKey: string }> = {
@@ -574,6 +575,34 @@ const AdminDashboard = () => {
           logActivity={logActivity}
         />
       )}
+
+      {/* SwipeUp Service Editor */}
+      <SwipeUpEditor
+        open={!!editingId}
+        onClose={() => setEditingId(null)}
+        title="সেবা এডিট করুন"
+        subtitle={editData.title || ""}
+        icon={<Edit3 className="w-4 h-4 text-white" />}
+        headerGradient="from-blue-500 to-indigo-500"
+      >
+        <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" value={editData.title || ""} onChange={(e) => setEditData({ ...editData, title: e.target.value })} placeholder="শিরোনাম" />
+        <textarea className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 min-h-[70px] outline-none resize-none focus:border-primary/50 transition-all" value={editData.description || ""} onChange={(e) => setEditData({ ...editData, description: e.target.value })} placeholder="বিবরণ" />
+        <div className="grid grid-cols-2 gap-2">
+          <input className="bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" value={editData.phone || ""} onChange={(e) => setEditData({ ...editData, phone: e.target.value })} placeholder="📞 ফোন" />
+          <input className="bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" value={editData.whatsapp || ""} onChange={(e) => setEditData({ ...editData, whatsapp: e.target.value })} placeholder="💬 WhatsApp" />
+        </div>
+        <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" value={editData.address || ""} onChange={(e) => setEditData({ ...editData, address: e.target.value })} placeholder="📍 ঠিকানা" />
+        <select className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" value={editData.category_id || ""} onChange={(e) => setEditData({ ...editData, category_id: e.target.value })}>
+          <option value="">ক্যাটাগরি নির্বাচন</option>
+          {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
+        <input className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" value={editData.image_url || ""} onChange={(e) => setEditData({ ...editData, image_url: e.target.value })} placeholder="ছবির লিংক" />
+        <div className="flex gap-2 pt-2">
+          <button onClick={() => { if (editingId) saveEdit(editingId); }} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"><Save className="w-4 h-4" /> সেভ</button>
+          <button onClick={() => setEditingId(null)} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">বাতিল</button>
+        </div>
+      </SwipeUpEditor>
+
       <div className="bg-card border border-border/60 rounded-2xl p-4 space-y-3">
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
@@ -628,57 +657,35 @@ const AdminDashboard = () => {
           </div>
           {filteredServices.map((item: any) => (
             <div key={item.id} className={`bg-card border rounded-2xl overflow-hidden hover:shadow-md transition-all ${selectedIds.has(item.id) ? "border-primary/40 bg-primary/[0.02]" : "border-border/60"}`}>
-              {editingId === item.id ? (
-                <div className="p-4 space-y-3">
-                  <span className="text-sm font-bold text-foreground flex items-center gap-2"><Edit3 className="w-4 h-4 text-primary" /> এডিট মোড</span>
-                  <input className="w-full bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 outline-none" value={editData.title} onChange={(e) => setEditData({ ...editData, title: e.target.value })} placeholder="শিরোনাম" />
-                  <textarea className="w-full bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 min-h-[70px] outline-none resize-none" value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} placeholder="বিবরণ" />
-                  <div className="grid grid-cols-2 gap-2">
-                    <input className="bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 outline-none" value={editData.phone} onChange={(e) => setEditData({ ...editData, phone: e.target.value })} placeholder="📞 ফোন" />
-                    <input className="bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 outline-none" value={editData.whatsapp} onChange={(e) => setEditData({ ...editData, whatsapp: e.target.value })} placeholder="💬 WhatsApp" />
-                  </div>
-                  <input className="w-full bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 outline-none" value={editData.address} onChange={(e) => setEditData({ ...editData, address: e.target.value })} placeholder="📍 ঠিকানা" />
-                  <select className="w-full bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 outline-none" value={editData.category_id} onChange={(e) => setEditData({ ...editData, category_id: e.target.value })}>
-                    <option value="">ক্যাটাগরি নির্বাচন</option>
-                    {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
-                  <input className="w-full bg-muted/40 rounded-xl px-4 py-2.5 text-sm border border-border/60 outline-none" value={editData.image_url} onChange={(e) => setEditData({ ...editData, image_url: e.target.value })} placeholder="ছবির লিংক" />
-                  <div className="flex gap-2">
-                    <button onClick={() => saveEdit(item.id)} className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2"><Save className="w-4 h-4" /> সেভ</button>
-                    <button onClick={() => setEditingId(null)} className="px-5 py-2.5 rounded-xl bg-muted text-muted-foreground text-sm font-medium">বাতিল</button>
-                  </div>
-                </div>
-              ) : (
-                <div className="p-4">
-                  <div className="flex gap-3">
-                    <button onClick={() => toggleSelect(item.id)}
-                      className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 mt-1 transition-all ${selectedIds.has(item.id) ? "bg-primary border-primary" : "border-border hover:border-primary/50"}`}>
-                      {selectedIds.has(item.id) && <CheckCircle className="w-3 h-3 text-primary-foreground" />}
-                    </button>
-                    {item.image_url && <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-muted border border-border/40"><img src={item.image_url} alt="" className="w-full h-full object-cover" /></div>}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <h3 className="font-bold text-foreground text-sm truncate">{item.title}</h3>
-                            {item.is_featured && <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />}
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-0.5">{item.service_categories?.name || "—"}</p>
+              <div className="p-4">
+                <div className="flex gap-3">
+                  <button onClick={() => toggleSelect(item.id)}
+                    className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 mt-1 transition-all ${selectedIds.has(item.id) ? "bg-primary border-primary" : "border-border hover:border-primary/50"}`}>
+                    {selectedIds.has(item.id) && <CheckCircle className="w-3 h-3 text-primary-foreground" />}
+                  </button>
+                  {item.image_url && <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-muted border border-border/40"><img src={item.image_url} alt="" className="w-full h-full object-cover" /></div>}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <h3 className="font-bold text-foreground text-sm truncate">{item.title}</h3>
+                          {item.is_featured && <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />}
                         </div>
-                        <StatusBadge status={item.status} />
+                        <p className="text-xs text-muted-foreground mt-0.5">{item.service_categories?.name || "—"}</p>
                       </div>
-                      {item.phone && <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Phone className="w-3 h-3" /> {item.phone}</p>}
+                      <StatusBadge status={item.status} />
                     </div>
-                  </div>
-                  <div className="flex gap-1.5 mt-3 pt-3 border-t border-border/40 flex-wrap">
-                    {item.status !== "approved" && <ActionBtn variant="success" onClick={() => updateServiceStatus(item.id, "approved", item.title)} icon={<CheckCircle className="w-3.5 h-3.5" />} label="অনুমোদন" />}
-                    {item.status !== "rejected" && <ActionBtn variant="danger" onClick={() => updateServiceStatus(item.id, "rejected", item.title)} icon={<XCircle className="w-3.5 h-3.5" />} label="প্রত্যাখ্যান" />}
-                    <ActionBtn variant="warning" onClick={() => toggleFeatured(item.id, item.is_featured, item.title)} icon={item.is_featured ? <StarOff className="w-3.5 h-3.5" /> : <Star className="w-3.5 h-3.5" />} label={item.is_featured ? "আনফিচার" : "ফিচার"} />
-                    <ActionBtn variant="info" onClick={() => startEdit(item)} icon={<Edit3 className="w-3.5 h-3.5" />} label="এডিট" />
-                    <ActionBtn variant="danger" onClick={() => deleteService(item.id, item.title)} icon={<Trash2 className="w-3.5 h-3.5" />} label="মুছুন" />
+                    {item.phone && <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Phone className="w-3 h-3" /> {item.phone}</p>}
                   </div>
                 </div>
-              )}
+                <div className="flex gap-1.5 mt-3 pt-3 border-t border-border/40 flex-wrap">
+                  {item.status !== "approved" && <ActionBtn variant="success" onClick={() => updateServiceStatus(item.id, "approved", item.title)} icon={<CheckCircle className="w-3.5 h-3.5" />} label="অনুমোদন" />}
+                  {item.status !== "rejected" && <ActionBtn variant="danger" onClick={() => updateServiceStatus(item.id, "rejected", item.title)} icon={<XCircle className="w-3.5 h-3.5" />} label="প্রত্যাখ্যান" />}
+                  <ActionBtn variant="warning" onClick={() => toggleFeatured(item.id, item.is_featured, item.title)} icon={item.is_featured ? <StarOff className="w-3.5 h-3.5" /> : <Star className="w-3.5 h-3.5" />} label={item.is_featured ? "আনফিচার" : "ফিচার"} />
+                  <ActionBtn variant="info" onClick={() => startEdit(item)} icon={<Edit3 className="w-3.5 h-3.5" />} label="এডিট" />
+                  <ActionBtn variant="danger" onClick={() => deleteService(item.id, item.title)} icon={<Trash2 className="w-3.5 h-3.5" />} label="মুছুন" />
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -774,36 +781,41 @@ const AdminDashboard = () => {
     return (
       <div className="space-y-4">
         {hasCRUD && (
-          showLegacyForm ? (
-            <div className="bg-card border-2 border-primary/20 rounded-2xl p-5 space-y-4 shadow-md">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-bold text-foreground">{legacyEditId ? "এডিট করুন" : "নতুন যোগ করুন"}</h2>
-                <button onClick={() => { setShowLegacyForm(false); setLegacyForm({}); setLegacyEditId(null); }} className="w-8 h-8 rounded-xl bg-muted hover:bg-muted/80 flex items-center justify-center">
-                  <X className="w-4 h-4 text-muted-foreground" />
-                </button>
-              </div>
+          <>
+            <SwipeUpEditor
+              open={showLegacyForm}
+              onClose={() => { setShowLegacyForm(false); setLegacyForm({}); setLegacyEditId(null); }}
+              title={legacyEditId ? "এডিট করুন" : `নতুন ${activeTabLabel} যোগ করুন`}
+              subtitle={activeTabLabel}
+              icon={<Plus className="w-4 h-4 text-white" />}
+              headerGradient="from-primary to-primary/80"
+            >
               {config.fields.map(field => (
                 <div key={field.name}>
                   <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">{field.label}</label>
                   {field.type === "select" && field.options ? (
-                    <select className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none" value={legacyForm[field.name] || ""} onChange={(e) => setLegacyForm({ ...legacyForm, [field.name]: e.target.value })}>
+                    <select className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" value={legacyForm[field.name] || ""} onChange={(e) => setLegacyForm({ ...legacyForm, [field.name]: e.target.value })}>
                       <option value="">নির্বাচন করুন</option>
                       {field.options.map(o => <option key={o} value={o}>{o}</option>)}
                     </select>
                   ) : (
-                    <input type={field.type === "number" ? "number" : "text"} className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none" placeholder={field.label} value={legacyForm[field.name] || ""} onChange={(e) => setLegacyForm({ ...legacyForm, [field.name]: e.target.value })} />
+                    <input type={field.type === "number" ? "number" : "text"} className="w-full bg-muted/40 rounded-xl px-4 py-3 text-sm border border-border/60 outline-none focus:border-primary/50 transition-all" placeholder={field.label} value={legacyForm[field.name] || ""} onChange={(e) => setLegacyForm({ ...legacyForm, [field.name]: e.target.value })} />
                   )}
                 </div>
               ))}
-              <button onClick={saveLegacyItem} className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2">
-                <Save className="w-4 h-4" /> {legacyEditId ? "আপডেট" : "যোগ করুন"}
-              </button>
-            </div>
-          ) : (
+              <div className="flex gap-2 pt-2">
+                <button onClick={saveLegacyItem} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+                  <Save className="w-4 h-4" /> {legacyEditId ? "আপডেট" : "যোগ করুন"}
+                </button>
+                <button onClick={() => { setShowLegacyForm(false); setLegacyForm({}); setLegacyEditId(null); }} className="px-5 py-3 rounded-xl bg-muted text-muted-foreground text-sm font-medium hover:bg-muted/80 transition-colors">
+                  বাতিল
+                </button>
+              </div>
+            </SwipeUpEditor>
             <button onClick={() => setShowLegacyForm(true)} className="w-full py-3.5 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-all">
               <Plus className="w-4 h-4" /> নতুন {activeTabLabel} যোগ করুন
             </button>
-          )
+          </>
         )}
         <span className="text-xs text-muted-foreground flex items-center gap-1"><Hash className="w-3 h-3" /> মোট: {legacyData.length}টি</span>
         {legacyData.length === 0 ? <EmptyState /> : legacyData.map((item: any) => {
