@@ -74,7 +74,7 @@ const LatestNews = () => {
                 className="glass-card overflow-hidden w-[340px] shrink-0 flex flex-row items-stretch transition-transform duration-200 hover:scale-[1.02] rounded-2xl"
               >
                 {/* Square thumbnail */}
-                <div className="w-[130px] min-h-[100px] bg-muted overflow-hidden shrink-0 rounded-l-2xl">
+                <div className="w-[150px] aspect-video bg-muted overflow-hidden shrink-0 rounded-l-2xl self-center">
                   {item.thumbnail_url ? (
                     <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
                   ) : (
