@@ -26,7 +26,7 @@ export const firebaseConfig = {
 
 // Your VAPID key from Firebase Console > Project Settings > Cloud Messaging > Web Push certificates
 // You need to generate this from Firebase Console > Project Settings > Cloud Messaging > Web Push certificates
-export const VAPID_KEY = "";
+export const VAPID_KEY = "BDP4IFyAIHRBbLetujtvT-BV3EYUysSFXNim5Qzm8bCAN-3k3x0PXAa-pHphoX0X_Ymphcy6H-FTZSigSqydu0A";
 
 /**
  * Check if Firebase is configured
