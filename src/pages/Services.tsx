@@ -13,6 +13,8 @@ interface Category {
   icon: string;
   description?: string | null;
   view_count?: number;
+  icon_url?: string | null;
+  svg_icon?: string | null;
 }
 
 interface Ad {
@@ -147,7 +149,13 @@ const Services = () => {
                   className="relative bg-card rounded-2xl flex flex-col items-center gap-1.5 py-4 px-1.5 transition-all duration-200 hover:shadow-md hover:scale-105 active:scale-95"
                   style={{ border: `0.8px solid ${bColor}` }}>
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm" style={{ background: iconData.bg }}>
-                    {iconData.svg}
+                    {cat.icon_url ? (
+                      <img src={cat.icon_url} alt={cat.name} className="w-8 h-8 object-contain" />
+                    ) : cat.svg_icon ? (
+                      <div className="w-8 h-8 flex items-center justify-center" dangerouslySetInnerHTML={{ __html: cat.svg_icon }} />
+                    ) : (
+                      iconData.svg
+                    )}
                   </div>
                   <span className="text-[11px] font-semibold text-foreground text-center leading-tight line-clamp-2">{cat.name}</span>
                   <span className="flex items-center gap-0.5 text-[9px] text-muted-foreground">
@@ -168,7 +176,13 @@ const Services = () => {
                     className="bg-card rounded-2xl flex items-center gap-3.5 p-3.5 w-full text-left transition-all duration-200 hover:shadow-md hover:scale-[1.01] active:scale-[0.98]"
                     style={{ border: `0.8px solid ${bColor}` }}>
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow-sm" style={{ background: iconData.bg }}>
-                      {iconData.svg}
+                      {cat.icon_url ? (
+                        <img src={cat.icon_url} alt={cat.name} className="w-7 h-7 object-contain" />
+                      ) : cat.svg_icon ? (
+                        <div className="w-7 h-7 flex items-center justify-center" dangerouslySetInnerHTML={{ __html: cat.svg_icon }} />
+                      ) : (
+                        iconData.svg
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm font-bold text-foreground leading-tight">{cat.name}</h3>
