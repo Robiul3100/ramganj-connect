@@ -4,11 +4,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import BottomMenuSheet from "@/components/BottomMenuSheet";
 
 const navItems = [
-  { icon: Home, label: "হোম", route: "/", type: "route" as const },
-  { icon: LayoutGrid, label: "সেবা", route: "/services", type: "route" as const },
-  { icon: Heart, label: "অনুদান", route: "/donation", type: "route" as const },
-  { icon: Bell, label: "নোটিশ", route: "/notifications", type: "route" as const },
-  { icon: Menu, label: "মেন্যু", route: "", type: "menu" as const },
+  { icon: Home, label: "হোম", route: "/", type: "route" as const, gradient: "from-blue-500 to-cyan-400", glow: "rgba(59,130,246,0.5)" },
+  { icon: LayoutGrid, label: "সেবা", route: "/services", type: "route" as const, gradient: "from-violet-500 to-purple-400", glow: "rgba(139,92,246,0.5)" },
+  { icon: Heart, label: "অনুদান", route: "/donation", type: "route" as const, gradient: "from-rose-500 to-pink-400", glow: "rgba(244,63,94,0.5)" },
+  { icon: Bell, label: "নোটিশ", route: "/notifications", type: "route" as const, gradient: "from-amber-500 to-orange-400", glow: "rgba(245,158,11,0.5)" },
+  { icon: Menu, label: "মেন্যু", route: "", type: "menu" as const, gradient: "from-emerald-500 to-teal-400", glow: "rgba(16,185,129,0.5)" },
 ];
 
 const BottomNav = () => {
@@ -58,21 +58,22 @@ const BottomNav = () => {
                   >
                     <div
                       className={`absolute inset-0 rounded-full blur-lg transition-opacity duration-300 ${
-                        isActive ? "opacity-40" : "opacity-0 group-hover:opacity-20"
+                        isActive ? "opacity-50" : "opacity-0 group-hover:opacity-25"
                       }`}
-                      style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.6))" }}
+                      style={{ background: `linear-gradient(135deg, ${item.glow}, transparent)` }}
                     />
                     <div
-                      className={`relative w-[52px] h-[52px] rounded-full flex items-center justify-center shadow-lg bg-primary transition-all duration-300 ease-out ${
-                        isTapped ? "scale-90" : isActive ? "scale-110 shadow-primary/30" : "scale-100 group-hover:scale-105"
+                      className={`relative w-[52px] h-[52px] rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br ${item.gradient} transition-all duration-300 ease-out ${
+                        isTapped ? "scale-90" : isActive ? "scale-110" : "scale-100 group-hover:scale-105"
                       }`}
+                      style={isActive ? { boxShadow: `0 6px 20px ${item.glow}` } : undefined}
                     >
-                      <Icon className={`w-[22px] h-[22px] text-primary-foreground transition-transform duration-300 ${
+                      <Icon className={`w-[22px] h-[22px] text-white transition-transform duration-300 ${
                         isTapped ? "scale-75 rotate-[-8deg]" : "scale-100 rotate-0"
                       }`} strokeWidth={2.2} />
                     </div>
-                    <span className={`text-[10px] mt-1 leading-tight font-bold transition-all duration-300 ${
-                      isActive ? "text-primary" : "text-muted-foreground"
+                    <span className={`text-[10px] mt-1 leading-tight font-bold transition-all duration-300 bg-gradient-to-r ${item.gradient} bg-clip-text ${
+                      isActive ? "text-transparent" : "text-muted-foreground"
                     }`}>
                       {item.label}
                     </span>
@@ -89,26 +90,46 @@ const BottomNav = () => {
                 >
                   {/* Active indicator line */}
                   <span
-                    className={`absolute -top-0.5 left-1/2 -translate-x-1/2 h-[3px] rounded-full bg-primary transition-all duration-300 ease-out ${
+                    className={`absolute -top-0.5 left-1/2 -translate-x-1/2 h-[3px] rounded-full bg-gradient-to-r ${item.gradient} transition-all duration-300 ease-out ${
                       isActive ? "opacity-100 w-5" : "opacity-0 w-0"
                     }`}
                   />
 
                   <div className={`relative flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-300 ease-out ${
-                    isTapped ? "scale-[0.8]" : isActive ? "bg-primary/10 dark:bg-primary/15 scale-100" : "group-hover:bg-muted/60 scale-100"
+                    isTapped ? "scale-[0.8]" : "scale-100"
                   }`}>
+                    {/* Active background glow */}
+                    {isActive && (
+                      <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${item.gradient} opacity-15 dark:opacity-20`} />
+                    )}
                     <Icon
                       className={`w-[20px] h-[20px] transition-all duration-300 ease-out ${
                         isTapped ? "scale-75" : "scale-100"
                       } ${
-                        isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                        isActive ? "text-transparent" : "text-muted-foreground group-hover:text-foreground"
                       }`}
                       strokeWidth={isActive ? 2.4 : 1.8}
+                      style={isActive ? {
+                        stroke: "url(#icon-gradient-" + idx + ")",
+                      } : undefined}
                     />
+                    {/* SVG gradient definition for active icon */}
+                    {isActive && (
+                      <svg width="0" height="0" className="absolute">
+                        <defs>
+                          <linearGradient id={`icon-gradient-${idx}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                            {idx === 0 && <><stop offset="0%" stopColor="#3b82f6"/><stop offset="100%" stopColor="#22d3ee"/></>}
+                            {idx === 1 && <><stop offset="0%" stopColor="#8b5cf6"/><stop offset="100%" stopColor="#c084fc"/></>}
+                            {idx === 3 && <><stop offset="0%" stopColor="#f59e0b"/><stop offset="100%" stopColor="#fb923c"/></>}
+                            {idx === 4 && <><stop offset="0%" stopColor="#10b981"/><stop offset="100%" stopColor="#2dd4bf"/></>}
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                    )}
                   </div>
 
                   <span className={`text-[10px] leading-tight transition-all duration-300 ${
-                    isActive ? "font-bold text-primary" : "font-medium text-muted-foreground"
+                    isActive ? "font-bold bg-gradient-to-r bg-clip-text text-transparent " + item.gradient : "font-medium text-muted-foreground"
                   }`}>
                     {item.label}
                   </span>
