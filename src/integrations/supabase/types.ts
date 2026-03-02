@@ -299,13 +299,18 @@ export type Database = {
           bio: string | null
           cover_url: string | null
           designation: string
+          experience: Json
           facebook_url: string | null
           github_url: string | null
           id: string
+          is_active: boolean
           linkedin_url: string | null
           messenger_url: string | null
           name: string
           phone: string | null
+          projects: Json
+          skills: string[]
+          sort_order: number
           twitter_url: string | null
           updated_at: string
           website_url: string | null
@@ -315,13 +320,18 @@ export type Database = {
           bio?: string | null
           cover_url?: string | null
           designation?: string
+          experience?: Json
           facebook_url?: string | null
           github_url?: string | null
           id?: string
+          is_active?: boolean
           linkedin_url?: string | null
           messenger_url?: string | null
           name?: string
           phone?: string | null
+          projects?: Json
+          skills?: string[]
+          sort_order?: number
           twitter_url?: string | null
           updated_at?: string
           website_url?: string | null
@@ -331,13 +341,18 @@ export type Database = {
           bio?: string | null
           cover_url?: string | null
           designation?: string
+          experience?: Json
           facebook_url?: string | null
           github_url?: string | null
           id?: string
+          is_active?: boolean
           linkedin_url?: string | null
           messenger_url?: string | null
           name?: string
           phone?: string | null
+          projects?: Json
+          skills?: string[]
+          sort_order?: number
           twitter_url?: string | null
           updated_at?: string
           website_url?: string | null
