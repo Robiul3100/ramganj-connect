@@ -566,15 +566,14 @@ const AdminDashboard = () => {
 
   const renderServicesList = () => (
     <div className="space-y-4">
-      {showAddService && (
-        <AddServiceForm
-          categories={categories}
-          preselectedCategoryId={addServiceCategoryId}
-          onClose={() => { setShowAddService(false); setAddServiceCategoryId(""); }}
-          onSaved={() => { fetchServices(); fetchCounts(); }}
-          logActivity={logActivity}
-        />
-      )}
+      <AddServiceForm
+        open={showAddService}
+        categories={categories}
+        preselectedCategoryId={addServiceCategoryId}
+        onClose={() => { setShowAddService(false); setAddServiceCategoryId(""); }}
+        onSaved={() => { fetchServices(); fetchCounts(); }}
+        logActivity={logActivity}
+      />
 
       {/* SwipeUp Service Editor */}
       <SwipeUpEditor
