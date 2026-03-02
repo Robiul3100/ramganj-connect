@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Save, X, Image as ImageIcon, Plus } from "lucide-react";
+import { Save, Image as ImageIcon, Plus } from "lucide-react";
+import SwipeUpEditor from "./SwipeUpEditor";
 
 interface Category {
   id: string;
@@ -12,12 +13,13 @@ interface Category {
 interface AddServiceFormProps {
   categories: Category[];
   preselectedCategoryId?: string;
+  open: boolean;
   onClose: () => void;
   onSaved: () => void;
   logActivity?: (action: string, tableName?: string, recordId?: string, details?: string) => Promise<void>;
 }
 
-const AddServiceForm = ({ categories, preselectedCategoryId, onClose, onSaved, logActivity }: AddServiceFormProps) => {
+const AddServiceForm = ({ categories, preselectedCategoryId, open, onClose, onSaved, logActivity }: AddServiceFormProps) => {
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -68,6 +70,7 @@ const AddServiceForm = ({ categories, preselectedCategoryId, onClose, onSaved, l
     if (logActivity) await logActivity("created", "services", undefined, form.title);
     toast({ title: "সেবা সফলভাবে যোগ হয়েছে ✅" });
     setSaving(false);
+    setForm({ title: "", description: "", phone: "", whatsapp: "", address: "", area: "", category_id: preselectedCategoryId || "", image_url: "" });
     onSaved();
     onClose();
   };
@@ -75,26 +78,14 @@ const AddServiceForm = ({ categories, preselectedCategoryId, onClose, onSaved, l
   const selectedCat = categories.find(c => c.id === form.category_id);
 
   return (
-    <div className="bg-card border-2 border-primary/20 rounded-2xl p-5 space-y-4 shadow-lg">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Plus className="w-4 h-4 text-primary" />
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-foreground">
-              নতুন সেবা যোগ করুন
-            </h2>
-            {selectedCat && (
-              <p className="text-[10px] text-primary font-semibold">{selectedCat.name}</p>
-            )}
-          </div>
-        </div>
-        <button onClick={onClose} className="w-8 h-8 rounded-xl bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors">
-          <X className="w-4 h-4 text-muted-foreground" />
-        </button>
-      </div>
-
+    <SwipeUpEditor
+      open={open}
+      onClose={onClose}
+      title="নতুন সেবা যোগ করুন"
+      subtitle={selectedCat?.name}
+      icon={<Plus className="w-4 h-4 text-white" />}
+      headerGradient="from-primary to-primary/80"
+    >
       <input
         className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
         placeholder="সেবার নাম / শিরোনাম *"
@@ -167,7 +158,7 @@ const AddServiceForm = ({ categories, preselectedCategoryId, onClose, onSaved, l
       >
         <Save className="w-4 h-4" /> {saving ? "সেভ হচ্ছে..." : "সেবা যোগ করুন"}
       </button>
-    </div>
+    </SwipeUpEditor>
   );
 };
 
