@@ -183,7 +183,7 @@ const buildMetadata = (slug: string, data: Record<string, string>) => {
   return meta;
 };
 
-// ──── Doctor Card (Clean Professional Card) ────
+// ──── Doctor Card (Modern Minimal Card) ────
 const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: string; bg: string; gradient: string }; onShare: () => void }) => {
   const m = s.metadata || {};
   const degrees: string[] = m.degrees || [];
@@ -194,148 +194,131 @@ const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: stri
   const chamberTime = m.chamber_time || "";
   const fee = m.consultation_fee || "";
 
-  return (
-    <div className="rounded-2xl overflow-hidden bg-card border border-border/50 shadow-[0_2px_16px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.14)] transition-all duration-300 group">
-      {/* ── Top Section: Avatar + Name ── */}
-      <div className="p-4 pb-3 flex gap-3.5 items-start relative">
-        {/* Avatar */}
-        <div className="relative shrink-0">
-          {s.image_url ? (
-            <img
-              src={s.image_url}
-              alt={s.title}
-              className="w-[72px] h-[72px] sm:w-20 sm:h-20 rounded-2xl object-cover border-2"
-              style={{ borderColor: `${colors.accent}30` }}
-            />
-          ) : (
-            <div
-              className="w-[72px] h-[72px] sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center border-2"
-              style={{ background: colors.bg, borderColor: `${colors.accent}25`, color: colors.accent }}
-            >
-              <Stethoscope className="w-8 h-8 sm:w-9 sm:h-9" />
-            </div>
-          )}
-          {/* Online dot */}
-          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-emerald-500 border-[2.5px] border-card" />
-        </div>
+  const infoItems = [
+    experience && { icon: Award, label: "অভিজ্ঞতা", value: experience },
+    chamberTime && { icon: CalendarClock, label: "চেম্বার", value: chamberTime },
+    fee && { icon: Banknote, label: "ভিজিট", value: fee },
+    regNo && { icon: BadgeCheck, label: "BMDC", value: regNo },
+  ].filter(Boolean) as { icon: any; label: string; value: string }[];
 
-        {/* Name & Specialty */}
-        <div className="flex-1 min-w-0 pt-0.5">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <h3 className="font-extrabold text-foreground text-[15px] sm:text-base leading-snug line-clamp-2">{s.title}</h3>
-              {specialty && (
-                <p className="text-[11px] sm:text-xs font-semibold mt-0.5 line-clamp-1" style={{ color: colors.accent }}>{specialty}</p>
-              )}
-            </div>
-            {/* Badges */}
-            <div className="flex flex-col gap-1 shrink-0 items-end">
-              {s.is_featured && (
-                <span className="flex items-center gap-1 bg-amber-400/90 px-2 py-0.5 rounded-full">
-                  <Star className="w-2.5 h-2.5 text-white fill-white" />
-                  <span className="text-[9px] font-bold text-white">ফিচার্ড</span>
-                </span>
-              )}
-              {regNo && (
-                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: `${colors.accent}12`, color: colors.accent }}>
-                  <BadgeCheck className="w-2.5 h-2.5" />
-                  <span className="text-[9px] font-bold">যাচাইকৃত</span>
-                </span>
-              )}
-            </div>
+  return (
+    <div className="relative rounded-2xl bg-card overflow-hidden border border-border/40 transition-all duration-300 hover:shadow-lg">
+      {/* Accent top bar */}
+      <div className="h-1.5 w-full" style={{ background: colors.gradient }} />
+
+      {/* Featured ribbon */}
+      {s.is_featured && (
+        <div className="absolute top-3 right-0 flex items-center gap-1 px-2.5 py-1 rounded-l-full shadow-sm"
+          style={{ background: "hsl(45,90%,55%)" }}>
+          <Star className="w-3 h-3 text-white fill-white" />
+          <span className="text-[9px] font-extrabold text-white tracking-wide">ফিচার্ড</span>
+        </div>
+      )}
+
+      {/* Main content */}
+      <div className="p-4 sm:p-5">
+        {/* Profile row */}
+        <div className="flex gap-3.5">
+          {/* Circular avatar */}
+          <div className="relative shrink-0">
+            {s.image_url ? (
+              <img
+                src={s.image_url}
+                alt={s.title}
+                className="w-16 h-16 sm:w-[76px] sm:h-[76px] rounded-full object-cover ring-2 ring-offset-2 ring-offset-card"
+                style={{ ringColor: `${colors.accent}40` } as any}
+              />
+            ) : (
+              <div
+                className="w-16 h-16 sm:w-[76px] sm:h-[76px] rounded-full flex items-center justify-center ring-2 ring-offset-2 ring-offset-card"
+                style={{ background: colors.bg, color: colors.accent }}
+              >
+                <Stethoscope className="w-7 h-7 sm:w-8 sm:h-8" />
+              </div>
+            )}
+            <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-card" />
           </div>
 
-          {/* Degree tags */}
-          {degrees.length > 0 && (
-            <div className="flex gap-1 mt-2 flex-wrap">
-              {degrees.map((deg, i) => (
-                <span
-                  key={i}
-                  className="text-[9px] sm:text-[10px] font-semibold px-2 py-[3px] rounded-md"
-                  style={{
-                    background: tagColors[i % tagColors.length].bg,
-                    color: tagColors[i % tagColors.length].text,
-                  }}
-                >
-                  {deg}
-                </span>
-              ))}
-            </div>
-          )}
+          {/* Name block */}
+          <div className="flex-1 min-w-0 py-0.5">
+            <h3 className="font-extrabold text-foreground text-base sm:text-[17px] leading-snug line-clamp-2">{s.title}</h3>
+            {specialty && (
+              <p className="text-xs sm:text-[13px] font-medium mt-0.5" style={{ color: colors.accent }}>{specialty}</p>
+            )}
+            {regNo && (
+              <div className="flex items-center gap-1 mt-1.5">
+                <BadgeCheck className="w-3.5 h-3.5" style={{ color: colors.accent }} />
+                <span className="text-[10px] font-semibold" style={{ color: colors.accent }}>যাচাইকৃত চিকিৎসক</span>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Degree tags */}
+        {degrees.length > 0 && (
+          <div className="flex gap-1.5 mt-3 flex-wrap">
+            {degrees.map((deg, i) => (
+              <span
+                key={i}
+                className="text-[10px] font-semibold px-2.5 py-1 rounded-full"
+                style={{
+                  background: tagColors[i % tagColors.length].bg,
+                  color: tagColors[i % tagColors.length].text,
+                }}
+              >
+                {deg}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Info grid */}
+        {infoItems.length > 0 && (
+          <div className={`grid gap-2 mt-3.5 ${infoItems.length <= 2 ? 'grid-cols-2' : infoItems.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
+            {infoItems.map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <div key={i} className="flex items-center gap-2 rounded-xl px-3 py-2.5 bg-muted/50">
+                  <Icon className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
+                  <div className="min-w-0">
+                    <p className="text-[9px] text-muted-foreground leading-none">{item.label}</p>
+                    <p className="text-[11px] font-bold text-foreground leading-tight mt-0.5 truncate">{item.value}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Hospital & Address */}
+        {(hospital || s.address) && (
+          <div className="mt-3 space-y-2 border-t border-border/30 pt-3">
+            {hospital && (
+              <div className="flex items-center gap-2">
+                <Building2 className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
+                <p className="text-xs font-semibold text-foreground line-clamp-1">{hospital}</p>
+              </div>
+            )}
+            {s.address && (
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 shrink-0 text-muted-foreground" />
+                <p className="text-[11px] text-muted-foreground line-clamp-1">{s.address}{s.area ? `, ${s.area}` : ""}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {s.description && (
+          <p className="text-[11px] text-muted-foreground line-clamp-2 mt-2.5 leading-relaxed">{s.description}</p>
+        )}
       </div>
 
-      {/* ── Quick Info Chips ── */}
-      {(experience || chamberTime || fee) && (
-        <div className="px-4 pb-3">
-          <div className="grid grid-cols-3 gap-2">
-            {experience && (
-              <div className="rounded-xl px-2.5 py-2 text-center" style={{ background: `${colors.accent}08` }}>
-                <Award className="w-3.5 h-3.5 mx-auto mb-0.5" style={{ color: colors.accent }} />
-                <p className="text-[9px] text-muted-foreground leading-tight">অভিজ্ঞতা</p>
-                <p className="text-[11px] font-bold text-foreground leading-tight mt-0.5">{experience}</p>
-              </div>
-            )}
-            {chamberTime && (
-              <div className="rounded-xl px-2.5 py-2 text-center" style={{ background: `${colors.accent}08` }}>
-                <CalendarClock className="w-3.5 h-3.5 mx-auto mb-0.5" style={{ color: colors.accent }} />
-                <p className="text-[9px] text-muted-foreground leading-tight">চেম্বার</p>
-                <p className="text-[11px] font-bold text-foreground leading-tight mt-0.5">{chamberTime}</p>
-              </div>
-            )}
-            {fee && (
-              <div className="rounded-xl px-2.5 py-2 text-center" style={{ background: `${colors.accent}08` }}>
-                <Banknote className="w-3.5 h-3.5 mx-auto mb-0.5" style={{ color: colors.accent }} />
-                <p className="text-[9px] text-muted-foreground leading-tight">ভিজিট ফি</p>
-                <p className="text-[11px] font-bold text-foreground leading-tight mt-0.5">{fee}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── Hospital & Address ── */}
-      {(hospital || s.address) && (
-        <div className="px-4 pb-3 space-y-1.5">
-          {hospital && (
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${colors.accent}10` }}>
-                <Building2 className="w-3.5 h-3.5" style={{ color: colors.accent }} />
-              </div>
-              <p className="text-xs font-semibold text-foreground line-clamp-1">{hospital}</p>
-            </div>
-          )}
-          {s.address && (
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-muted/60">
-                <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-              </div>
-              <p className="text-[11px] text-muted-foreground line-clamp-1">{s.address}{s.area ? `, ${s.area}` : ""}</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {s.description && (
-        <p className="text-[11px] text-muted-foreground/80 line-clamp-2 px-4 pb-3 leading-relaxed">{s.description}</p>
-      )}
-
-      {/* ── Serial Notice ── */}
-      {(s.phone || s.whatsapp) && (
-        <div className="mx-4 mb-3">
-          <p className="text-[11px] font-bold text-center rounded-lg py-1.5"
-            style={{ background: "hsl(45,65%,92%)", color: "hsl(35,55%,32%)" }}>
-            📞 সিরিয়ালের জন্য যোগাযোগ করুন
-          </p>
-        </div>
-      )}
-
-      {/* ── CTA Buttons ── */}
-      <div className="flex gap-0 border-t border-border/40">
+      {/* CTA area */}
+      <div className="px-4 sm:px-5 pb-4 sm:pb-5 flex gap-2">
         {s.phone && (
           <a
             href={`tel:${s.phone}`}
-            className="flex-1 py-3 text-[13px] font-bold flex items-center justify-center gap-2 text-white transition-opacity hover:opacity-90 active:scale-[0.98]"
+            className="flex-1 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-2 text-white active:scale-[0.97] transition-transform"
             style={{ background: colors.gradient }}
           >
             <Phone className="w-4 h-4" /> কল করুন
@@ -346,13 +329,13 @@ const DoctorCard = ({ s, colors, onShare }: { s: Service; colors: { accent: stri
             href={`https://wa.me/88${s.whatsapp}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 py-3 text-[13px] font-bold flex items-center justify-center gap-2 text-white transition-opacity hover:opacity-90 active:scale-[0.98]"
+            className="flex-1 py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-2 text-white active:scale-[0.97] transition-transform"
             style={{ background: "linear-gradient(135deg, hsl(142,70%,38%), hsl(152,65%,45%))" }}
           >
             <MessageCircle className="w-4 h-4" /> হোয়াটসঅ্যাপ
           </a>
         )}
-        <button onClick={onShare} className="px-4 py-3 bg-muted/60 text-muted-foreground flex items-center justify-center hover:bg-muted transition-colors">
+        <button onClick={onShare} className="w-10 h-10 rounded-xl bg-muted/60 flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors shrink-0">
           <Share2 className="w-4 h-4" />
         </button>
       </div>
