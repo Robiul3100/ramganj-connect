@@ -99,25 +99,52 @@ export type Database = {
         Row: {
           body: string
           created_at: string
+          failed_count: number
           icon_name: string | null
           id: string
+          image_url: string | null
+          is_draft: boolean
           is_read: boolean
+          redirect_url: string | null
+          scheduled_at: string | null
+          sent_count: number
+          status: string
+          target_type: string
+          target_value: string | null
           title: string
         }
         Insert: {
           body?: string
           created_at?: string
+          failed_count?: number
           icon_name?: string | null
           id?: string
+          image_url?: string | null
+          is_draft?: boolean
           is_read?: boolean
+          redirect_url?: string | null
+          scheduled_at?: string | null
+          sent_count?: number
+          status?: string
+          target_type?: string
+          target_value?: string | null
           title: string
         }
         Update: {
           body?: string
           created_at?: string
+          failed_count?: number
           icon_name?: string | null
           id?: string
+          image_url?: string | null
+          is_draft?: boolean
           is_read?: boolean
+          redirect_url?: string | null
+          scheduled_at?: string | null
+          sent_count?: number
+          status?: string
+          target_type?: string
+          target_value?: string | null
           title?: string
         }
         Relationships: []
@@ -773,6 +800,36 @@ export type Database = {
           phone?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          created_at: string
+          endpoint: string
+          fcm_token: string
+          id: string
+          is_active: boolean
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          fcm_token: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          fcm_token?: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+          user_agent?: string | null
         }
         Relationships: []
       }
