@@ -12,9 +12,11 @@ import Footer from "@/components/Footer";
 import DrawerMenu from "@/components/DrawerMenu";
 import BottomNav from "@/components/BottomNav";
 import FloatingActions from "@/components/FloatingActions";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 
 const Index = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { prefs } = useUserPreferences();
 
   return (
     <div className="min-h-screen bg-background max-w-4xl mx-auto pb-20">
@@ -25,11 +27,10 @@ const Index = () => {
         <PrayerTimesWidget />
         <AnnouncementBar />
 
-
         <ServiceGrid />
         <QuickStatsWidget />
-        <LatestNews />
-        <FeaturedServices />
+        {prefs.showNewsCards && <LatestNews />}
+        {prefs.showFeaturedCards && <FeaturedServices />}
         <Footer />
       </div>
 
