@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -152,6 +152,7 @@ const EmptyState = () => (
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [services, setServices] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -173,6 +174,54 @@ const AdminDashboard = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [todayStats, setTodayStats] = useState({ visitors: 0, newSubmissions: 0 });
   const [adItems, setAdItems] = useState<any[]>([]);
+
+  // Browser back button management
+  const activeTabRef = useRef(activeTab);
+  activeTabRef.current = activeTab;
+
+  const handleTabChange = useCallback((tab: AdminTab) => {
+    const mainTabs: AdminTab[] = ["dashboard", "all_services", "all_settings", "analytics"];
+    // Push history state so browser back works
+    window.history.pushState({ adminTab: tab }, "");
+    setActiveTab(tab);
+  }, []);
+
+  useEffect(() => {
+    // Push initial state
+    window.history.pushState({ adminTab: "dashboard" }, "");
+
+    const handlePopState = (e: PopStateEvent) => {
+      const current = activeTabRef.current;
+      const mainTabs: AdminTab[] = ["dashboard", "all_services", "all_settings", "analytics"];
+      
+      // Service sub-tabs → go to all_services hub
+      const serviceSubTabs: AdminTab[] = ["services", "pending", "categories", "service_grid", "news", "slider", "advertisements", "about", "timeline", "emergency", "blood", "donations", "offices", "announcements"];
+      // Settings sub-tabs → go to all_settings hub
+      const settingsSubTabs: AdminTab[] = ["site_settings", "app_settings", "notifications", "users", "activity"];
+
+      if (serviceSubTabs.includes(current)) {
+        e.preventDefault();
+        window.history.pushState({ adminTab: "all_services" }, "");
+        setActiveTab("all_services");
+      } else if (settingsSubTabs.includes(current)) {
+        e.preventDefault();
+        window.history.pushState({ adminTab: "all_settings" }, "");
+        setActiveTab("all_settings");
+      } else if (current === "all_services" || current === "all_settings" || current === "analytics") {
+        e.preventDefault();
+        window.history.pushState({ adminTab: "dashboard" }, "");
+        setActiveTab("dashboard");
+      } else if (current === "dashboard") {
+        // Trying to leave admin panel - show confirmation
+        e.preventDefault();
+        window.history.pushState({ adminTab: "dashboard" }, "");
+        setShowExitConfirm(true);
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   // Auth check
   useEffect(() => {
@@ -389,7 +438,7 @@ const AdminDashboard = () => {
   const openAddServiceForCategory = (categoryId: string) => {
     setAddServiceCategoryId(categoryId);
     setShowAddService(true);
-    setActiveTab("services");
+    handleTabChange("services");
     setFilterCategory(categoryId);
   };
 
@@ -469,7 +518,7 @@ const AdminDashboard = () => {
 
       {/* Pending Alert */}
       {counts.pending > 0 && (
-        <button onClick={() => setActiveTab("pending")} className="w-full group">
+        <button onClick={() => handleTabChange("pending")} className="w-full group">
           <div className="flex items-center gap-4 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 transition-all">
             <div className="w-11 h-11 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
               <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -545,7 +594,7 @@ const AdminDashboard = () => {
             { label: "বিজ্ঞাপন", tab: "advertisements" as AdminTab, icon: ImageIcon, gradient: "from-yellow-500 to-orange-500" },
             { label: "অফিস", tab: "offices" as AdminTab, icon: Building2, gradient: "from-teal-500 to-cyan-500" },
           ].map(item => (
-            <button key={item.label} onClick={() => setActiveTab(item.tab)}
+            <button key={item.label} onClick={() => handleTabChange(item.tab)}
               className="bg-card border border-border/60 rounded-2xl p-3.5 text-left hover:shadow-md transition-all group">
               <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center mb-2 shadow-sm`}>
                 <item.icon className="w-3.5 h-3.5 text-white" />
@@ -890,7 +939,7 @@ const AdminDashboard = () => {
 
       {/* Pending Alert */}
       {counts.pending > 0 && (
-        <button onClick={() => setActiveTab("pending")} className="w-full group">
+        <button onClick={() => handleTabChange("pending")} className="w-full group">
           <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40">
             <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
               <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -908,7 +957,7 @@ const AdminDashboard = () => {
         {filteredHubSections.map(section => (
           <button
             key={section.id}
-            onClick={() => setActiveTab(section.id)}
+            onClick={() => handleTabChange(section.id)}
             className="bg-card border border-border/60 rounded-2xl p-3.5 text-left hover:shadow-md transition-all group"
           >
             <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${section.gradient} flex items-center justify-center mb-2.5 shadow-sm group-hover:scale-105 transition-transform`}>
@@ -957,7 +1006,7 @@ const AdminDashboard = () => {
         {filteredSettingsSections.map(section => (
           <button
             key={section.id}
-            onClick={() => setActiveTab(section.id)}
+            onClick={() => handleTabChange(section.id)}
             className="w-full bg-card border border-border/60 rounded-2xl p-4 flex items-center gap-3.5 hover:shadow-md transition-all group text-left"
           >
             <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${section.gradient} flex items-center justify-center shadow-sm shrink-0 group-hover:scale-105 transition-transform`}>
@@ -1008,14 +1057,46 @@ const AdminDashboard = () => {
   }
 
   return (
-    <AdminLayout
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-      currentUser={currentUser}
-      pendingCount={counts.pending}
-    >
-      {renderContent()}
-    </AdminLayout>
+    <>
+      <AdminLayout
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        currentUser={currentUser}
+        pendingCount={counts.pending}
+      >
+        {renderContent()}
+      </AdminLayout>
+
+      {/* Exit Confirmation Dialog */}
+      {showExitConfirm && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in" onClick={() => setShowExitConfirm(false)} />
+          <div className="relative bg-card rounded-2xl w-full max-w-sm p-6 shadow-2xl animate-in zoom-in-95 text-center space-y-4">
+            <div className="w-14 h-14 rounded-2xl bg-destructive/10 flex items-center justify-center mx-auto">
+              <AlertTriangle className="w-7 h-7 text-destructive" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-foreground">অ্যাডমিন প্যানেল থেকে বের হবেন?</h3>
+              <p className="text-sm text-muted-foreground mt-1">আপনি কি নিশ্চিত যে হোমপেজে ফিরে যেতে চান?</p>
+            </div>
+            <div className="flex gap-2.5">
+              <button
+                onClick={() => setShowExitConfirm(false)}
+                className="flex-1 py-2.5 rounded-xl bg-muted text-muted-foreground text-sm font-semibold hover:bg-muted/80 transition-colors"
+              >
+                থাকুন
+              </button>
+              <button
+                onClick={() => { setShowExitConfirm(false); navigate("/"); }}
+                className="flex-1 py-2.5 rounded-xl bg-destructive text-destructive-foreground text-sm font-bold hover:opacity-90 transition-opacity"
+              >
+                বের হন
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
