@@ -293,6 +293,57 @@ export type Database = {
         }
         Relationships: []
       }
+      developer_profile: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          cover_url: string | null
+          designation: string
+          facebook_url: string | null
+          github_url: string | null
+          id: string
+          linkedin_url: string | null
+          messenger_url: string | null
+          name: string
+          phone: string | null
+          twitter_url: string | null
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          cover_url?: string | null
+          designation?: string
+          facebook_url?: string | null
+          github_url?: string | null
+          id?: string
+          linkedin_url?: string | null
+          messenger_url?: string | null
+          name?: string
+          phone?: string | null
+          twitter_url?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          cover_url?: string | null
+          designation?: string
+          facebook_url?: string | null
+          github_url?: string | null
+          id?: string
+          linkedin_url?: string | null
+          messenger_url?: string | null
+          name?: string
+          phone?: string | null
+          twitter_url?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       doctors: {
         Row: {
           created_at: string

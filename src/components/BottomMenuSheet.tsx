@@ -61,7 +61,7 @@ const BottomMenuSheet = ({ open, onOpenChange }: BottomMenuSheetProps) => {
     {
       title: "অ্যাকাউন্ট",
       items: [
-        { icon: User, label: "প্রোফাইল", action: () => go("/profile") },
+        { icon: User, label: "ডেভেলপার প্রোফাইল", action: () => go("/developer") },
         { icon: Shield, label: "অ্যাডমিন প্যানেল", action: () => go("/admin-login") },
       ],
     },
