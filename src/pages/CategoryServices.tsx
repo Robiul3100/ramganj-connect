@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { Phone, MapPin, Share2, MessageCircle, Star, GraduationCap, Building2, Briefcase, Clock, User, Award, Stethoscope, BadgeCheck, CalendarClock, Banknote, Filter, ChevronDown, Eye, Calendar, Search, X, Navigation, ImageIcon } from "lucide-react";
+import { Phone, MapPin, Share2, MessageCircle, Star, GraduationCap, Building2, Briefcase, Clock, User, Award, Stethoscope, BadgeCheck, CalendarClock, Banknote, Filter, ChevronDown, Eye, Calendar, Search, X, Navigation, ImageIcon, BookOpen, Hash, Globe, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
 import SubmitFormDialog from "@/components/SubmitFormDialog";
@@ -129,14 +129,24 @@ const getCategoryFormFields = (slug: string) => {
       return [
         { name: "title", label: "প্রতিষ্ঠানের নাম", required: true },
         { name: "edu_type", label: "ধরন", type: "select" as const, options: ["স্কুল", "কলেজ", "মাদ্রাসা", "বিশ্ববিদ্যালয়", "কোচিং", "অন্যান্য"] },
+        { name: "edu_level", label: "শিক্ষা স্তর", placeholder: "যেমন: প্রাথমিক, মাধ্যমিক, উচ্চমাধ্যমিক" },
+        { name: "medium", label: "মাধ্যম", type: "select" as const, options: ["বাংলা", "ইংরেজি", "আরবি", "বাংলা ও ইংরেজি", "অন্যান্য"] },
+        { name: "ownership", label: "পরিচালনা", type: "select" as const, options: ["সরকারি", "বেসরকারি", "স্বায়ত্তশাসিত", "অন্যান্য"] },
+        { name: "motto", label: "মটো / স্লোগান", placeholder: "যেমন: শিক্ষাই আলো" },
         { name: "established_year", label: "প্রতিষ্ঠার সাল", placeholder: "যেমন: ১৯৯০" },
+        { name: "eiin_code", label: "EIIN / কোড নম্বর", placeholder: "যেমন: 123456" },
         { name: "principal_name", label: "প্রধান শিক্ষক / অধ্যক্ষের নাম" },
-        { name: "description", label: "বিবরণ", type: "textarea" as const },
+        { name: "total_students", label: "মোট ছাত্র-ছাত্রী সংখ্যা", placeholder: "যেমন: ১২০০+" },
+        { name: "total_teachers", label: "মোট শিক্ষক সংখ্যা", placeholder: "যেমন: ৪৫" },
+        { name: "admission_open", label: "ভর্তি চলছে?", type: "select" as const, options: ["হ্যাঁ", "না"] },
+        { name: "short_description", label: "সংক্ষিপ্ত বিবরণ", placeholder: "২-৩ লাইনে প্রতিষ্ঠান সম্পর্কে" },
+        { name: "description", label: "বিস্তারিত বিবরণ", type: "textarea" as const },
         { name: "phone", label: "ফোন নাম্বার", type: "tel" as const },
         { name: "whatsapp", label: "WhatsApp নাম্বার", type: "tel" as const },
         { name: "address", label: "ঠিকানা" },
         { name: "area", label: "এলাকা" },
-        { name: "image_url", label: "ছবি (URL)", placeholder: "https://example.com/photo.jpg" },
+        { name: "map_url", label: "Google Maps লিংক", placeholder: "https://maps.google.com/..." },
+        { name: "image_url", label: "প্রতিষ্ঠানের ছবি (URL)", placeholder: "https://example.com/photo.jpg" },
       ];
     case "pharmacy":
     case "shops":
@@ -200,8 +210,18 @@ const buildMetadata = (slug: string, data: Record<string, string>) => {
       break;
     case "education":
       if (data.edu_type) meta.edu_category = data.edu_type;
+      if (data.edu_level) meta.edu_level = data.edu_level;
+      if (data.medium) meta.medium = data.medium;
+      if (data.ownership) meta.ownership = data.ownership;
+      if (data.motto) meta.motto = data.motto;
       if (data.established_year) meta.established_year = data.established_year;
+      if (data.eiin_code) meta.eiin_code = data.eiin_code;
       if (data.principal_name) meta.principal_name = data.principal_name;
+      if (data.total_students) meta.total_students = data.total_students;
+      if (data.total_teachers) meta.total_teachers = data.total_teachers;
+      if (data.admission_open) meta.admission_open = data.admission_open === "হ্যাঁ";
+      if (data.short_description) meta.short_description = data.short_description;
+      if (data.map_url) meta.map_url = data.map_url;
       break;
     case "pharmacy":
     case "shops":
@@ -566,56 +586,211 @@ const HospitalCard = ({ s, colors }: { s: Service; colors: { accent: string; bg:
   );
 };
 
-// ──── Education Card ────
+// ──── Education Card (Premium Institute Design) ────
 const EducationCard = ({ s, colors }: { s: Service; colors: { accent: string; bg: string; gradient: string } }) => {
   const m = s.metadata || {};
+  const [expanded, setExpanded] = useState(false);
+  const eduType = m.edu_category || "";
+  const eduLevel = m.edu_level || "";
+  const medium = m.medium || "";
+  const ownership = m.ownership || "";
+  const motto = m.motto || "";
+  const estYear = m.established_year || "";
+  const eiinCode = m.eiin_code || "";
+  const principalName = m.principal_name || "";
+  const totalStudents = m.total_students || "";
+  const totalTeachers = m.total_teachers || "";
+  const admissionOpen = m.admission_open === true;
+  const shortDesc = m.short_description || "";
+  const mapUrl = m.map_url || "";
+
   return (
-    <div className={`rounded-2xl overflow-hidden border transition-shadow hover:shadow-lg ${s.is_featured ? "ring-2 ring-amber-400/40" : ""}`} style={{ borderColor: colors.accent + "55" }}>
-      {s.is_featured && (
-        <div className="flex items-center gap-1 px-4 pt-3 pb-1">
-          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-          <span className="text-xs font-bold text-amber-600">ফিচার্ড</span>
-        </div>
-      )}
-      <div className="p-4 flex items-start gap-3.5" style={{ background: `linear-gradient(135deg, ${colors.bg}, hsl(0,0%,100%))` }}>
+    <div className="rounded-[16px] bg-card overflow-hidden border border-border/50 transition-all duration-200 hover:shadow-xl group">
+      {/* Cover image */}
+      <div className="relative w-full h-36 sm:h-40 overflow-hidden bg-muted">
         {s.image_url ? (
-          <img src={s.image_url} alt={s.title} className="w-16 h-16 rounded-xl object-cover shrink-0 border shadow-sm" style={{ borderColor: colors.accent + "40" }} />
+          <img src={s.image_url} alt={s.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
         ) : (
-          <div className="w-16 h-16 rounded-xl flex items-center justify-center shrink-0 shadow-sm" style={{ background: colors.bg, color: colors.accent }}>
-            <GraduationCap className="w-7 h-7" />
+          <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${colors.bg}, hsl(0,0%,96%))` }}>
+            <GraduationCap className="w-12 h-12" style={{ color: colors.accent, opacity: 0.4 }} />
           </div>
         )}
-        <div className="flex-1 min-w-0">
-          <h3 className="font-extrabold text-foreground text-[15px] leading-tight">{s.title}</h3>
-          <div className="flex gap-1.5 mt-2 flex-wrap">
-            {m.edu_category && <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: tagColors[0].bg, color: tagColors[0].text }}>{m.edu_category}</span>}
-            {m.established_year && <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: tagColors[1].bg, color: tagColors[1].text }}>প্রতিষ্ঠা: {m.established_year}</span>}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+
+        {/* Type badge (top-left) */}
+        {eduType && (
+          <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full shadow-sm z-10 text-[9px] font-bold text-white" style={{ background: colors.gradient }}>
+            🎓 {eduType}
           </div>
+        )}
+
+        {/* Ownership badge (top-right) */}
+        {ownership && (
+          <div className="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-full shadow-sm z-10 bg-card/90 backdrop-blur-sm">
+            <span className="text-[9px] font-bold text-foreground">{ownership}</span>
+          </div>
+        )}
+
+        {/* Admission Open badge */}
+        {admissionOpen && (
+          <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/90 shadow-md z-10">
+            <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+            <span className="text-[9px] font-bold text-white">ভর্তি চলছে</span>
+          </div>
+        )}
+
+        {/* Featured badge */}
+        {s.is_featured && (
+          <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1 px-2.5 py-1 rounded-full shadow-md z-10"
+            style={{ background: "linear-gradient(135deg, hsl(45,90%,50%), hsl(35,85%,55%))" }}>
+            <Star className="w-3 h-3 text-white fill-white" />
+            <span className="text-[9px] font-extrabold text-white">ফিচার্ড</span>
+          </div>
+        )}
+      </div>
+
+      {/* Info Section */}
+      <div className="px-4 pt-3 pb-2.5">
+        {/* Institution name */}
+        <h3 className="text-[15px] sm:text-[17px] font-extrabold text-foreground leading-tight line-clamp-2">{s.title}</h3>
+
+        {/* Motto */}
+        {motto && (
+          <p className="text-[11px] italic text-muted-foreground mt-0.5 line-clamp-1">"{motto}"</p>
+        )}
+
+        {/* Tags row */}
+        <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+          {eduLevel && (
+            <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full" style={{ background: tagColors[0].bg, color: tagColors[0].text }}>
+              📚 {eduLevel}
+            </span>
+          )}
+          {medium && (
+            <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full" style={{ background: tagColors[3].bg, color: tagColors[3].text }}>
+              🗣 {medium}
+            </span>
+          )}
+          {estYear && (
+            <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full" style={{ background: tagColors[1].bg, color: tagColors[1].text }}>
+              🏛 প্রতিষ্ঠা: {estYear}
+            </span>
+          )}
         </div>
-      </div>
-      <div className="px-4 py-3 border-t border-border/50 bg-card">
-        {m.principal_name && (
-          <p className="text-xs text-foreground font-semibold flex items-center gap-1.5 mb-1">
-            <User className="w-3 h-3 shrink-0" style={{ color: colors.accent }} /> {m.principal_name}
-          </p>
+
+        {/* Compact info grid */}
+        <div className="grid grid-cols-2 gap-1.5 mt-2.5">
+          {principalName && (
+            <div className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 bg-muted/50 border border-border/30">
+              <User className="w-3.5 h-3.5 shrink-0" style={{ color: colors.accent }} />
+              <div className="min-w-0">
+                <p className="text-[8px] text-muted-foreground leading-none">প্রধান</p>
+                <p className="text-[10px] font-bold text-foreground leading-tight mt-0.5 truncate">{principalName}</p>
+              </div>
+            </div>
+          )}
+          {eiinCode && (
+            <div className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 bg-muted/50 border border-border/30">
+              <Hash className="w-3.5 h-3.5 shrink-0" style={{ color: colors.accent }} />
+              <div className="min-w-0">
+                <p className="text-[8px] text-muted-foreground leading-none">EIIN</p>
+                <p className="text-[10px] font-bold text-foreground leading-tight mt-0.5 truncate">{eiinCode}</p>
+              </div>
+            </div>
+          )}
+          {totalStudents && (
+            <div className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 bg-muted/50 border border-border/30">
+              <Users className="w-3.5 h-3.5 shrink-0" style={{ color: colors.accent }} />
+              <div className="min-w-0">
+                <p className="text-[8px] text-muted-foreground leading-none">ছাত্র-ছাত্রী</p>
+                <p className="text-[10px] font-bold text-foreground leading-tight mt-0.5 truncate">{totalStudents}</p>
+              </div>
+            </div>
+          )}
+          {totalTeachers && (
+            <div className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 bg-muted/50 border border-border/30">
+              <BookOpen className="w-3.5 h-3.5 shrink-0" style={{ color: colors.accent }} />
+              <div className="min-w-0">
+                <p className="text-[8px] text-muted-foreground leading-none">শিক্ষক</p>
+                <p className="text-[10px] font-bold text-foreground leading-tight mt-0.5 truncate">{totalTeachers}</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Short description */}
+        {shortDesc && (
+          <p className="text-[12px] text-muted-foreground mt-2 line-clamp-3 leading-relaxed">{shortDesc}</p>
         )}
+
+        {/* Location */}
         {s.address && (
-          <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-            <MapPin className="w-3 h-3 shrink-0" /> {s.address}{s.area ? `, ${s.area}` : ""}
+          <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-2">
+            <MapPin className="w-3 h-3 shrink-0" style={{ color: colors.accent }} />
+            <span className="line-clamp-1">{s.address}{s.area ? `, ${s.area}` : ""}</span>
           </p>
         )}
-        {s.description && <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{s.description}</p>}
+
+        {/* Expandable full description */}
+        {s.description && (
+          <div className="mt-2.5">
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="flex items-center gap-2 w-full px-3 py-2 rounded-xl bg-muted/50 border border-border/40 text-[12px] font-bold text-foreground hover:bg-muted transition-colors"
+            >
+              <Eye className="w-3.5 h-3.5" style={{ color: colors.accent }} />
+              <span>আরও দেখুন</span>
+              <ChevronDown className={`w-4 h-4 ml-auto text-muted-foreground transition-transform duration-300 ${expanded ? "rotate-180" : ""}`} />
+            </button>
+            <div
+              className="overflow-hidden transition-all duration-300 ease-in-out"
+              style={{ maxHeight: expanded ? "500px" : "0px", opacity: expanded ? 1 : 0 }}
+            >
+              <p className="text-[12px] text-muted-foreground leading-relaxed pt-3 px-1">{s.description}</p>
+            </div>
+          </div>
+        )}
       </div>
-      <div className="flex gap-0 border-t border-border/30">
-        {s.phone && (
-          <a href={`tel:${s.phone}`} className="flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 text-white" style={{ background: colors.gradient }}>
+
+      {/* CTA Buttons */}
+      <div className="px-4 pb-3 pt-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {s.phone ? (
+          <a
+            href={`tel:${s.phone}`}
+            className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 text-white active:scale-[0.97] transition-transform"
+            style={{ background: colors.gradient }}
+          >
             <Phone className="w-4 h-4" /> কল করুন
           </a>
+        ) : (
+          <div className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 bg-muted/40 text-muted-foreground cursor-not-allowed">
+            <Phone className="w-4 h-4" /> কল করুন
+          </div>
         )}
-        {s.whatsapp && (
-          <a href={`https://wa.me/88${s.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 text-white" style={{ background: "linear-gradient(135deg, hsl(140,70%,35%), hsl(160,75%,40%))" }}>
-            <MessageCircle className="w-4 h-4" /> হোয়াটসঅ্যাপ
+        {mapUrl ? (
+          <a
+            href={mapUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 border-2 active:scale-[0.97] transition-transform"
+            style={{ borderColor: colors.accent, color: colors.accent }}
+          >
+            <Navigation className="w-4 h-4" /> ম্যাপ দেখুন
           </a>
+        ) : s.whatsapp ? (
+          <a
+            href={`https://wa.me/88${s.whatsapp}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 border-2 active:scale-[0.97] transition-transform"
+            style={{ borderColor: colors.accent, color: colors.accent }}
+          >
+            <MessageCircle className="w-4 h-4" /> মেসেজ করুন
+          </a>
+        ) : (
+          <div className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 bg-muted/40 text-muted-foreground cursor-not-allowed">
+            <Navigation className="w-4 h-4" /> ম্যাপ দেখুন
+          </div>
         )}
       </div>
     </div>
