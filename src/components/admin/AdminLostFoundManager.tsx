@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import SwipeUpEditor from "./SwipeUpEditor";
-import { Search, Plus, Trash2, Edit, Eye, EyeOff, AlertCircle, HandHeart, Upload, Gift } from "lucide-react";
+import { Search, Plus, Trash2, Edit, Eye, EyeOff, AlertCircle, HandHeart, Upload, Gift, Shield, Flame, MapPin } from "lucide-react";
 
 interface LostFoundItem {
   id: string;
@@ -19,6 +19,13 @@ interface LostFoundItem {
   person_image_url: string | null;
   reward: string | null;
   detail_description: string | null;
+  category: string | null;
+  item_time: string | null;
+  identification_marks: string | null;
+  map_link: string | null;
+  is_high_priority: boolean;
+  is_verified: boolean;
+  expire_at: string | null;
 }
 
 interface Props {
@@ -37,6 +44,13 @@ const emptyForm = {
   person_image_url: "",
   reward: "",
   detail_description: "",
+  category: "সাধারণ",
+  item_time: "",
+  identification_marks: "",
+  map_link: "",
+  is_high_priority: false,
+  is_verified: false,
+  expire_days: "",
 };
 
 const AdminLostFoundManager = ({ logActivity }: Props) => {
@@ -72,6 +86,7 @@ const AdminLostFoundManager = ({ logActivity }: Props) => {
 
   const save = async () => {
     if (!form.item_name) { toast({ title: "পণ্যের নাম দিন", variant: "destructive" }); return; }
+    const expireAt = form.expire_days ? new Date(Date.now() + parseInt(form.expire_days) * 86400000).toISOString() : null;
     const payload: any = {
       type: form.type,
       item_name: form.item_name,
@@ -84,6 +99,13 @@ const AdminLostFoundManager = ({ logActivity }: Props) => {
       person_image_url: form.person_image_url || null,
       reward: form.reward || null,
       detail_description: form.detail_description || null,
+      category: form.category || null,
+      item_time: form.item_time || null,
+      identification_marks: form.identification_marks || null,
+      map_link: form.map_link || null,
+      is_high_priority: form.is_high_priority,
+      is_verified: form.is_verified,
+      expire_at: expireAt,
     };
 
     if (editId) {
@@ -115,6 +137,13 @@ const AdminLostFoundManager = ({ logActivity }: Props) => {
       person_image_url: item.person_image_url || "",
       reward: item.reward || "",
       detail_description: item.detail_description || "",
+      category: item.category || "সাধারণ",
+      item_time: item.item_time || "",
+      identification_marks: item.identification_marks || "",
+      map_link: item.map_link || "",
+      is_high_priority: item.is_high_priority || false,
+      is_verified: item.is_verified || false,
+      expire_days: "",
     });
     setShowForm(true);
   };
@@ -135,6 +164,8 @@ const AdminLostFoundManager = ({ logActivity }: Props) => {
   };
 
   const filtered = items.filter(i => i.item_name.toLowerCase().includes(search.toLowerCase()));
+
+  const categories = ["সাধারণ", "মোবাইল", "ডকুমেন্ট", "ব্যাগ", "গহনা", "পোষা প্রাণী", "অন্যান্য"];
 
   return (
     <div className="space-y-4">
@@ -165,6 +196,14 @@ const AdminLostFoundManager = ({ logActivity }: Props) => {
             <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none" value={form.item_name} onChange={e => setForm(p => ({ ...p, item_name: e.target.value }))} placeholder="যেমন: মানিব্যাগ" />
           </div>
 
+          {/* Category */}
+          <div>
+            <label className="text-sm font-semibold text-foreground mb-1 block">ক্যাটাগরি</label>
+            <select className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none" value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}>
+              {categories.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+
           {/* Description */}
           <div>
             <label className="text-sm font-semibold text-foreground mb-1 block">সংক্ষিপ্ত বিবরণ</label>
@@ -180,6 +219,18 @@ const AdminLostFoundManager = ({ logActivity }: Props) => {
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">তারিখ</label>
               <input type="date" className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none" value={form.item_date} onChange={e => setForm(p => ({ ...p, item_date: e.target.value }))} />
+            </div>
+          </div>
+
+          {/* Time + Identification */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1 block">সম্ভাব্য সময়</label>
+              <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none" value={form.item_time} onChange={e => setForm(p => ({ ...p, item_time: e.target.value }))} placeholder="সকাল ১০টা" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1 block">চিহ্নিতকরণ</label>
+              <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none" value={form.identification_marks} onChange={e => setForm(p => ({ ...p, identification_marks: e.target.value }))} placeholder="রঙ, মডেল..." />
             </div>
           </div>
 
@@ -221,6 +272,12 @@ const AdminLostFoundManager = ({ logActivity }: Props) => {
             {form.person_image_url && <img src={form.person_image_url} alt="" className="w-16 h-16 object-cover rounded-full mt-2" />}
           </div>
 
+          {/* Map Link */}
+          <div>
+            <label className="text-sm font-semibold text-foreground mb-1 block flex items-center gap-1"><MapPin className="w-4 h-4 text-primary" /> ম্যাপ লিংক (ঐচ্ছিক)</label>
+            <input className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none" value={form.map_link} onChange={e => setForm(p => ({ ...p, map_link: e.target.value }))} placeholder="Google Maps লিংক..." />
+          </div>
+
           {/* Reward */}
           <div>
             <label className="text-sm font-semibold text-foreground mb-1 block flex items-center gap-1"><Gift className="w-4 h-4 text-amber-500" /> পুরষ্কার ঘোষণা</label>
@@ -231,6 +288,28 @@ const AdminLostFoundManager = ({ logActivity }: Props) => {
           <div>
             <label className="text-sm font-semibold text-foreground mb-1 block">বিস্তারিত বিবরণ</label>
             <textarea className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none min-h-[80px]" value={form.detail_description} onChange={e => setForm(p => ({ ...p, detail_description: e.target.value }))} placeholder="বিস্তারিত তথ্য..." />
+          </div>
+
+          {/* Toggles */}
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setForm(p => ({ ...p, is_high_priority: !p.is_high_priority }))}
+              className={`py-3 rounded-xl text-sm font-bold border-2 transition-all flex items-center justify-center gap-2 ${form.is_high_priority ? "border-red-500 bg-red-500/10 text-red-600" : "border-border text-muted-foreground"}`}
+            >
+              <Flame className="w-4 h-4" /> জরুরি
+            </button>
+            <button
+              onClick={() => setForm(p => ({ ...p, is_verified: !p.is_verified }))}
+              className={`py-3 rounded-xl text-sm font-bold border-2 transition-all flex items-center justify-center gap-2 ${form.is_verified ? "border-blue-500 bg-blue-500/10 text-blue-600" : "border-border text-muted-foreground"}`}
+            >
+              <Shield className="w-4 h-4" /> যাচাইকৃত
+            </button>
+          </div>
+
+          {/* Expire days */}
+          <div>
+            <label className="text-sm font-semibold text-foreground mb-1 block">অটো আর্কাইভ (দিন পর)</label>
+            <input type="number" className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none" value={form.expire_days} onChange={e => setForm(p => ({ ...p, expire_days: e.target.value }))} placeholder="যেমন: 30" />
           </div>
 
           <button onClick={save} disabled={uploading} className="w-full py-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold text-sm disabled:opacity-50">
@@ -280,11 +359,13 @@ const AdminLostFoundManager = ({ logActivity }: Props) => {
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${item.type === "lost" ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"}`}>
                     {item.type === "lost" ? "হারানো" : "পাওয়া"}
                   </span>
                   {!item.is_approved && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">অপেক্ষমান</span>}
+                  {item.is_high_priority && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-600">জরুরি</span>}
+                  {item.is_verified && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-600">যাচাই</span>}
                 </div>
                 <h4 className="text-sm font-bold text-foreground mt-0.5 truncate">{item.item_name}</h4>
                 <p className="text-[11px] text-muted-foreground truncate">{item.location || "অজানা স্থান"} • {item.person_name || "অজানা"}</p>

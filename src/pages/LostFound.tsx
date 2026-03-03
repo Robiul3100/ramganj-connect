@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
 import BottomNav from "@/components/BottomNav";
 import SubmitFormDialog from "@/components/SubmitFormDialog";
-import { Search, MapPin, Calendar, Phone, ChevronDown, ChevronUp, AlertCircle, HandHeart, User, Gift, Clock } from "lucide-react";
-import { format } from "date-fns";
+import { Search, MapPin, Calendar, Phone, ChevronDown, ChevronUp, AlertCircle, HandHeart, User, Gift, Clock, Tag, Eye, Shield, Flame, MessageCircle, ExternalLink } from "lucide-react";
+import { format, differenceInHours } from "date-fns";
 import { bn } from "date-fns/locale";
 
 interface LostFoundItem {
@@ -22,15 +22,31 @@ interface LostFoundItem {
   person_image_url: string | null;
   reward: string | null;
   detail_description: string | null;
+  category: string | null;
+  item_time: string | null;
+  identification_marks: string | null;
+  map_link: string | null;
+  is_high_priority: boolean;
+  is_verified: boolean;
+  expire_at: string | null;
 }
 
 const ItemCardSkeleton = () => (
   <div className="bg-card rounded-2xl overflow-hidden border border-border">
     <div className="aspect-[16/9] skeleton-shimmer" />
     <div className="p-4 space-y-3">
-      <div className="w-3/4 h-4 rounded skeleton-shimmer" />
-      <div className="w-1/2 h-3 rounded skeleton-shimmer" />
-      <div className="w-full h-3 rounded skeleton-shimmer" />
+      <div className="flex gap-2">
+        <div className="w-10 h-10 rounded-full skeleton-shimmer" />
+        <div className="flex-1 space-y-2">
+          <div className="w-3/4 h-4 rounded skeleton-shimmer" />
+          <div className="w-1/2 h-3 rounded skeleton-shimmer" />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div className="h-8 rounded-lg skeleton-shimmer" />
+        <div className="h-8 rounded-lg skeleton-shimmer" />
+      </div>
+      <div className="h-10 rounded-xl skeleton-shimmer" />
     </div>
   </div>
 );
@@ -38,81 +54,129 @@ const ItemCardSkeleton = () => (
 const LostFoundCard = ({ item }: { item: LostFoundItem }) => {
   const [expanded, setExpanded] = useState(false);
   const isLost = item.type === "lost";
+  const isRecent = differenceInHours(new Date(), new Date(item.created_at)) < 24;
 
   return (
-    <div className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm">
-      {/* Person header - like a social post */}
-      <div className="flex items-center gap-3 px-4 pt-4 pb-2">
-        {item.person_image_url ? (
-          <img src={item.person_image_url} alt={item.person_name || ""} className="w-10 h-10 rounded-full object-cover border-2 border-border" />
-        ) : (
-          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
-            <User className="w-5 h-5 text-muted-foreground" />
-          </div>
-        )}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-foreground truncate">{item.person_name || "বেনামী"}</p>
-          <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-            <Clock className="w-3 h-3 shrink-0" />
-            {format(new Date(item.created_at), "d MMM yyyy, h:mm a", { locale: bn })}
-          </p>
-        </div>
-        <span className={`px-3 py-1 rounded-full text-[11px] font-bold text-primary-foreground shrink-0 ${isLost ? "bg-destructive" : "bg-primary"}`}>
-          {isLost ? "হারিয়েছি" : "পেয়েছি"}
-        </span>
-      </div>
-
-      {/* Full-width image */}
+    <div className="bg-card rounded-[16px] overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow duration-300">
+      {/* Full-width image with badge overlay */}
       <div className="relative">
         {item.image_url ? (
-          <img src={item.image_url} alt={item.item_name} className="w-full aspect-[4/3] object-cover" />
+          <img src={item.image_url} alt={item.item_name} className="w-full aspect-[16/9] object-cover" />
         ) : (
-          <div className={`w-full aspect-[3/2] flex items-center justify-center ${isLost ? "bg-destructive/5" : "bg-primary/5"}`}>
-            {isLost ? <AlertCircle className="w-14 h-14 text-destructive/20" /> : <HandHeart className="w-14 h-14 text-primary/20" />}
+          <div className={`w-full aspect-[16/9] flex items-center justify-center ${isLost ? "bg-destructive/5" : "bg-primary/5"}`}>
+            {isLost ? <AlertCircle className="w-16 h-16 text-destructive/15" /> : <HandHeart className="w-16 h-16 text-primary/15" />}
           </div>
         )}
+        {/* Bottom gradient overlay */}
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent" />
+
+        {/* Top-right status badge */}
+        <span className={`absolute top-3 right-3 px-3 py-1.5 rounded-full text-[11px] font-bold text-white shadow-lg ${isLost ? "bg-destructive" : "bg-emerald-500"}`}>
+          {isLost ? "🔴 হারিয়েছে" : "🟢 পাওয়া গেছে"}
+        </span>
+
+        {/* Top-left badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+          {isRecent && (
+            <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-amber-500 text-white shadow-md flex items-center gap-1">
+              <Flame className="w-3 h-3" /> সাম্প্রতিক
+            </span>
+          )}
+          {item.is_high_priority && (
+            <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-red-600 text-white shadow-md">
+              ⚡ জরুরি
+            </span>
+          )}
+          {item.is_verified && (
+            <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-blue-500 text-white shadow-md flex items-center gap-1">
+              <Shield className="w-3 h-3" /> যাচাইকৃত
+            </span>
+          )}
+        </div>
+
+        {/* Reward badge on image */}
         {item.reward && (
-          <span className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500 text-primary-foreground flex items-center gap-1 shadow-md">
+          <span className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500 text-white flex items-center gap-1 shadow-lg">
             <Gift className="w-3 h-3" /> পুরষ্কার আছে
           </span>
         )}
       </div>
 
-      {/* Content */}
-      <div className="px-4 pt-3 pb-4 space-y-2.5">
-        <h3 className="font-bold text-foreground text-[15px] leading-snug">{item.item_name}</h3>
-
-        {item.description && (
-          <p className="text-[13px] text-muted-foreground leading-relaxed line-clamp-2">{item.description}</p>
-        )}
-
-        {/* Meta info chips */}
-        <div className="flex flex-wrap gap-2">
-          {item.location && (
-            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground bg-muted rounded-lg px-2.5 py-1.5">
-              <MapPin className="w-3 h-3 shrink-0" /> {item.location}
-            </span>
-          )}
-          {item.item_date && (
-            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground bg-muted rounded-lg px-2.5 py-1.5">
-              <Calendar className="w-3 h-3 shrink-0" />
-              {format(new Date(item.item_date), "d MMM yyyy", { locale: bn })}
-            </span>
+      {/* Content section */}
+      <div className="p-4 space-y-3">
+        {/* Primary info */}
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="font-bold text-foreground text-[15px] leading-snug flex-1">{item.item_name}</h3>
+            {item.category && item.category !== "সাধারণ" && (
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground shrink-0">
+                {item.category}
+              </span>
+            )}
+          </div>
+          {item.description && (
+            <p className="text-[13px] text-muted-foreground leading-relaxed line-clamp-2">{item.description}</p>
           )}
         </div>
 
-        {/* Expandable Detail */}
+        {/* Icon-based compact info grid */}
+        <div className="grid grid-cols-2 gap-2">
+          {item.item_date && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/60 rounded-lg px-2.5 py-2">
+              <Calendar className="w-3.5 h-3.5 text-primary shrink-0" />
+              <span className="truncate">{format(new Date(item.item_date), "d MMM yyyy", { locale: bn })}</span>
+            </div>
+          )}
+          {item.item_time && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/60 rounded-lg px-2.5 py-2">
+              <Clock className="w-3.5 h-3.5 text-primary shrink-0" />
+              <span className="truncate">{item.item_time}</span>
+            </div>
+          )}
+          {item.location && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/60 rounded-lg px-2.5 py-2">
+              <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
+              <span className="truncate">{item.location}</span>
+            </div>
+          )}
+          {item.identification_marks && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/60 rounded-lg px-2.5 py-2">
+              <Tag className="w-3.5 h-3.5 text-primary shrink-0" />
+              <span className="truncate">{item.identification_marks}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Person info section */}
+        <div className="flex items-center gap-3 bg-muted/40 rounded-xl p-2.5">
+          {item.person_image_url ? (
+            <img src={item.person_image_url} alt={item.person_name || ""} className="w-9 h-9 rounded-full object-cover border-2 border-background shrink-0" />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0">
+              <User className="w-4 h-4 text-muted-foreground" />
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] text-muted-foreground">{isLost ? "হারানো ব্যক্তির তথ্য" : "যিনি পেয়েছেন"}</p>
+            <p className="text-xs font-semibold text-foreground truncate">{item.person_name || "বেনামী"}</p>
+          </div>
+          <p className="text-[10px] text-muted-foreground shrink-0">
+            {format(new Date(item.created_at), "d MMM", { locale: bn })}
+          </p>
+        </div>
+
+        {/* Expandable detail */}
         {(item.detail_description || item.reward) && (
           <div>
             <button
               onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-1 text-xs font-semibold text-primary pt-1"
+              className="flex items-center gap-1 text-xs font-semibold text-primary"
             >
-              {expanded ? "সংক্ষেপে দেখুন" : "বিস্তারিত দেখুন"}
+              {expanded ? "সংক্ষেপে দেখুন" : "আরও দেখুন"}
               {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             </button>
-            {expanded && (
-              <div className="mt-2 space-y-2 text-[13px] text-muted-foreground bg-muted/40 rounded-xl p-3">
+            <div className={`overflow-hidden transition-all duration-300 ${expanded ? "max-h-96 mt-2" : "max-h-0"}`}>
+              <div className="space-y-2 text-[13px] text-muted-foreground bg-muted/40 rounded-xl p-3">
                 {item.detail_description && <p className="leading-relaxed">{item.detail_description}</p>}
                 {item.reward && (
                   <div className="flex items-start gap-2 bg-amber-500/10 rounded-lg p-2.5">
@@ -121,19 +185,31 @@ const LostFoundCard = ({ item }: { item: LostFoundItem }) => {
                   </div>
                 )}
               </div>
-            )}
+            </div>
           </div>
         )}
 
-        {/* CTA */}
-        {item.phone && (
-          <a
-            href={`tel:${item.phone}`}
-            className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90 ${isLost ? "bg-destructive" : "bg-primary"}`}
-          >
-            <Phone className="w-4 h-4" /> যোগাযোগ করুন
-          </a>
-        )}
+        {/* CTA Buttons */}
+        <div className="flex gap-2">
+          {item.phone && (
+            <a
+              href={`tel:${item.phone}`}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-white transition-opacity hover:opacity-90 ${isLost ? "bg-destructive" : "bg-emerald-500"}`}
+            >
+              <Phone className="w-4 h-4" /> যোগাযোগ করুন
+            </a>
+          )}
+          {item.map_link && (
+            <a
+              href={item.map_link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold border border-border text-foreground bg-muted/50 hover:bg-muted transition-colors"
+            >
+              <ExternalLink className="w-4 h-4" /> লোকেশন
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -142,9 +218,12 @@ const LostFoundCard = ({ item }: { item: LostFoundItem }) => {
 const submitFields = [
   { name: "type", label: "ধরন", type: "select" as const, options: ["হারিয়েছি", "পেয়েছি"], required: true },
   { name: "item_name", label: "কি হারিয়েছেন/পেয়েছেন?", placeholder: "যেমন: মানিব্যাগ, এনআইডি", required: true },
-  { name: "description", label: "বিবরণ", type: "textarea" as const, placeholder: "রঙ, সাইজ বা বিশেষ চিহ্ন..." },
+  { name: "category", label: "ক্যাটাগরি", type: "select" as const, options: ["মোবাইল", "ডকুমেন্ট", "ব্যাগ", "গহনা", "পোষা প্রাণী", "অন্যান্য"] },
+  { name: "description", label: "সংক্ষিপ্ত বিবরণ", type: "textarea" as const, placeholder: "রঙ, সাইজ বা বিশেষ চিহ্ন..." },
   { name: "location", label: "স্থান", placeholder: "কোথায়?" },
   { name: "item_date", label: "তারিখ", type: "date" as const },
+  { name: "item_time", label: "সম্ভাব্য সময়", placeholder: "যেমন: সকাল ১০টা" },
+  { name: "identification_marks", label: "চিহ্নিতকরণ বৈশিষ্ট্য", placeholder: "রঙ, মডেল, বিশেষ চিহ্ন..." },
   { name: "person_name", label: "আপনার নাম", placeholder: "আপনার পুরো নাম" },
   { name: "phone", label: "যোগাযোগ নম্বর", type: "tel" as const, placeholder: "017...", required: true },
   { name: "reward", label: "পুরষ্কার ঘোষণা (ঐচ্ছিক)", placeholder: "ফেরত দিলে পুরষ্কার পাবেন..." },
@@ -177,12 +256,15 @@ const LostFound = () => {
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  const filtered = items.filter((item) => {
+  const filtered = useMemo(() => items.filter((item) => {
     if (filter === "lost" && item.type !== "lost") return false;
     if (filter === "found" && item.type !== "found") return false;
-    if (search && !item.item_name.toLowerCase().includes(search.toLowerCase()) && !(item.description || "").toLowerCase().includes(search.toLowerCase())) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (!item.item_name.toLowerCase().includes(q) && !(item.description || "").toLowerCase().includes(q) && !(item.location || "").toLowerCase().includes(q)) return false;
+    }
     return true;
-  });
+  }), [items, filter, search]);
 
   const handleSubmit = async (data: Record<string, string>) => {
     const typeValue = data.type === "পেয়েছি" ? "found" : "lost";
@@ -192,9 +274,12 @@ const LostFound = () => {
       description: data.description || null,
       location: data.location || null,
       item_date: data.item_date || null,
+      item_time: data.item_time || null,
       phone: data.phone,
       person_name: data.person_name || null,
       reward: data.reward || null,
+      category: data.category || null,
+      identification_marks: data.identification_marks || null,
     } as any);
   };
 
@@ -236,6 +321,18 @@ const LostFound = () => {
               {tab.label} ({tab.count})
             </button>
           ))}
+        </div>
+
+        {/* Stats bar */}
+        <div className="flex items-center gap-2 text-xs">
+          <span className="bg-muted px-3 py-1.5 rounded-full text-muted-foreground font-medium">
+            মোট: {items.length}
+          </span>
+          {items.filter(i => differenceInHours(new Date(), new Date(i.created_at)) < 24).length > 0 && (
+            <span className="bg-amber-500/10 text-amber-700 dark:text-amber-400 px-3 py-1.5 rounded-full font-medium flex items-center gap-1">
+              <Flame className="w-3 h-3" /> আজকের: {items.filter(i => differenceInHours(new Date(), new Date(i.created_at)) < 24).length}
+            </span>
+          )}
         </div>
 
         {/* Cards */}
