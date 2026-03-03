@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { Phone, MapPin, Share2, MessageCircle, Star, GraduationCap, Building2, Briefcase, Clock, User, Award, Stethoscope, BadgeCheck, CalendarClock, Banknote, Filter, ChevronDown, Eye, Calendar, Search, X, Navigation, ImageIcon, BookOpen, Hash, Globe, Users } from "lucide-react";
+import { Phone, MapPin, Share2, MessageCircle, Star, GraduationCap, Building2, Briefcase, Clock, User, Award, Stethoscope, BadgeCheck, CalendarClock, Banknote, Filter, ChevronDown, Eye, Calendar, Search, X, Navigation, ImageIcon, BookOpen, Hash, Globe, Users, ShoppingBag, Tag, Facebook, ChevronLeft, ChevronRight, Package, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
 import SubmitFormDialog from "@/components/SubmitFormDialog";
@@ -169,6 +169,26 @@ const getCategoryFormFields = (slug: string) => {
         { name: "cover_image", label: "কভার ছবি (URL)", placeholder: "https://example.com/cover.jpg" },
         { name: "image_url", label: "মালিকের ছবি (URL)", placeholder: "https://example.com/owner.jpg" },
       ];
+    case "marketplace":
+      return [
+        { name: "title", label: "পণ্যের নাম", required: true, placeholder: "যেমন: Samsung Galaxy S24 Ultra" },
+        { name: "price", label: "দাম (৳)", required: true, placeholder: "যেমন: ৫৫,০০০" },
+        { name: "condition", label: "পণ্যের অবস্থা", type: "select" as const, options: ["নতুন", "ব্যবহৃত - ভালো", "ব্যবহৃত - মোটামুটি", "রিফার্বিশড"] },
+        { name: "product_category", label: "পণ্যের ক্যাটাগরি", type: "select" as const, options: ["মোবাইল", "ইলেকট্রনিক্স", "পোশাক", "আসবাবপত্র", "যানবাহন", "জমি/ফ্ল্যাট", "বই", "খাদ্যদ্রব্য", "অন্যান্য"] },
+        { name: "description", label: "পণ্যের বিস্তারিত বিবরণ", type: "textarea" as const, required: true, placeholder: "পণ্যের ফিচার, স্পেসিফিকেশন, কেনো বিক্রি করছেন ইত্যাদি..." },
+        { name: "image_url", label: "পণ্যের ছবি ১ (প্রধান)", placeholder: "https://example.com/product1.jpg" },
+        { name: "image_2", label: "পণ্যের ছবি ২", placeholder: "https://example.com/product2.jpg" },
+        { name: "image_3", label: "পণ্যের ছবি ৩", placeholder: "https://example.com/product3.jpg" },
+        { name: "image_4", label: "পণ্যের ছবি ৪", placeholder: "https://example.com/product4.jpg" },
+        { name: "seller_name", label: "বিক্রেতার নাম", required: true },
+        { name: "seller_image", label: "বিক্রেতার ছবি (URL)", placeholder: "https://example.com/seller.jpg" },
+        { name: "facebook_url", label: "ফেসবুক প্রোফাইল লিংক", placeholder: "https://facebook.com/..." },
+        { name: "is_negotiable", label: "দাম আলোচনা সাপেক্ষ?", type: "select" as const, options: ["হ্যাঁ", "না"] },
+        { name: "phone", label: "ফোন নাম্বার", type: "tel" as const, required: true },
+        { name: "whatsapp", label: "WhatsApp নাম্বার", type: "tel" as const },
+        { name: "address", label: "অবস্থান / ঠিকানা", required: true },
+        { name: "area", label: "এলাকা" },
+      ];
     case "jobs":
       return [
         { name: "title", label: "পদের নাম", required: true },
@@ -235,6 +255,22 @@ const buildMetadata = (slug: string, data: Record<string, string>) => {
       if (data.map_url) meta.map_url = data.map_url;
       if (data.message_url) meta.message_url = data.message_url;
       if (data.cover_image) meta.cover_image = data.cover_image;
+      break;
+    case "marketplace":
+      if (data.price) meta.price = data.price;
+      if (data.condition) meta.condition = data.condition;
+      if (data.product_category) meta.product_category = data.product_category;
+      if (data.seller_name) meta.seller_name = data.seller_name;
+      if (data.seller_image) meta.seller_image = data.seller_image;
+      if (data.facebook_url) meta.facebook_url = data.facebook_url;
+      if (data.is_negotiable) meta.is_negotiable = data.is_negotiable === "হ্যাঁ";
+      {
+        const imgs: string[] = [];
+        if (data.image_2) imgs.push(data.image_2);
+        if (data.image_3) imgs.push(data.image_3);
+        if (data.image_4) imgs.push(data.image_4);
+        if (imgs.length > 0) meta.extra_images = imgs;
+      }
       break;
     case "jobs":
       if (data.company) meta.company = data.company;
@@ -1014,6 +1050,253 @@ const ShopCard = ({ s, colors }: { s: Service; colors: { accent: string; bg: str
   );
 };
 
+// ──── Marketplace Card (Premium Product Listing) ────
+const MarketplaceCard = ({ s, colors }: { s: Service; colors: { accent: string; bg: string; gradient: string } }) => {
+  const m = s.metadata || {};
+  const [expanded, setExpanded] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [liked, setLiked] = useState(false);
+
+  const price = m.price || "";
+  const condition = m.condition || "";
+  const productCategory = m.product_category || "";
+  const sellerName = m.seller_name || "";
+  const sellerImage = m.seller_image || "";
+  const facebookUrl = m.facebook_url || "";
+  const isNegotiable = m.is_negotiable === true;
+
+  // Build image array
+  const images: string[] = [];
+  if (s.image_url) images.push(s.image_url);
+  if (Array.isArray(m.extra_images)) images.push(...m.extra_images);
+
+  const nextSlide = useCallback(() => setCurrentSlide(p => (p + 1) % Math.max(images.length, 1)), [images.length]);
+  const prevSlide = useCallback(() => setCurrentSlide(p => (p - 1 + Math.max(images.length, 1)) % Math.max(images.length, 1)), [images.length]);
+
+  const conditionColor = condition === "নতুন"
+    ? { bg: "hsl(142,50%,90%)", text: "hsl(142,60%,30%)" }
+    : { bg: "hsl(45,60%,90%)", text: "hsl(45,70%,30%)" };
+
+  return (
+    <div className="rounded-[16px] bg-card overflow-hidden border border-border/50 transition-all duration-200 hover:shadow-xl group">
+      {/* Image Slider */}
+      <div className="relative w-full aspect-[4/3] overflow-hidden bg-muted">
+        {images.length > 0 ? (
+          <>
+            <img
+              src={images[currentSlide]}
+              alt={`${s.title} - ছবি ${currentSlide + 1}`}
+              className="w-full h-full object-cover transition-opacity duration-300"
+            />
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+
+            {/* Nav arrows */}
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => { e.stopPropagation(); prevSlide(); }}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-md hover:bg-card transition-colors z-10"
+                >
+                  <ChevronLeft className="w-4 h-4 text-foreground" />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); nextSlide(); }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-md hover:bg-card transition-colors z-10"
+                >
+                  <ChevronRight className="w-4 h-4 text-foreground" />
+                </button>
+              </>
+            )}
+
+            {/* Slide dots */}
+            {images.length > 1 && (
+              <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
+                {images.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={(e) => { e.stopPropagation(); setCurrentSlide(i); }}
+                    className={`rounded-full transition-all duration-200 ${i === currentSlide ? "w-5 h-2 bg-white" : "w-2 h-2 bg-white/50"}`}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Image counter */}
+            {images.length > 1 && (
+              <div className="absolute top-2.5 right-2.5 px-2 py-1 rounded-full bg-black/50 backdrop-blur-sm z-10">
+                <span className="text-[10px] font-bold text-white">{currentSlide + 1}/{images.length}</span>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: `linear-gradient(135deg, ${colors.bg}, hsl(0,0%,96%))` }}>
+            <Package className="w-12 h-12 mb-2" style={{ color: colors.accent, opacity: 0.4 }} />
+            <span className="text-[11px] text-muted-foreground">ছবি নেই</span>
+          </div>
+        )}
+
+        {/* Like button */}
+        <button
+          onClick={(e) => { e.stopPropagation(); setLiked(!liked); }}
+          className="absolute top-2.5 left-2.5 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-md z-10 transition-transform active:scale-90"
+        >
+          <Heart className={`w-4 h-4 transition-colors ${liked ? "text-red-500 fill-red-500" : "text-foreground"}`} />
+        </button>
+
+        {/* Featured badge */}
+        {s.is_featured && (
+          <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1 px-2.5 py-1 rounded-full shadow-md z-10"
+            style={{ background: "linear-gradient(135deg, hsl(45,90%,50%), hsl(35,85%,55%))" }}>
+            <Star className="w-3 h-3 text-white fill-white" />
+            <span className="text-[9px] font-extrabold text-white">ফিচার্ড</span>
+          </div>
+        )}
+      </div>
+
+      {/* Product Info */}
+      <div className="px-4 pt-3 pb-2.5">
+        {/* Price + condition row */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[18px] sm:text-[20px] font-extrabold" style={{ color: colors.accent }}>
+              ৳{price}
+            </span>
+            {isNegotiable && (
+              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400">
+                আলোচনা সাপেক্ষ
+              </span>
+            )}
+          </div>
+          {condition && (
+            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: conditionColor.bg, color: conditionColor.text }}>
+              {condition}
+            </span>
+          )}
+        </div>
+
+        {/* Product name */}
+        <h3 className="text-[15px] sm:text-[17px] font-extrabold text-foreground leading-tight line-clamp-2 mt-1.5">{s.title}</h3>
+
+        {/* Category tag */}
+        {productCategory && (
+          <div className="flex items-center gap-1.5 mt-2">
+            <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full" style={{ background: colors.bg, color: colors.accent }}>
+              <Tag className="w-3 h-3 inline mr-1" />{productCategory}
+            </span>
+          </div>
+        )}
+
+        {/* Short description (first 3 lines) */}
+        {s.description && (
+          <p className="text-[12px] text-muted-foreground mt-2 line-clamp-3 leading-relaxed">{s.description}</p>
+        )}
+
+        {/* Location */}
+        {s.address && (
+          <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-2">
+            <MapPin className="w-3 h-3 shrink-0" style={{ color: colors.accent }} />
+            <span className="line-clamp-1">{s.address}{s.area ? `, ${s.area}` : ""}</span>
+          </p>
+        )}
+
+        {/* Expandable full description */}
+        {s.description && s.description.length > 120 && (
+          <div className="mt-2.5">
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="flex items-center gap-2 w-full px-3 py-2 rounded-xl bg-muted/50 border border-border/40 text-[12px] font-bold text-foreground hover:bg-muted transition-colors"
+            >
+              <Eye className="w-3.5 h-3.5" style={{ color: colors.accent }} />
+              <span>বিস্তারিত দেখুন</span>
+              <ChevronDown className={`w-4 h-4 ml-auto text-muted-foreground transition-transform duration-300 ${expanded ? "rotate-180" : ""}`} />
+            </button>
+            <div
+              className="overflow-hidden transition-all duration-300 ease-in-out"
+              style={{ maxHeight: expanded ? "600px" : "0px", opacity: expanded ? 1 : 0 }}
+            >
+              <p className="text-[12px] text-muted-foreground leading-relaxed pt-3 px-1 whitespace-pre-line">{s.description}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Divider */}
+        <div className="border-t border-border/40 mt-3 pt-3">
+          {/* Seller info */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              {sellerImage ? (
+                <img src={sellerImage} alt={sellerName} className="w-9 h-9 rounded-full object-cover border-2 border-border/60" />
+              ) : (
+                <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-bold" style={{ background: colors.bg, color: colors.accent }}>
+                  {sellerName ? sellerName.charAt(0) : "?"}
+                </div>
+              )}
+              <div>
+                <p className="text-[12px] font-bold text-foreground leading-tight">{sellerName || "বিক্রেতা"}</p>
+                <p className="text-[10px] text-muted-foreground">বিক্রেতা</p>
+              </div>
+            </div>
+            {facebookUrl && (
+              <a
+                href={facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors"
+                style={{ background: "hsl(220,70%,94%)", color: "hsl(220,70%,45%)" }}
+              >
+                <Facebook className="w-3.5 h-3.5" /> প্রোফাইল
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Buttons */}
+      <div className="px-4 pb-3 pt-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {s.phone ? (
+          <a
+            href={`tel:${s.phone}`}
+            className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 text-white active:scale-[0.97] transition-transform"
+            style={{ background: colors.gradient }}
+          >
+            <Phone className="w-4 h-4" /> কল করুন
+          </a>
+        ) : (
+          <div className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 bg-muted/40 text-muted-foreground cursor-not-allowed">
+            <Phone className="w-4 h-4" /> কল করুন
+          </div>
+        )}
+        {s.whatsapp ? (
+          <a
+            href={`https://wa.me/88${s.whatsapp}?text=${encodeURIComponent(`"${s.title}" পণ্যটি সম্পর্কে জানতে চাই।`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 text-white active:scale-[0.97] transition-transform"
+            style={{ background: "linear-gradient(135deg, hsl(142,70%,38%), hsl(152,65%,45%))" }}
+          >
+            <MessageCircle className="w-4 h-4" /> মেসেজ করুন
+          </a>
+        ) : facebookUrl ? (
+          <a
+            href={facebookUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 border-2 active:scale-[0.97] transition-transform"
+            style={{ borderColor: colors.accent, color: colors.accent }}
+          >
+            <Facebook className="w-4 h-4" /> মেসেঞ্জার
+          </a>
+        ) : (
+          <div className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 bg-muted/40 text-muted-foreground cursor-not-allowed">
+            <MessageCircle className="w-4 h-4" /> মেসেজ
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // ──── Default Card (for other categories) ────
 const DefaultCard = ({ s, colors }: { s: Service; colors: { accent: string; bg: string; gradient: string } }) => {
   const m = s.metadata || {};
@@ -1315,6 +1598,8 @@ const CategoryServices = () => {
       case "pharmacy":
       case "shops":
         return <ShopCard key={s.id} s={s} colors={colors} />;
+      case "marketplace":
+        return <MarketplaceCard key={s.id} s={s} colors={colors} />;
       default:
         return <DefaultCard key={s.id} s={s} colors={colors} />;
     }
