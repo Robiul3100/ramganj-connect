@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Megaphone, RefreshCw, ToggleLeft, ToggleRight, Wrench, Save, Shield, SlidersHorizontal, Layers, Newspaper, Star, Clock } from "lucide-react";
+import { Megaphone, RefreshCw, ToggleLeft, ToggleRight, Wrench, Save, Shield, SlidersHorizontal, Layers, Newspaper, Star, Clock, FileText } from "lucide-react";
 
 interface Setting {
   key: string;
@@ -14,6 +14,9 @@ const SiteSettingsPanel = () => {
   const [saving, setSaving] = useState<string | null>(null);
   const [maintenanceMsg, setMaintenanceMsg] = useState("");
   const [savingMsg, setSavingMsg] = useState(false);
+  const [privacyContent, setPrivacyContent] = useState("");
+  const [disclaimerContent, setDisclaimerContent] = useState("");
+  const [savingContent, setSavingContent] = useState<string | null>(null);
 
   const fetchSettings = async () => {
     setLoading(true);
@@ -23,6 +26,8 @@ const SiteSettingsPanel = () => {
       (data as Setting[]).forEach((s) => { map[s.key] = s.value; });
       setSettings(map);
       setMaintenanceMsg(map["maintenance_message"] || "");
+      setPrivacyContent(map["privacy_policy_content"] || "");
+      setDisclaimerContent(map["disclaimer_content"] || "");
     }
     setLoading(false);
   };
@@ -41,6 +46,19 @@ const SiteSettingsPanel = () => {
       toast({ title: newValue === "true" ? "✅ চালু করা হয়েছে" : "⏸ বন্ধ করা হয়েছে" });
     }
     setSaving(null);
+  };
+
+  const saveContent = async (key: string, value: string) => {
+    setSavingContent(key);
+    const { error } = await (supabase.from as any)("site_settings")
+      .upsert({ key, value }, { onConflict: "key" });
+    if (error) {
+      toast({ title: "ব্যর্থ হয়েছে", variant: "destructive" });
+    } else {
+      setSettings((prev) => ({ ...prev, [key]: value }));
+      toast({ title: "সেভ হয়েছে ✅" });
+    }
+    setSavingContent(null);
   };
 
   const saveMaintenanceMsg = async () => {
@@ -207,6 +225,58 @@ const SiteSettingsPanel = () => {
           className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
         >
           <Save className="w-4 h-4" /> {savingMsg ? "সেভ হচ্ছে..." : "ম্যাসেজ সেভ করুন"}
+        </button>
+      </div>
+
+      {/* Privacy Policy Editor */}
+      <div className="bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl p-5 space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <FileText className="w-4 h-4 text-primary" />
+          </div>
+          <div>
+            <h3 className="font-bold text-sm text-foreground">প্রাইভেসি পলিসি</h3>
+            <p className="text-[10px] text-muted-foreground">HTML কন্টেন্ট সাপোর্ট করে</p>
+          </div>
+        </div>
+        <textarea
+          className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none min-h-[120px] focus:border-primary/40 focus:ring-2 focus:ring-primary/10 resize-none transition-all font-mono"
+          value={privacyContent}
+          onChange={(e) => setPrivacyContent(e.target.value)}
+          placeholder="প্রাইভেসি পলিসি কন্টেন্ট (HTML)..."
+        />
+        <button
+          onClick={() => saveContent("privacy_policy_content", privacyContent)}
+          disabled={savingContent === "privacy_policy_content"}
+          className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
+        >
+          <Save className="w-4 h-4" /> {savingContent === "privacy_policy_content" ? "সেভ হচ্ছে..." : "প্রাইভেসি পলিসি সেভ করুন"}
+        </button>
+      </div>
+
+      {/* Disclaimer Editor */}
+      <div className="bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl p-5 space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+            <FileText className="w-4 h-4 text-amber-500" />
+          </div>
+          <div>
+            <h3 className="font-bold text-sm text-foreground">ডিসক্লেইমার</h3>
+            <p className="text-[10px] text-muted-foreground">HTML কন্টেন্ট সাপোর্ট করে</p>
+          </div>
+        </div>
+        <textarea
+          className="w-full bg-muted/50 rounded-xl px-4 py-3 text-sm border border-border outline-none min-h-[120px] focus:border-primary/40 focus:ring-2 focus:ring-primary/10 resize-none transition-all font-mono"
+          value={disclaimerContent}
+          onChange={(e) => setDisclaimerContent(e.target.value)}
+          placeholder="ডিসক্লেইমার কন্টেন্ট (HTML)..."
+        />
+        <button
+          onClick={() => saveContent("disclaimer_content", disclaimerContent)}
+          disabled={savingContent === "disclaimer_content"}
+          className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
+        >
+          <Save className="w-4 h-4" /> {savingContent === "disclaimer_content" ? "সেভ হচ্ছে..." : "ডিসক্লেইমার সেভ করুন"}
         </button>
       </div>
 
