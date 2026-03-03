@@ -34,6 +34,7 @@ import AdminDeveloperProfile from "@/components/admin/AdminDeveloperProfile";
 import AdminLostFoundManager from "@/components/admin/AdminLostFoundManager";
 import AdminEventsManager from "@/components/admin/AdminEventsManager";
 import AdminPoliceManager from "@/components/admin/AdminPoliceManager";
+import AdminServicesByCategory from "@/components/admin/AdminServicesByCategory";
 
 // Legacy table configs for CRUD
 const legacyTableConfig: Record<string, { table: string; fields: { name: string; label: string; type?: string; options?: string[] }[]; nameKey: string }> = {
@@ -906,7 +907,7 @@ const AdminDashboard = () => {
   const [serviceHubSearch, setServiceHubSearch] = useState("");
 
   const serviceHubSections = [
-    { id: "services" as AdminTab, label: "সেবাসমূহ", desc: "সেবা যোগ, এডিট, অনুমোদন", icon: Globe, gradient: "from-primary to-primary/80" },
+    { id: "services" as AdminTab, label: "সেবাসমূহ", desc: "ক্যাটাগরি অনুযায়ী সেবা ম্যানেজ", icon: Globe, gradient: "from-primary to-primary/80" },
     { id: "pending" as AdminTab, label: "অপেক্ষমান", desc: `${counts.pending}টি অনুমোদন বাকি`, icon: Clock, gradient: "from-amber-500 to-orange-500" },
     { id: "categories" as AdminTab, label: "ক্যাটাগরি", desc: "ক্যাটাগরি ম্যানেজ করুন", icon: Layers, gradient: "from-violet-500 to-purple-500" },
     { id: "service_grid" as AdminTab, label: "সার্ভিস গ্রিড", desc: "হোমপেজ গ্রিড আইকন", icon: SlidersHorizontal, gradient: "from-blue-500 to-indigo-500" },
@@ -1035,7 +1036,8 @@ const AdminDashboard = () => {
       case "dashboard": return renderDashboard();
       case "all_services": return renderAllServicesHub();
       case "all_settings": return renderAllSettingsHub();
-      case "services": case "pending": return renderServicesList();
+      case "services": return <AdminServicesByCategory logActivity={logActivity} />;
+      case "pending": return renderServicesList();
       case "categories": return renderCategories();
       case "activity": return renderActivity();
       case "users": return renderUsers();
