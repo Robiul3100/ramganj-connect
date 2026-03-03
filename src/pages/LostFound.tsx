@@ -40,74 +40,80 @@ const LostFoundCard = ({ item }: { item: LostFoundItem }) => {
   const isLost = item.type === "lost";
 
   return (
-    <div className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow">
-      {/* Type Badge + Image */}
-      <div className="relative">
-        {item.image_url ? (
-          <img src={item.image_url} alt={item.item_name} className="w-full aspect-[16/9] object-cover" />
+    <div className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm">
+      {/* Person header - like a social post */}
+      <div className="flex items-center gap-3 px-4 pt-4 pb-2">
+        {item.person_image_url ? (
+          <img src={item.person_image_url} alt={item.person_name || ""} className="w-10 h-10 rounded-full object-cover border-2 border-border" />
         ) : (
-          <div className={`w-full aspect-[16/9] flex items-center justify-center ${isLost ? "bg-destructive/5" : "bg-primary/5"}`}>
-            {isLost ? <AlertCircle className="w-12 h-12 text-destructive/30" /> : <HandHeart className="w-12 h-12 text-primary/30" />}
+          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+            <User className="w-5 h-5 text-muted-foreground" />
           </div>
         )}
-        <span className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold text-white ${isLost ? "bg-destructive" : "bg-primary"}`}>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-foreground truncate">{item.person_name || "বেনামী"}</p>
+          <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+            <Clock className="w-3 h-3 shrink-0" />
+            {format(new Date(item.created_at), "d MMM yyyy, h:mm a", { locale: bn })}
+          </p>
+        </div>
+        <span className={`px-3 py-1 rounded-full text-[11px] font-bold text-primary-foreground shrink-0 ${isLost ? "bg-destructive" : "bg-primary"}`}>
           {isLost ? "হারিয়েছি" : "পেয়েছি"}
         </span>
+      </div>
+
+      {/* Full-width image */}
+      <div className="relative">
+        {item.image_url ? (
+          <img src={item.image_url} alt={item.item_name} className="w-full aspect-[4/3] object-cover" />
+        ) : (
+          <div className={`w-full aspect-[3/2] flex items-center justify-center ${isLost ? "bg-destructive/5" : "bg-primary/5"}`}>
+            {isLost ? <AlertCircle className="w-14 h-14 text-destructive/20" /> : <HandHeart className="w-14 h-14 text-primary/20" />}
+          </div>
+        )}
         {item.reward && (
-          <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500 text-white flex items-center gap-1">
-            <Gift className="w-3 h-3" /> পুরষ্কার
+          <span className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500 text-primary-foreground flex items-center gap-1 shadow-md">
+            <Gift className="w-3 h-3" /> পুরষ্কার আছে
           </span>
         )}
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-3">
-        <h3 className="font-bold text-foreground text-base leading-tight">{item.item_name}</h3>
+      <div className="px-4 pt-3 pb-4 space-y-2.5">
+        <h3 className="font-bold text-foreground text-[15px] leading-snug">{item.item_name}</h3>
 
         {item.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2">{item.description}</p>
+          <p className="text-[13px] text-muted-foreground leading-relaxed line-clamp-2">{item.description}</p>
         )}
 
-        {/* Info Row */}
-        <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
+        {/* Meta info chips */}
+        <div className="flex flex-wrap gap-2">
           {item.location && (
-            <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {item.location}</span>
+            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground bg-muted rounded-lg px-2.5 py-1.5">
+              <MapPin className="w-3 h-3 shrink-0" /> {item.location}
+            </span>
           )}
           {item.item_date && (
-            <span className="flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5" />
+            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground bg-muted rounded-lg px-2.5 py-1.5">
+              <Calendar className="w-3 h-3 shrink-0" />
               {format(new Date(item.item_date), "d MMM yyyy", { locale: bn })}
             </span>
           )}
         </div>
-
-        {/* Person Info */}
-        {item.person_name && (
-          <div className="flex items-center gap-2.5 pt-1 border-t border-border">
-            {item.person_image_url ? (
-              <img src={item.person_image_url} alt={item.person_name} className="w-8 h-8 rounded-full object-cover border border-border" />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                <User className="w-4 h-4 text-muted-foreground" />
-              </div>
-            )}
-            <span className="text-sm font-medium text-foreground">{item.person_name}</span>
-          </div>
-        )}
 
         {/* Expandable Detail */}
         {(item.detail_description || item.reward) && (
           <div>
             <button
               onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-1 text-xs font-semibold text-primary"
+              className="flex items-center gap-1 text-xs font-semibold text-primary pt-1"
             >
               {expanded ? "সংক্ষেপে দেখুন" : "বিস্তারিত দেখুন"}
               {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             </button>
             {expanded && (
-              <div className="mt-2 space-y-2 text-sm text-muted-foreground bg-muted/30 rounded-xl p-3">
-                {item.detail_description && <p>{item.detail_description}</p>}
+              <div className="mt-2 space-y-2 text-[13px] text-muted-foreground bg-muted/40 rounded-xl p-3">
+                {item.detail_description && <p className="leading-relaxed">{item.detail_description}</p>}
                 {item.reward && (
                   <div className="flex items-start gap-2 bg-amber-500/10 rounded-lg p-2.5">
                     <Gift className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
@@ -123,17 +129,11 @@ const LostFoundCard = ({ item }: { item: LostFoundItem }) => {
         {item.phone && (
           <a
             href={`tel:${item.phone}`}
-            className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold text-white transition-opacity hover:opacity-90 ${isLost ? "bg-destructive" : "bg-primary"}`}
+            className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90 ${isLost ? "bg-destructive" : "bg-primary"}`}
           >
             <Phone className="w-4 h-4" /> যোগাযোগ করুন
           </a>
         )}
-
-        {/* Time ago */}
-        <p className="text-[10px] text-muted-foreground flex items-center gap-1">
-          <Clock className="w-3 h-3" />
-          {format(new Date(item.created_at), "d MMM yyyy, h:mm a", { locale: bn })}
-        </p>
       </div>
     </div>
   );
