@@ -932,6 +932,99 @@ export type Database = {
         }
         Relationships: []
       }
+      police_stations: {
+        Row: {
+          assigned_station: string | null
+          badges: string[] | null
+          created_at: string
+          description: string | null
+          district: string | null
+          division: string | null
+          duty_time: string | null
+          emergency_phone: string | null
+          full_description: string | null
+          id: string
+          is_active: boolean
+          is_approved: boolean
+          is_verified: boolean | null
+          location: string | null
+          map_link: string | null
+          name: string
+          officer_count: string | null
+          phone: string | null
+          profile_image_url: string | null
+          rank: string | null
+          service_area: string | null
+          service_types: string[] | null
+          sort_order: number
+          station_image_url: string | null
+          thana: string | null
+          type: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          assigned_station?: string | null
+          badges?: string[] | null
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          division?: string | null
+          duty_time?: string | null
+          emergency_phone?: string | null
+          full_description?: string | null
+          id?: string
+          is_active?: boolean
+          is_approved?: boolean
+          is_verified?: boolean | null
+          location?: string | null
+          map_link?: string | null
+          name: string
+          officer_count?: string | null
+          phone?: string | null
+          profile_image_url?: string | null
+          rank?: string | null
+          service_area?: string | null
+          service_types?: string[] | null
+          sort_order?: number
+          station_image_url?: string | null
+          thana?: string | null
+          type?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          assigned_station?: string | null
+          badges?: string[] | null
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          division?: string | null
+          duty_time?: string | null
+          emergency_phone?: string | null
+          full_description?: string | null
+          id?: string
+          is_active?: boolean
+          is_approved?: boolean
+          is_verified?: boolean | null
+          location?: string | null
+          map_link?: string | null
+          name?: string
+          officer_count?: string | null
+          phone?: string | null
+          profile_image_url?: string | null
+          rank?: string | null
+          service_area?: string | null
+          service_types?: string[] | null
+          sort_order?: number
+          station_image_url?: string | null
+          thana?: string | null
+          type?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

@@ -10,6 +10,7 @@ import { format, differenceInHours } from "date-fns";
 import { bn } from "date-fns/locale";
 import LostFoundPageComponent from "@/components/LostFoundPage";
 import EventsPageComponent from "@/components/EventsPage";
+import PolicePageComponent from "@/components/PolicePage";
 
 interface Service {
   id: string;
@@ -2168,6 +2169,10 @@ const CategoryServices = () => {
 
   if (slug === "events") {
     return <EventsPageComponent />;
+  }
+
+  if (slug === "police") {
+    return <PolicePageComponent />;
   }
 
   return (
