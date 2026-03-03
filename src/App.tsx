@@ -34,6 +34,7 @@ import Offices from "./pages/Offices";
 import InstallApp from "./pages/InstallApp";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Disclaimer from "./pages/Disclaimer";
+import LostFound from "./pages/LostFound";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +75,7 @@ const App = () => {
                 <Route path="/install" element={<InstallApp />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/disclaimer" element={<Disclaimer />} />
+                <Route path="/lost-found" element={<LostFound />} />
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="*" element={<NotFound />} />

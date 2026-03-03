@@ -9,7 +9,7 @@ import {
   Zap, Plus
 } from "lucide-react";
 
-export type AdminTab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications" | "app_settings" | "service_grid" | "all_services" | "all_settings" | "developer_profile";
+export type AdminTab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications" | "app_settings" | "service_grid" | "all_services" | "all_settings" | "developer_profile" | "lost_found";
 
 // Bottom nav pages (4 main pages)
 const bottomNavItems: { id: AdminTab; label: string; icon: typeof LayoutDashboard }[] = [
@@ -48,6 +48,7 @@ const tabGroups = [
       { id: "offices" as AdminTab, label: "অফিস", icon: Building2 },
       { id: "announcements" as AdminTab, label: "ঘোষণা", icon: Megaphone },
       { id: "timeline" as AdminTab, label: "টাইমলাইন", icon: History },
+      { id: "lost_found" as AdminTab, label: "হারানো ও পাওয়া", icon: Globe },
     ],
   },
   {
