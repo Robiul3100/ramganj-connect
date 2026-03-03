@@ -1496,6 +1496,148 @@ const DoctorFilters = ({
   );
 };
 
+// ──── Marketplace Filters + Hero ────
+const MarketplaceHero = ({
+  services,
+  filters,
+  setFilters,
+  totalCount,
+}: {
+  services: Service[];
+  filters: { search: string; category: string; condition: string; priceRange: string };
+  setFilters: (f: any) => void;
+  totalCount: number;
+}) => {
+  const [showFilters, setShowFilters] = useState(false);
+  const colors = categoryColors.marketplace;
+
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    services.forEach(s => { if (s.metadata?.product_category) set.add(s.metadata.product_category); });
+    return Array.from(set).sort();
+  }, [services]);
+
+  const activeCount = [filters.category, filters.condition, filters.priceRange].filter(Boolean).length;
+
+  return (
+    <div className="space-y-3">
+      {/* Hero Banner */}
+      <div className="relative rounded-2xl overflow-hidden" style={{ background: colors.gradient }}>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-4 right-6 w-20 h-20 rounded-full border-4 border-white/30" />
+          <div className="absolute bottom-3 left-8 w-12 h-12 rounded-full border-4 border-white/20" />
+          <div className="absolute top-8 left-20 w-6 h-6 rounded-full bg-white/20" />
+        </div>
+        <div className="relative px-5 py-6 sm:py-8">
+          <div className="flex items-center gap-2 mb-2">
+            <ShoppingBag className="w-6 h-6 text-white/90" />
+            <h2 className="text-lg sm:text-xl font-extrabold text-white">মার্কেটপ্লেস</h2>
+          </div>
+          <p className="text-[13px] text-white/80 leading-relaxed max-w-sm">
+            রামগঞ্জের সবচেয়ে বড় অনলাইন মার্কেট। কিনুন, বিক্রি করুন — সহজে ও নিরাপদে।
+          </p>
+          <div className="flex items-center gap-3 mt-3">
+            <span className="text-[11px] font-bold text-white/90 bg-white/15 px-3 py-1 rounded-full">
+              📦 {totalCount}টি পণ্য
+            </span>
+            <span className="text-[11px] font-bold text-white/90 bg-white/15 px-3 py-1 rounded-full">
+              🛡️ নিরাপদ লেনদেন
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder="পণ্য খুঁজুন... (যেমন: মোবাইল, ল্যাপটপ)"
+          value={filters.search}
+          onChange={e => setFilters({ ...filters, search: e.target.value })}
+          className="w-full pl-10 pr-10 py-3 rounded-xl bg-card border border-border/60 text-sm outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground"
+        />
+        {filters.search && (
+          <button onClick={() => setFilters({ ...filters, search: "" })} className="absolute right-3.5 top-1/2 -translate-y-1/2">
+            <X className="w-4 h-4 text-muted-foreground" />
+          </button>
+        )}
+      </div>
+
+      {/* Filter toggle */}
+      <button
+        onClick={() => setShowFilters(!showFilters)}
+        className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-card border border-border/60 text-sm font-semibold text-foreground w-full justify-between"
+      >
+        <span className="flex items-center gap-2">
+          <Filter className="w-4 h-4" style={{ color: colors.accent }} />
+          ফিল্টার করুন
+          {activeCount > 0 && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style={{ background: colors.accent }}>{activeCount}</span>
+          )}
+        </span>
+        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${showFilters ? "rotate-180" : ""}`} />
+      </button>
+
+      {/* Filter options */}
+      {showFilters && (
+        <div className="grid grid-cols-3 gap-2 p-3 rounded-xl bg-card border border-border/40 animate-in fade-in slide-in-from-top-2 duration-200">
+          {/* Category */}
+          <div>
+            <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">ক্যাটাগরি</label>
+            <select
+              value={filters.category}
+              onChange={e => setFilters({ ...filters, category: e.target.value })}
+              className="w-full text-xs px-2 py-2 rounded-lg bg-muted/50 border border-border/40 outline-none"
+            >
+              <option value="">সকল</option>
+              {categories.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          {/* Condition */}
+          <div>
+            <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">অবস্থা</label>
+            <select
+              value={filters.condition}
+              onChange={e => setFilters({ ...filters, condition: e.target.value })}
+              className="w-full text-xs px-2 py-2 rounded-lg bg-muted/50 border border-border/40 outline-none"
+            >
+              <option value="">সকল</option>
+              <option value="নতুন">নতুন</option>
+              <option value="ব্যবহৃত">ব্যবহৃত</option>
+              <option value="রিফার্বিশড">রিফার্বিশড</option>
+            </select>
+          </div>
+          {/* Price Range */}
+          <div>
+            <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">দাম</label>
+            <select
+              value={filters.priceRange}
+              onChange={e => setFilters({ ...filters, priceRange: e.target.value })}
+              className="w-full text-xs px-2 py-2 rounded-lg bg-muted/50 border border-border/40 outline-none"
+            >
+              <option value="">সকল</option>
+              <option value="low">৫,০০০ এর নিচে</option>
+              <option value="mid">৫,০০০ - ২০,০০০</option>
+              <option value="high">২০,০০০ - ৫০,০০০</option>
+              <option value="premium">৫০,০০০+</option>
+            </select>
+          </div>
+          {/* Clear */}
+          {activeCount > 0 && (
+            <button
+              onClick={() => setFilters({ search: filters.search, category: "", condition: "", priceRange: "" })}
+              className="col-span-3 text-xs font-bold py-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+            >
+              সকল ফিল্টার মুছুন
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const CategoryServices = () => {
   const { slug } = useParams<{ slug: string }>();
   const [services, setServices] = useState<Service[]>([]);
@@ -1503,6 +1645,7 @@ const CategoryServices = () => {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [doctorFilters, setDoctorFilters] = useState({ specialty: "", location: "", feeRange: "", rating: "", search: "" });
+  const [marketplaceFilters, setMarketplaceFilters] = useState({ search: "", category: "", condition: "", priceRange: "" });
 
   const colors = (slug && categoryColors[slug]) || defaultColor;
 
@@ -1531,28 +1674,23 @@ const CategoryServices = () => {
   }, [slug]);
 
   // Doctor filtering logic
-  const filtered = useMemo(() => {
+  const filteredDoctors = useMemo(() => {
     if (slug !== "doctors") return services;
     return services.filter(s => {
       const m = s.metadata || {};
-      // Search
       if (doctorFilters.search) {
         const q = doctorFilters.search.toLowerCase();
         const match = s.title.toLowerCase().includes(q) || (m.specialty || "").toLowerCase().includes(q) || (m.hospital_name || "").toLowerCase().includes(q);
         if (!match) return false;
       }
-      // Specialty
       if (doctorFilters.specialty && m.specialty !== doctorFilters.specialty) return false;
-      // Location
       if (doctorFilters.location && s.area !== doctorFilters.location && s.address !== doctorFilters.location) return false;
-      // Fee range
       if (doctorFilters.feeRange) {
         const feeNum = parseInt((m.consultation_fee || "").replace(/[^\d]/g, "")) || 0;
         if (doctorFilters.feeRange === "low" && feeNum >= 500) return false;
         if (doctorFilters.feeRange === "mid" && (feeNum < 500 || feeNum > 1000)) return false;
         if (doctorFilters.feeRange === "high" && feeNum <= 1000) return false;
       }
-      // Rating
       if (doctorFilters.rating) {
         const minRating = parseInt(doctorFilters.rating);
         if ((m.rating || 0) < minRating) return false;
@@ -1560,6 +1698,36 @@ const CategoryServices = () => {
       return true;
     });
   }, [services, doctorFilters, slug]);
+
+  // Marketplace filtering logic
+  const filteredMarketplace = useMemo(() => {
+    if (slug !== "marketplace") return services;
+    return services.filter(s => {
+      const m = s.metadata || {};
+      if (marketplaceFilters.search) {
+        const q = marketplaceFilters.search.toLowerCase();
+        const match = s.title.toLowerCase().includes(q) || (s.description || "").toLowerCase().includes(q) || (m.product_category || "").toLowerCase().includes(q) || (m.seller_name || "").toLowerCase().includes(q);
+        if (!match) return false;
+      }
+      if (marketplaceFilters.category && m.product_category !== marketplaceFilters.category) return false;
+      if (marketplaceFilters.condition) {
+        const cond = (m.condition || "").toLowerCase();
+        if (marketplaceFilters.condition === "ব্যবহৃত" && !cond.includes("ব্যবহৃত")) return false;
+        if (marketplaceFilters.condition === "নতুন" && cond !== "নতুন") return false;
+        if (marketplaceFilters.condition === "রিফার্বিশড" && cond !== "রিফার্বিশড") return false;
+      }
+      if (marketplaceFilters.priceRange) {
+        const priceNum = parseInt((m.price || "").replace(/[^\d]/g, "")) || 0;
+        if (marketplaceFilters.priceRange === "low" && priceNum >= 5000) return false;
+        if (marketplaceFilters.priceRange === "mid" && (priceNum < 5000 || priceNum > 20000)) return false;
+        if (marketplaceFilters.priceRange === "high" && (priceNum < 20000 || priceNum > 50000)) return false;
+        if (marketplaceFilters.priceRange === "premium" && priceNum <= 50000) return false;
+      }
+      return true;
+    });
+  }, [services, marketplaceFilters, slug]);
+
+  const filtered = slug === "doctors" ? filteredDoctors : slug === "marketplace" ? filteredMarketplace : services;
 
   const handleShare = (service: Service) => {
     if (navigator.share) {
@@ -1618,6 +1786,11 @@ const CategoryServices = () => {
           <DoctorFilters services={services} filters={doctorFilters} setFilters={setDoctorFilters} />
         )}
 
+        {/* Marketplace Hero + Filters */}
+        {slug === "marketplace" && !loading && (
+          <MarketplaceHero services={services} filters={marketplaceFilters} setFilters={setMarketplaceFilters} totalCount={services.length} />
+        )}
+
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {[1, 2, 3, 4].map(i => (
@@ -1649,11 +1822,19 @@ const CategoryServices = () => {
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-12">
-            <Stethoscope className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
+            {slug === "marketplace" ? <Package className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" /> : <Stethoscope className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />}
             <p className="text-muted-foreground font-semibold">কোন তথ্য পাওয়া যায়নি</p>
             {slug === "doctors" && (doctorFilters.specialty || doctorFilters.location || doctorFilters.feeRange || doctorFilters.rating || doctorFilters.search) && (
               <button
                 onClick={() => setDoctorFilters({ specialty: "", location: "", feeRange: "", rating: "", search: "" })}
+                className="mt-2 text-sm font-bold text-primary"
+              >
+                ফিল্টার মুছুন
+              </button>
+            )}
+            {slug === "marketplace" && (marketplaceFilters.search || marketplaceFilters.category || marketplaceFilters.condition || marketplaceFilters.priceRange) && (
+              <button
+                onClick={() => setMarketplaceFilters({ search: "", category: "", condition: "", priceRange: "" })}
                 className="mt-2 text-sm font-bold text-primary"
               >
                 ফিল্টার মুছুন
@@ -1664,6 +1845,9 @@ const CategoryServices = () => {
           <>
             {slug === "doctors" && (
               <p className="text-xs text-muted-foreground font-semibold">{filtered.length}জন ডাক্তার পাওয়া গেছে</p>
+            )}
+            {slug === "marketplace" && (
+              <p className="text-xs text-muted-foreground font-semibold">{filtered.length}টি পণ্য পাওয়া গেছে</p>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-6">
               {filtered.map(renderCard)}
