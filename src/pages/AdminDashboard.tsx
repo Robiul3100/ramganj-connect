@@ -33,6 +33,7 @@ import SwipeUpEditor from "@/components/admin/SwipeUpEditor";
 import AdminDeveloperProfile from "@/components/admin/AdminDeveloperProfile";
 import AdminLostFoundManager from "@/components/admin/AdminLostFoundManager";
 import AdminEventsManager from "@/components/admin/AdminEventsManager";
+import AdminPoliceManager from "@/components/admin/AdminPoliceManager";
 
 // Legacy table configs for CRUD
 const legacyTableConfig: Record<string, { table: string; fields: { name: string; label: string; type?: string; options?: string[] }[]; nameKey: string }> = {
@@ -920,6 +921,7 @@ const AdminDashboard = () => {
     { id: "offices" as AdminTab, label: "অফিস", desc: "অফিস ও কর্মকর্তা", icon: Building2, gradient: "from-slate-500 to-zinc-600" },
     { id: "announcements" as AdminTab, label: "ঘোষণা", desc: "মার্কি ঘোষণা ম্যানেজ", icon: Megaphone, gradient: "from-orange-500 to-red-500" },
     { id: "events" as AdminTab, label: "ইভেন্ট", desc: "ইভেন্ট ম্যানেজ করুন", icon: CalendarHeart, gradient: "from-fuchsia-500 to-pink-500" },
+    { id: "police" as AdminTab, label: "পুলিশ", desc: "পুলিশ থানা ও কর্মকর্তা", icon: ShieldAlert, gradient: "from-slate-600 to-blue-600" },
   ];
 
   const filteredHubSections = serviceHubSections.filter(s =>
@@ -1049,6 +1051,7 @@ const AdminDashboard = () => {
       case "developer_profile": return <AdminDeveloperProfile logActivity={logActivity} />;
       case "lost_found": return <AdminLostFoundManager logActivity={logActivity} />;
       case "events": return <AdminEventsManager logActivity={logActivity} />;
+      case "police": return <AdminPoliceManager logActivity={logActivity} />;
       default: return renderLegacy();
     }
   };

@@ -9,7 +9,7 @@ import {
   Zap, Plus
 } from "lucide-react";
 
-export type AdminTab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications" | "app_settings" | "service_grid" | "all_services" | "all_settings" | "developer_profile" | "lost_found" | "events";
+export type AdminTab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications" | "app_settings" | "service_grid" | "all_services" | "all_settings" | "developer_profile" | "lost_found" | "events" | "police";
 
 // Bottom nav pages (4 main pages)
 const bottomNavItems: { id: AdminTab; label: string; icon: typeof LayoutDashboard }[] = [
@@ -50,6 +50,7 @@ const tabGroups = [
       { id: "timeline" as AdminTab, label: "টাইমলাইন", icon: History },
       { id: "lost_found" as AdminTab, label: "হারানো ও পাওয়া", icon: Globe },
       { id: "events" as AdminTab, label: "ইভেন্ট", icon: Globe },
+      { id: "police" as AdminTab, label: "পুলিশ", icon: Shield },
     ],
   },
   {
@@ -259,7 +260,7 @@ const AdminLayout = ({ activeTab, onTabChange, currentUser, pendingCount, childr
         <div className="flex items-center justify-around px-1 py-1.5 max-w-lg mx-auto">
           {bottomNavItems.map(item => {
             // "all_services" is active if current tab is any service-related tab
-            const serviceSubTabs: AdminTab[] = ["all_services", "services", "pending", "categories", "service_grid", "news", "slider", "advertisements", "about", "timeline", "emergency", "blood", "donations", "offices", "announcements", "events"];
+            const serviceSubTabs: AdminTab[] = ["all_services", "services", "pending", "categories", "service_grid", "news", "slider", "advertisements", "about", "timeline", "emergency", "blood", "donations", "offices", "announcements", "events", "police"];
             const settingsSubTabs: AdminTab[] = ["all_settings", "site_settings", "app_settings", "notifications", "users", "activity", "developer_profile"];
             
             const isActive = item.id === "all_services"
