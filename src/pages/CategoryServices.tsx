@@ -138,17 +138,26 @@ const getCategoryFormFields = (slug: string) => {
         { name: "area", label: "এলাকা" },
         { name: "image_url", label: "ছবি (URL)", placeholder: "https://example.com/photo.jpg" },
       ];
+    case "pharmacy":
     case "shops":
       return [
-        { name: "title", label: "দোকানের নাম", required: true },
-        { name: "shop_category", label: "দোকানের ধরন", placeholder: "যেমন: কাপড়, ইলেকট্রনিক্স" },
-        { name: "owner_name", label: "মালিকের নাম" },
-        { name: "description", label: "বিবরণ", type: "textarea" as const },
-        { name: "phone", label: "ফোন নাম্বার", type: "tel" as const },
+        { name: "title", label: "দোকানের নাম", required: true, placeholder: "যেমন: আল-আমিন ফার্মেসী" },
+        { name: "shop_category", label: "দোকানের ধরন", placeholder: "যেমন: ফার্মেসী, কাপড়, ইলেকট্রনিক্স" },
+        { name: "owner_name", label: "মালিকের নাম", placeholder: "যেমন: মো. আব্দুল করিম" },
+        { name: "short_description", label: "কি কি পাওয়া যায় (সংক্ষেপে)", placeholder: "যেমন: সব ধরনের ঔষধ, কসমেটিক্স, বেবি প্রোডাক্ট" },
+        { name: "description", label: "বিস্তারিত বিবরণ", type: "textarea" as const },
+        { name: "is_open", label: "এখন খোলা?", type: "select" as const, options: ["হ্যাঁ", "না"] },
+        { name: "is_verified", label: "ভেরিফাইড?", type: "select" as const, options: ["হ্যাঁ", "না"] },
+        { name: "years_in_service", label: "কত বছর ধরে সেবায়", placeholder: "যেমন: ১০+" },
+        { name: "has_map", label: "ম্যাপ লিংক আছে?", type: "select" as const, options: ["হ্যাঁ", "না"] },
+        { name: "map_url", label: "Google Maps লিংক", placeholder: "https://maps.google.com/..." },
+        { name: "message_url", label: "মেসেজ লিংক (WhatsApp/Messenger)", placeholder: "https://m.me/..." },
+        { name: "phone", label: "ফোন নাম্বার", type: "tel" as const, required: true },
         { name: "whatsapp", label: "WhatsApp নাম্বার", type: "tel" as const },
-        { name: "address", label: "ঠিকানা" },
+        { name: "address", label: "ঠিকানা", required: true },
         { name: "area", label: "এলাকা" },
-        { name: "image_url", label: "ছবি (URL)", placeholder: "https://example.com/photo.jpg" },
+        { name: "cover_image", label: "কভার ছবি (URL)", placeholder: "https://example.com/cover.jpg" },
+        { name: "image_url", label: "মালিকের ছবি (URL)", placeholder: "https://example.com/owner.jpg" },
       ];
     case "jobs":
       return [
@@ -194,9 +203,18 @@ const buildMetadata = (slug: string, data: Record<string, string>) => {
       if (data.established_year) meta.established_year = data.established_year;
       if (data.principal_name) meta.principal_name = data.principal_name;
       break;
+    case "pharmacy":
     case "shops":
       if (data.shop_category) meta.shop_category = data.shop_category;
       if (data.owner_name) meta.owner_name = data.owner_name;
+      if (data.short_description) meta.short_description = data.short_description;
+      if (data.is_open) meta.is_open = data.is_open === "হ্যাঁ";
+      if (data.is_verified) meta.is_verified = data.is_verified === "হ্যাঁ";
+      if (data.years_in_service) meta.years_in_service = data.years_in_service;
+      if (data.has_map) meta.has_map = data.has_map === "হ্যাঁ";
+      if (data.map_url) meta.map_url = data.map_url;
+      if (data.message_url) meta.message_url = data.message_url;
+      if (data.cover_image) meta.cover_image = data.cover_image;
       break;
     case "jobs":
       if (data.company) meta.company = data.company;
@@ -652,51 +670,169 @@ const JobCard = ({ s, colors }: { s: Service; colors: { accent: string; bg: stri
   );
 };
 
-// ──── Shop Card ────
+// ──── Shop / Pharmacy Card (Premium Business Listing) ────
 const ShopCard = ({ s, colors }: { s: Service; colors: { accent: string; bg: string; gradient: string } }) => {
   const m = s.metadata || {};
+  const [expanded, setExpanded] = useState(false);
+  const coverImage = m.cover_image || s.image_url;
+  const ownerImage = m.cover_image ? s.image_url : null;
+  const isOpen = m.is_open === true;
+  const isVerified = m.is_verified === true;
+  const hasMap = m.has_map === true;
+  const mapUrl = m.map_url || "";
+  const messageUrl = m.message_url || (s.whatsapp ? `https://wa.me/88${s.whatsapp}` : "");
+  const yearsInService = m.years_in_service || "";
+  const shortDesc = m.short_description || "";
+
   return (
-    <div className={`rounded-2xl overflow-hidden border transition-shadow hover:shadow-lg ${s.is_featured ? "ring-2 ring-amber-400/40" : ""}`} style={{ borderColor: colors.accent + "55" }}>
-      {s.is_featured && (
-        <div className="flex items-center gap-1 px-4 pt-3 pb-1">
-          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-          <span className="text-xs font-bold text-amber-600">ফিচার্ড</span>
-        </div>
-      )}
-      <div className="p-4 flex items-start gap-3.5" style={{ background: `linear-gradient(135deg, ${colors.bg}, hsl(0,0%,100%))` }}>
-        {s.image_url ? (
-          <img src={s.image_url} alt={s.title} className="w-16 h-16 rounded-xl object-cover shrink-0 border shadow-sm" style={{ borderColor: colors.accent + "40" }} />
+    <div className="rounded-[16px] bg-card overflow-hidden border border-border/50 transition-all duration-200 hover:shadow-xl group">
+      {/* Cover image */}
+      <div className="relative w-full h-36 sm:h-40 overflow-hidden bg-muted">
+        {coverImage ? (
+          <img src={coverImage} alt={s.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
         ) : (
-          <div className="w-16 h-16 rounded-xl flex items-center justify-center shrink-0 shadow-sm text-xl font-bold" style={{ background: colors.bg, color: colors.accent }}>
-            {s.title.charAt(0)}
+          <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${colors.bg}, hsl(0,0%,96%))` }}>
+            <Building2 className="w-12 h-12" style={{ color: colors.accent + "60" }} />
           </div>
         )}
-        <div className="flex-1 min-w-0">
-          <h3 className="font-extrabold text-foreground text-[15px] leading-tight">{s.title}</h3>
-          <div className="flex gap-1.5 mt-2 flex-wrap">
-            {m.shop_category && <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: tagColors[0].bg, color: tagColors[0].text }}>{m.shop_category}</span>}
-            {m.owner_name && <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: tagColors[2].bg, color: tagColors[2].text }}>👤 {m.owner_name}</span>}
+        {/* Dark gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+
+        {/* Featured badge */}
+        {s.is_featured && (
+          <div className="absolute top-2.5 right-2.5 flex items-center gap-1 px-2.5 py-1 rounded-full shadow-md z-10"
+            style={{ background: "linear-gradient(135deg, hsl(45,90%,50%), hsl(35,85%,55%))" }}>
+            <Star className="w-3 h-3 text-white fill-white" />
+            <span className="text-[9px] font-extrabold text-white">ফিচার্ড</span>
           </div>
+        )}
+
+        {/* Open/Closed badge */}
+        <div className={`absolute top-2.5 left-2.5 flex items-center gap-1 px-2.5 py-1 rounded-full shadow-sm z-10 ${isOpen ? "bg-emerald-500/90" : "bg-red-500/80"}`}>
+          <div className={`w-1.5 h-1.5 rounded-full bg-white ${isOpen ? "animate-pulse" : ""}`} />
+          <span className="text-[9px] font-bold text-white">{isOpen ? "খোলা আছে" : "বন্ধ"}</span>
         </div>
+
+        {/* Owner profile image - overlapping cover */}
+        {ownerImage && (
+          <div className="absolute -bottom-5 left-4 z-10">
+            <img
+              src={ownerImage}
+              alt={m.owner_name || "মালিক"}
+              className="w-12 h-12 rounded-full object-cover shadow-lg border-[3px] border-card"
+            />
+          </div>
+        )}
       </div>
-      <div className="px-4 py-3 border-t border-border/50 bg-card">
+
+      {/* Info Section */}
+      <div className={`px-4 ${ownerImage ? "pt-7" : "pt-3"} pb-2.5`}>
+        {/* Owner name with badge */}
+        {m.owner_name && (
+          <div className="flex items-center gap-1.5 mb-1">
+            <User className="w-3 h-3 text-muted-foreground" />
+            <span className="text-[11px] text-muted-foreground font-medium">{m.owner_name}</span>
+            {isVerified && (
+              <BadgeCheck className="w-3.5 h-3.5 text-blue-500" />
+            )}
+          </div>
+        )}
+
+        {/* Shop name */}
+        <h3 className="text-[15px] sm:text-[17px] font-extrabold text-foreground leading-tight line-clamp-1">{s.title}</h3>
+
+        {/* Category + trust badges */}
+        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+          {m.shop_category && (
+            <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full" style={{ background: colors.bg, color: colors.accent }}>
+              {m.shop_category}
+            </span>
+          )}
+          {isVerified && (
+            <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
+              ✓ ভেরিফাইড
+            </span>
+          )}
+          {yearsInService && (
+            <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full" style={{ background: tagColors[4].bg, color: tagColors[4].text }}>
+              🏪 {yearsInService} বছর
+            </span>
+          )}
+        </div>
+
+        {/* Short description */}
+        {shortDesc && (
+          <p className="text-[12px] text-muted-foreground mt-2 line-clamp-3 leading-relaxed">{shortDesc}</p>
+        )}
+
+        {/* Location */}
         {s.address && (
-          <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-            <MapPin className="w-3 h-3 shrink-0" /> {s.address}{s.area ? `, ${s.area}` : ""}
+          <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-2">
+            <MapPin className="w-3 h-3 shrink-0" style={{ color: colors.accent }} />
+            <span className="line-clamp-1">{s.address}{s.area ? `, ${s.area}` : ""}</span>
           </p>
         )}
-        {s.description && <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{s.description}</p>}
+
+        {/* Expandable description */}
+        {s.description && (
+          <div className="mt-2.5">
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="flex items-center gap-2 w-full px-3 py-2 rounded-xl bg-muted/50 border border-border/40 text-[12px] font-bold text-foreground hover:bg-muted transition-colors"
+            >
+              <Eye className="w-3.5 h-3.5" style={{ color: colors.accent }} />
+              <span>আরও দেখুন</span>
+              <ChevronDown className={`w-4 h-4 ml-auto text-muted-foreground transition-transform duration-300 ${expanded ? "rotate-180" : ""}`} />
+            </button>
+            <div
+              className="overflow-hidden transition-all duration-300 ease-in-out"
+              style={{ maxHeight: expanded ? "500px" : "0px", opacity: expanded ? 1 : 0 }}
+            >
+              <p className="text-[12px] text-muted-foreground leading-relaxed pt-3 px-1">{s.description}</p>
+            </div>
+          </div>
+        )}
       </div>
-      <div className="flex gap-0 border-t border-border/30">
-        {s.phone && (
-          <a href={`tel:${s.phone}`} className="flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 text-white" style={{ background: colors.gradient }}>
+
+      {/* CTA Buttons */}
+      <div className="px-4 pb-3 pt-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {s.phone ? (
+          <a
+            href={`tel:${s.phone}`}
+            className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 text-white active:scale-[0.97] transition-transform"
+            style={{ background: colors.gradient }}
+          >
             <Phone className="w-4 h-4" /> কল করুন
           </a>
+        ) : (
+          <div className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 bg-muted/40 text-muted-foreground cursor-not-allowed">
+            <Phone className="w-4 h-4" /> কল করুন
+          </div>
         )}
-        {s.whatsapp && (
-          <a href={`https://wa.me/88${s.whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 text-white" style={{ background: "linear-gradient(135deg, hsl(140,70%,35%), hsl(160,75%,40%))" }}>
-            <MessageCircle className="w-4 h-4" /> হোয়াটসঅ্যাপ
+        {hasMap && mapUrl ? (
+          <a
+            href={mapUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 border-2 active:scale-[0.97] transition-transform"
+            style={{ borderColor: colors.accent, color: colors.accent }}
+          >
+            <Navigation className="w-4 h-4" /> ম্যাপ দেখুন
           </a>
+        ) : messageUrl ? (
+          <a
+            href={messageUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 border-2 active:scale-[0.97] transition-transform"
+            style={{ borderColor: colors.accent, color: colors.accent }}
+          >
+            <MessageCircle className="w-4 h-4" /> মেসেজ করুন
+          </a>
+        ) : (
+          <div className="py-2.5 rounded-xl text-[12px] font-bold flex items-center justify-center gap-2 bg-muted/40 text-muted-foreground cursor-not-allowed">
+            <MessageCircle className="w-4 h-4" /> মেসেজ করুন
+          </div>
         )}
       </div>
     </div>
@@ -1001,6 +1137,7 @@ const CategoryServices = () => {
         return <EducationCard key={s.id} s={s} colors={colors} />;
       case "jobs":
         return <JobCard key={s.id} s={s} colors={colors} />;
+      case "pharmacy":
       case "shops":
         return <ShopCard key={s.id} s={s} colors={colors} />;
       default:
