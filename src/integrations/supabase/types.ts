@@ -655,15 +655,22 @@ export type Database = {
       }
       lost_found: {
         Row: {
+          category: string | null
           created_at: string
           description: string | null
           detail_description: string | null
+          expire_at: string | null
           id: string
+          identification_marks: string | null
           image_url: string | null
           is_approved: boolean
+          is_high_priority: boolean | null
+          is_verified: boolean | null
           item_date: string | null
           item_name: string
+          item_time: string | null
           location: string | null
+          map_link: string | null
           person_image_url: string | null
           person_name: string | null
           phone: string | null
@@ -672,15 +679,22 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category?: string | null
           created_at?: string
           description?: string | null
           detail_description?: string | null
+          expire_at?: string | null
           id?: string
+          identification_marks?: string | null
           image_url?: string | null
           is_approved?: boolean
+          is_high_priority?: boolean | null
+          is_verified?: boolean | null
           item_date?: string | null
           item_name: string
+          item_time?: string | null
           location?: string | null
+          map_link?: string | null
           person_image_url?: string | null
           person_name?: string | null
           phone?: string | null
@@ -689,15 +703,22 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category?: string | null
           created_at?: string
           description?: string | null
           detail_description?: string | null
+          expire_at?: string | null
           id?: string
+          identification_marks?: string | null
           image_url?: string | null
           is_approved?: boolean
+          is_high_priority?: boolean | null
+          is_verified?: boolean | null
           item_date?: string | null
           item_name?: string
+          item_time?: string | null
           location?: string | null
+          map_link?: string | null
           person_image_url?: string | null
           person_name?: string | null
           phone?: string | null
