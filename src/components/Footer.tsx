@@ -11,8 +11,8 @@ const footerLinks = [
   { label: "ব্লাড ব্যাংক", path: "/blood-bank" },
   { label: "অফিস সমূহ", path: "/offices" },
   { label: "ডোনেশন", path: "/donation" },
-  { label: "অ্যাপ ইনস্টল", path: "/install" },
-  { label: "ডেভেলপার", path: "/developer" },
+  { label: "প্রাইভেসি পলিসি", path: "/privacy-policy" },
+  { label: "ডিসক্লেইমার", path: "/disclaimer" },
 ];
 
 const Footer = () => {

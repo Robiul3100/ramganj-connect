@@ -32,6 +32,8 @@ import News from "./pages/News";
 import NewsDetail from "./pages/NewsDetail";
 import Offices from "./pages/Offices";
 import InstallApp from "./pages/InstallApp";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Disclaimer from "./pages/Disclaimer";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +72,8 @@ const App = () => {
                 <Route path="/news/:id" element={<NewsDetail />} />
                 <Route path="/offices" element={<Offices />} />
                 <Route path="/install" element={<InstallApp />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/disclaimer" element={<Disclaimer />} />
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="*" element={<NotFound />} />
