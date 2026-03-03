@@ -8,13 +8,15 @@ import {
   Settings, Activity, Menu, X, Image as ImageIcon, Home, ChevronDown, ChevronRight,
   Zap, Plus
 } from "lucide-react";
+import ramganjCityLogo from "@/assets/ramganj-city-logo.png";
 
 export type AdminTab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications" | "app_settings" | "service_grid" | "all_services" | "all_settings" | "developer_profile" | "lost_found" | "events" | "police";
 
 // Bottom nav pages (4 main pages)
-const bottomNavItems: { id: AdminTab; label: string; icon: typeof LayoutDashboard }[] = [
+const bottomNavItems: { id: AdminTab | "home"; label: string; icon: typeof LayoutDashboard }[] = [
   { id: "dashboard", label: "ড্যাশবোর্ড", icon: LayoutDashboard },
   { id: "all_services", label: "সেবা", icon: Globe },
+  { id: "home", label: "হোম", icon: Home },
   { id: "all_settings", label: "সেটিংস", icon: Settings },
   { id: "analytics", label: "অ্যানালিটিক্স", icon: TrendingUp },
 ];
@@ -155,9 +157,7 @@ const AdminLayout = ({ activeTab, onTabChange, currentUser, pendingCount, childr
               <Menu className="w-4.5 h-4.5 text-foreground" />
             </button>
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm">
-                <Shield className="w-4.5 h-4.5 text-primary-foreground" />
-              </div>
+              <img src={ramganjCityLogo} alt="রামগঞ্জ সিটি" className="h-9 w-auto object-contain" />
               <div className="hidden sm:block">
                 <h1 className="text-sm font-bold text-foreground leading-tight">অ্যাডমিন প্যানেল</h1>
                 <p className="text-[10px] text-muted-foreground">রামগঞ্জ সেবা</p>
@@ -173,13 +173,6 @@ const AdminLayout = ({ activeTab, onTabChange, currentUser, pendingCount, childr
           </div>
 
           <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => navigate("/")}
-              className="w-9 h-9 rounded-xl bg-muted/60 hover:bg-muted flex items-center justify-center transition-colors"
-              title="হোমপেজ"
-            >
-              <Home className="w-4 h-4 text-foreground" />
-            </button>
             {pendingCount > 0 && (
               <button
                 onClick={() => onTabChange("pending")}
@@ -258,21 +251,38 @@ const AdminLayout = ({ activeTab, onTabChange, currentUser, pendingCount, childr
       {/* Admin Bottom Navigation - Mobile Only */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-card/80 backdrop-blur-2xl border-t-2 border-border/40" style={{ borderTopLeftRadius: 15, borderTopRightRadius: 15 }}>
         <div className="flex items-center justify-around px-1 py-1.5 max-w-lg mx-auto">
-          {bottomNavItems.map(item => {
-            // "all_services" is active if current tab is any service-related tab
+          {bottomNavItems.map((item, idx) => {
+            const isHome = item.id === "home";
             const serviceSubTabs: AdminTab[] = ["all_services", "services", "pending", "categories", "service_grid", "news", "slider", "advertisements", "about", "timeline", "emergency", "blood", "donations", "offices", "announcements", "events", "police"];
             const settingsSubTabs: AdminTab[] = ["all_settings", "site_settings", "app_settings", "notifications", "users", "activity", "developer_profile"];
             
-            const isActive = item.id === "all_services"
+            const isActive = isHome
+              ? false
+              : item.id === "all_services"
               ? serviceSubTabs.includes(activeTab)
               : item.id === "all_settings"
               ? settingsSubTabs.includes(activeTab)
-              : activeTab === item.id;
+              : activeTab === (item.id as AdminTab);
+
+            if (isHome) {
+              return (
+                <button
+                  key="home"
+                  onClick={() => navigate("/")}
+                  className="relative flex flex-col items-center -mt-5"
+                >
+                  <div className="w-[52px] h-[52px] rounded-full bg-primary shadow-lg shadow-primary/30 flex items-center justify-center border-4 border-card">
+                    <Home className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <span className="text-[9px] font-semibold text-primary mt-0.5 leading-tight">{item.label}</span>
+                </button>
+              );
+            }
 
             return (
               <button
                 key={item.id}
-                onClick={() => onTabChange(item.id)}
+                onClick={() => onTabChange(item.id as AdminTab)}
                 className="flex flex-col items-center gap-0.5 py-1.5 px-2 rounded-xl transition-all relative min-w-[56px]"
               >
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 ${
