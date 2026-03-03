@@ -65,6 +65,7 @@ const categoryColors: Record<string, { gradient: string; accent: string; bg: str
   restaurant: { gradient: "linear-gradient(135deg, hsl(15,70%,50%), hsl(25,75%,55%))", accent: "hsl(15,70%,50%)", bg: "hsl(15,70%,92%)" },
   video: { gradient: "linear-gradient(135deg, hsl(240,50%,55%), hsl(250,55%,60%))", accent: "hsl(240,50%,55%)", bg: "hsl(240,50%,92%)" },
   nursery: { gradient: "linear-gradient(135deg, hsl(130,50%,40%), hsl(140,55%,48%))", accent: "hsl(130,50%,40%)", bg: "hsl(130,50%,92%)" },
+  teachers: { gradient: "linear-gradient(135deg, hsl(210,70%,50%), hsl(220,65%,55%))", accent: "hsl(210,70%,50%)", bg: "hsl(210,70%,92%)" },
 };
 
 const defaultColor = { gradient: "var(--gradient-primary)", accent: "hsl(210,85%,55%)", bg: "hsl(210,85%,93%)" };
@@ -202,6 +203,29 @@ const getCategoryFormFields = (slug: string) => {
         { name: "address", label: "কর্মস্থল" },
         { name: "area", label: "এলাকা" },
       ];
+    case "teachers":
+      return [
+        { name: "title", label: "শিক্ষকের নাম", required: true, placeholder: "যেমন: মোঃ আবদুল করিম" },
+        { name: "subject", label: "বিষয় / বিশেষত্ব", required: true, placeholder: "যেমন: গণিত, পদার্থবিজ্ঞান" },
+        { name: "qualification", label: "শিক্ষাগত যোগ্যতা", placeholder: "যেমন: M.Sc, B.Ed" },
+        { name: "institution", label: "বর্তমান প্রতিষ্ঠান", placeholder: "যেমন: রামগঞ্জ পাইলট উচ্চ বিদ্যালয়" },
+        { name: "designation", label: "পদবী", type: "select" as const, options: ["সিনিয়র শিক্ষক", "প্রধান শিক্ষক", "সহকারী শিক্ষক", "প্রভাষক", "অন্যান্য"] },
+        { name: "experience", label: "অভিজ্ঞতা", placeholder: "যেমন: ১০+ বছর" },
+        { name: "teaching_level", label: "শিক্ষাদানের স্তর", type: "select" as const, options: ["প্রাথমিক", "মাধ্যমিক", "উচ্চমাধ্যমিক", "অনার্স", "সকল স্তর"] },
+        { name: "subjects_taught", label: "যেসব বিষয় পড়ান (কমা দিয়ে)", placeholder: "যেমন: গণিত, পদার্থবিজ্ঞান, রসায়ন" },
+        { name: "education_bg", label: "শিক্ষাগত পটভূমি", placeholder: "যেমন: ঢাকা বিশ্ববিদ্যালয়, গণিত বিভাগ" },
+        { name: "rating", label: "রেটিং (১-৫)", placeholder: "যেমন: 4.5" },
+        { name: "total_students", label: "মোট শিক্ষার্থী সংখ্যা", placeholder: "যেমন: ৫০০+" },
+        { name: "available_coaching", label: "কোচিং এর জন্য উপলব্ধ?", type: "select" as const, options: ["হ্যাঁ", "না"] },
+        { name: "is_verified", label: "যাচাইকৃত?", type: "select" as const, options: ["হ্যাঁ", "না"] },
+        { name: "description", label: "সংক্ষিপ্ত পরিচিতি", type: "textarea" as const, placeholder: "শিক্ষক সম্পর্কে ২-৩ লাইনে..." },
+        { name: "phone", label: "ফোন নাম্বার", type: "tel" as const, required: true },
+        { name: "whatsapp", label: "WhatsApp নাম্বার", type: "tel" as const },
+        { name: "message_url", label: "মেসেজ লিংক (Messenger/WhatsApp)", placeholder: "https://m.me/..." },
+        { name: "address", label: "ঠিকানা" },
+        { name: "area", label: "এলাকা" },
+        { name: "image_url", label: "শিক্ষকের ছবি (URL)", placeholder: "https://example.com/photo.jpg" },
+      ];
     default:
       return baseFields;
   }
@@ -277,6 +301,21 @@ const buildMetadata = (slug: string, data: Record<string, string>) => {
       if (data.job_category) meta.job_category = data.job_category;
       if (data.salary_range) meta.salary_range = data.salary_range;
       if (data.deadline) meta.deadline = data.deadline;
+      break;
+    case "teachers":
+      if (data.subject) meta.subject = data.subject;
+      if (data.qualification) meta.qualification = data.qualification;
+      if (data.institution) meta.institution = data.institution;
+      if (data.designation) meta.designation = data.designation;
+      if (data.experience) meta.experience = data.experience;
+      if (data.teaching_level) meta.teaching_level = data.teaching_level;
+      if (data.subjects_taught) meta.subjects_taught = data.subjects_taught.split(",").map((s: string) => s.trim()).filter(Boolean);
+      if (data.education_bg) meta.education_bg = data.education_bg;
+      if (data.rating) meta.rating = parseFloat(data.rating) || 0;
+      if (data.total_students) meta.total_students = data.total_students;
+      if (data.available_coaching) meta.available_coaching = data.available_coaching === "হ্যাঁ";
+      if (data.is_verified) meta.is_verified = data.is_verified === "হ্যাঁ";
+      if (data.message_url) meta.message_url = data.message_url;
       break;
   }
   return meta;
@@ -1297,7 +1336,233 @@ const MarketplaceCard = ({ s, colors }: { s: Service; colors: { accent: string; 
   );
 };
 
-// ──── Default Card (for other categories) ────
+// ──── Teacher Card (Professional Academic Design) ────
+const TeacherCard = ({ s, colors, onShare }: { s: Service; colors: { accent: string; bg: string; gradient: string }; onShare: () => void }) => {
+  const m = s.metadata || {};
+  const subject = m.subject || "";
+  const qualification = m.qualification || "";
+  const institution = m.institution || "";
+  const designation = m.designation || "";
+  const experience = m.experience || "";
+  const teachingLevel = m.teaching_level || "";
+  const subjectsTaught: string[] = m.subjects_taught || [];
+  const educationBg = m.education_bg || "";
+  const rating = typeof m.rating === "number" ? m.rating : 0;
+  const totalStudents = m.total_students || "";
+  const availableCoaching = m.available_coaching === true;
+  const isVerified = m.is_verified === true;
+  const messageUrl = m.message_url || "";
+  const [showBio, setShowBio] = useState(false);
+
+  return (
+    <div className="relative rounded-[16px] bg-card overflow-hidden border-y border-border/40 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 group"
+      style={{ borderLeft: `3px solid ${colors.accent}`, borderRight: `3px solid ${colors.accent}` }}
+    >
+      {/* Featured ribbon */}
+      {s.is_featured && (
+        <div className="absolute top-3 right-0 flex items-center gap-1 px-3 py-1 rounded-l-full shadow-md z-10"
+          style={{ background: "linear-gradient(135deg, hsl(45,90%,50%), hsl(35,85%,55%))" }}>
+          <Star className="w-3 h-3 text-white fill-white" />
+          <span className="text-[9px] font-extrabold text-white tracking-wide uppercase">ফিচার্ড</span>
+        </div>
+      )}
+
+      {/* Available for coaching badge */}
+      {availableCoaching && (
+        <div className="absolute top-3 left-3 flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/90 shadow-sm z-10">
+          <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+          <span className="text-[9px] font-bold text-white">কোচিং উপলব্ধ</span>
+        </div>
+      )}
+
+      {/* Main content */}
+      <div className="p-4 sm:p-5">
+        {/* Profile row */}
+        <div className="flex gap-4">
+          {/* Circular avatar */}
+          <div className="relative shrink-0">
+            {s.image_url ? (
+              <img
+                src={s.image_url}
+                alt={s.title}
+                className="w-20 h-20 sm:w-[88px] sm:h-[88px] rounded-full object-cover shadow-md"
+                style={{ border: `3px solid ${colors.accent}30` }}
+              />
+            ) : (
+              <div
+                className="w-20 h-20 sm:w-[88px] sm:h-[88px] rounded-full flex items-center justify-center shadow-md"
+                style={{ background: colors.bg, color: colors.accent, border: `3px solid ${colors.accent}30` }}
+              >
+                <GraduationCap className="w-8 h-8 sm:w-9 sm:h-9" />
+              </div>
+            )}
+            {/* Designation badge overlay */}
+            {designation && (
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[8px] font-bold text-white whitespace-nowrap shadow-sm"
+                style={{ background: colors.gradient }}>
+                {designation}
+              </div>
+            )}
+          </div>
+
+          {/* Name & info block */}
+          <div className="flex-1 min-w-0 py-0.5">
+            <h3 className="font-extrabold text-foreground text-[16px] sm:text-[18px] leading-snug line-clamp-2">{s.title}</h3>
+            {subject && (
+              <p className="text-[12px] sm:text-[13px] font-semibold mt-0.5" style={{ color: colors.accent }}>{subject}</p>
+            )}
+            {/* Verified badge */}
+            {isVerified && (
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <BadgeCheck className="w-4 h-4 text-blue-500 fill-blue-500/20" />
+                <span className="text-[10px] font-bold text-blue-600">যাচাইকৃত শিক্ষক</span>
+              </div>
+            )}
+            {/* Rating */}
+            {rating > 0 && (
+              <div className="mt-1.5">
+                <StarRating rating={rating} />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Qualification & subject tags */}
+        <div className="flex gap-1.5 mt-3.5 flex-wrap">
+          {qualification && (
+            <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full border"
+              style={{ background: tagColors[0].bg, color: tagColors[0].text, borderColor: tagColors[0].text + "20" }}>
+              🎓 {qualification}
+            </span>
+          )}
+          {subjectsTaught.slice(0, 3).map((sub, i) => (
+            <span key={i} className="text-[10px] font-semibold px-2.5 py-1 rounded-full border"
+              style={{ background: tagColors[(i + 1) % tagColors.length].bg, color: tagColors[(i + 1) % tagColors.length].text, borderColor: tagColors[(i + 1) % tagColors.length].text + "20" }}>
+              📚 {sub}
+            </span>
+          ))}
+          {subjectsTaught.length > 3 && (
+            <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
+              +{subjectsTaught.length - 3} আরও
+            </span>
+          )}
+        </div>
+
+        {/* Info grid - 2x2 compact */}
+        <div className="grid grid-cols-2 gap-2 mt-3.5">
+          {experience && (
+            <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 bg-muted/50 border border-border/30">
+              <Award className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
+              <div className="min-w-0">
+                <p className="text-[9px] text-muted-foreground leading-none">অভিজ্ঞতা</p>
+                <p className="text-[11px] font-bold text-foreground leading-tight mt-0.5 truncate">{experience}</p>
+              </div>
+            </div>
+          )}
+          {institution && (
+            <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 bg-muted/50 border border-border/30">
+              <Building2 className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
+              <div className="min-w-0">
+                <p className="text-[9px] text-muted-foreground leading-none">প্রতিষ্ঠান</p>
+                <p className="text-[11px] font-bold text-foreground leading-tight mt-0.5 truncate">{institution}</p>
+              </div>
+            </div>
+          )}
+          {teachingLevel && (
+            <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 bg-muted/50 border border-border/30">
+              <BookOpen className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
+              <div className="min-w-0">
+                <p className="text-[9px] text-muted-foreground leading-none">শিক্ষাদান স্তর</p>
+                <p className="text-[11px] font-bold text-foreground leading-tight mt-0.5 truncate">{teachingLevel}</p>
+              </div>
+            </div>
+          )}
+          {educationBg && (
+            <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 bg-muted/50 border border-border/30">
+              <GraduationCap className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
+              <div className="min-w-0">
+                <p className="text-[9px] text-muted-foreground leading-none">শিক্ষা পটভূমি</p>
+                <p className="text-[11px] font-bold text-foreground leading-tight mt-0.5 truncate">{educationBg}</p>
+              </div>
+            </div>
+          )}
+          {totalStudents && (
+            <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 bg-muted/50 border border-border/30">
+              <Users className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
+              <div className="min-w-0">
+                <p className="text-[9px] text-muted-foreground leading-none">মোট শিক্ষার্থী</p>
+                <p className="text-[11px] font-bold text-foreground leading-tight mt-0.5 truncate">{totalStudents}</p>
+              </div>
+            </div>
+          )}
+          {s.address && (
+            <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 bg-muted/50 border border-border/30">
+              <MapPin className="w-4 h-4 shrink-0" style={{ color: colors.accent }} />
+              <div className="min-w-0">
+                <p className="text-[9px] text-muted-foreground leading-none">অবস্থান</p>
+                <p className="text-[11px] font-bold text-foreground leading-tight mt-0.5 truncate">{s.address}{s.area ? `, ${s.area}` : ""}</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Expandable bio section */}
+        {s.description && (
+          <div className="mt-3">
+            <div className={`text-[12px] text-muted-foreground leading-relaxed ${!showBio ? "line-clamp-2" : ""}`}>
+              {s.description}
+            </div>
+            {s.description.length > 80 && (
+              <button onClick={() => setShowBio(!showBio)} className="text-[11px] font-bold mt-1 transition-colors" style={{ color: colors.accent }}>
+                {showBio ? "সংক্ষেপে দেখুন" : "আরও দেখুন"}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* CTA Buttons */}
+      <div className="px-4 sm:px-5 pb-4 sm:pb-5 grid grid-cols-3 gap-2">
+        {s.phone ? (
+          <a
+            href={`tel:${s.phone}`}
+            className="py-2.5 rounded-xl text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1.5 text-white active:scale-[0.97] transition-transform"
+            style={{ background: colors.gradient }}
+          >
+            <Phone className="w-3.5 h-3.5" /> কল করুন
+          </a>
+        ) : (
+          <div className="py-2.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 bg-muted/40 text-muted-foreground cursor-not-allowed">
+            <Phone className="w-3.5 h-3.5" /> কল
+          </div>
+        )}
+        {messageUrl || s.whatsapp ? (
+          <a
+            href={messageUrl || `https://wa.me/88${s.whatsapp}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="py-2.5 rounded-xl text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1.5 text-white active:scale-[0.97] transition-transform"
+            style={{ background: "linear-gradient(135deg, hsl(142,70%,38%), hsl(152,65%,45%))" }}
+          >
+            <MessageCircle className="w-3.5 h-3.5" /> মেসেজ
+          </a>
+        ) : (
+          <div className="py-2.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 bg-muted/40 text-muted-foreground cursor-not-allowed">
+            <MessageCircle className="w-3.5 h-3.5" /> মেসেজ
+          </div>
+        )}
+        <button
+          onClick={onShare}
+          className="py-2.5 rounded-xl text-[11px] sm:text-[12px] font-bold flex items-center justify-center gap-1.5 bg-muted/70 text-foreground border border-border/40 hover:bg-muted transition-colors"
+        >
+          <Share2 className="w-3.5 h-3.5" /> শেয়ার
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
 const DefaultCard = ({ s, colors }: { s: Service; colors: { accent: string; bg: string; gradient: string } }) => {
   const m = s.metadata || {};
   const metaParts: string[] = [];
@@ -1638,6 +1903,106 @@ const MarketplaceHero = ({
   );
 };
 
+// ──── Teacher Filters Component ────
+const TeacherFilters = ({
+  services,
+  filters,
+  setFilters,
+}: {
+  services: Service[];
+  filters: { subject: string; level: string; location: string; search: string };
+  setFilters: (f: any) => void;
+}) => {
+  const [showFilters, setShowFilters] = useState(false);
+  const colors = categoryColors.teachers;
+
+  const subjects = useMemo(() => {
+    const set = new Set<string>();
+    services.forEach(s => { if (s.metadata?.subject) set.add(s.metadata.subject); });
+    return Array.from(set).sort();
+  }, [services]);
+
+  const levels = useMemo(() => {
+    const set = new Set<string>();
+    services.forEach(s => { if (s.metadata?.teaching_level) set.add(s.metadata.teaching_level); });
+    return Array.from(set).sort();
+  }, [services]);
+
+  const locations = useMemo(() => {
+    const set = new Set<string>();
+    services.forEach(s => { if (s.area) set.add(s.area); if (s.address) set.add(s.address); });
+    return Array.from(set).sort();
+  }, [services]);
+
+  const activeCount = [filters.subject, filters.level, filters.location].filter(Boolean).length;
+
+  return (
+    <div className="space-y-2">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder="শিক্ষক খুঁজুন..."
+          value={filters.search}
+          onChange={e => setFilters({ ...filters, search: e.target.value })}
+          className="w-full pl-9 pr-10 py-2.5 rounded-xl bg-card border border-border/60 text-sm outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground"
+        />
+        {filters.search && (
+          <button onClick={() => setFilters({ ...filters, search: "" })} className="absolute right-3 top-1/2 -translate-y-1/2">
+            <X className="w-4 h-4 text-muted-foreground" />
+          </button>
+        )}
+      </div>
+      <button
+        onClick={() => setShowFilters(!showFilters)}
+        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-card border border-border/60 text-sm font-semibold text-foreground w-full justify-between"
+      >
+        <span className="flex items-center gap-2">
+          <Filter className="w-4 h-4" style={{ color: colors.accent }} />
+          ফিল্টার করুন
+          {activeCount > 0 && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style={{ background: colors.accent }}>{activeCount}</span>
+          )}
+        </span>
+        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showFilters ? "rotate-180" : ""}`} />
+      </button>
+      {showFilters && (
+        <div className="grid grid-cols-3 gap-2 p-3 rounded-xl bg-card border border-border/40 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div>
+            <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">বিষয়</label>
+            <select value={filters.subject} onChange={e => setFilters({ ...filters, subject: e.target.value })} className="w-full text-xs px-2 py-2 rounded-lg bg-muted/50 border border-border/40 outline-none">
+              <option value="">সকল</option>
+              {subjects.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">স্তর</label>
+            <select value={filters.level} onChange={e => setFilters({ ...filters, level: e.target.value })} className="w-full text-xs px-2 py-2 rounded-lg bg-muted/50 border border-border/40 outline-none">
+              <option value="">সকল</option>
+              {levels.map(l => <option key={l} value={l}>{l}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">এলাকা</label>
+            <select value={filters.location} onChange={e => setFilters({ ...filters, location: e.target.value })} className="w-full text-xs px-2 py-2 rounded-lg bg-muted/50 border border-border/40 outline-none">
+              <option value="">সকল</option>
+              {locations.map(l => <option key={l} value={l}>{l}</option>)}
+            </select>
+          </div>
+          {activeCount > 0 && (
+            <button
+              onClick={() => setFilters({ subject: "", level: "", location: "", search: filters.search })}
+              className="col-span-3 text-xs font-bold py-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+            >
+              সকল ফিল্টার মুছুন
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const CategoryServices = () => {
   const { slug } = useParams<{ slug: string }>();
   const [services, setServices] = useState<Service[]>([]);
@@ -1646,6 +2011,7 @@ const CategoryServices = () => {
   const [loading, setLoading] = useState(true);
   const [doctorFilters, setDoctorFilters] = useState({ specialty: "", location: "", feeRange: "", rating: "", search: "" });
   const [marketplaceFilters, setMarketplaceFilters] = useState({ search: "", category: "", condition: "", priceRange: "" });
+  const [teacherFilters, setTeacherFilters] = useState({ subject: "", level: "", location: "", search: "" });
 
   const colors = (slug && categoryColors[slug]) || defaultColor;
 
@@ -1727,7 +2093,24 @@ const CategoryServices = () => {
     });
   }, [services, marketplaceFilters, slug]);
 
-  const filtered = slug === "doctors" ? filteredDoctors : slug === "marketplace" ? filteredMarketplace : services;
+  // Teacher filtering logic
+  const filteredTeachers = useMemo(() => {
+    if (slug !== "teachers") return services;
+    return services.filter(s => {
+      const m = s.metadata || {};
+      if (teacherFilters.search) {
+        const q = teacherFilters.search.toLowerCase();
+        const match = s.title.toLowerCase().includes(q) || (m.subject || "").toLowerCase().includes(q) || (m.institution || "").toLowerCase().includes(q) || ((m.subjects_taught || []) as string[]).some((sub: string) => sub.toLowerCase().includes(q));
+        if (!match) return false;
+      }
+      if (teacherFilters.subject && m.subject !== teacherFilters.subject) return false;
+      if (teacherFilters.level && m.teaching_level !== teacherFilters.level) return false;
+      if (teacherFilters.location && s.area !== teacherFilters.location && s.address !== teacherFilters.location) return false;
+      return true;
+    });
+  }, [services, teacherFilters, slug]);
+
+  const filtered = slug === "doctors" ? filteredDoctors : slug === "marketplace" ? filteredMarketplace : slug === "teachers" ? filteredTeachers : services;
 
   const handleShare = (service: Service) => {
     if (navigator.share) {
@@ -1768,6 +2151,8 @@ const CategoryServices = () => {
         return <ShopCard key={s.id} s={s} colors={colors} />;
       case "marketplace":
         return <MarketplaceCard key={s.id} s={s} colors={colors} />;
+      case "teachers":
+        return <TeacherCard key={s.id} s={s} colors={colors} onShare={() => handleShare(s)} />;
       default:
         return <DefaultCard key={s.id} s={s} colors={colors} />;
     }
@@ -1789,6 +2174,11 @@ const CategoryServices = () => {
         {/* Marketplace Hero + Filters */}
         {slug === "marketplace" && !loading && (
           <MarketplaceHero services={services} filters={marketplaceFilters} setFilters={setMarketplaceFilters} totalCount={services.length} />
+        )}
+
+        {/* Teacher Filters */}
+        {slug === "teachers" && !loading && services.length > 0 && (
+          <TeacherFilters services={services} filters={teacherFilters} setFilters={setTeacherFilters} />
         )}
 
         {loading ? (
@@ -1840,6 +2230,14 @@ const CategoryServices = () => {
                 ফিল্টার মুছুন
               </button>
             )}
+            {slug === "teachers" && (teacherFilters.subject || teacherFilters.level || teacherFilters.location || teacherFilters.search) && (
+              <button
+                onClick={() => setTeacherFilters({ subject: "", level: "", location: "", search: "" })}
+                className="mt-2 text-sm font-bold text-primary"
+              >
+                ফিল্টার মুছুন
+              </button>
+            )}
           </div>
         ) : (
           <>
@@ -1848,6 +2246,9 @@ const CategoryServices = () => {
             )}
             {slug === "marketplace" && (
               <p className="text-xs text-muted-foreground font-semibold">{filtered.length}টি পণ্য পাওয়া গেছে</p>
+            )}
+            {slug === "teachers" && (
+              <p className="text-xs text-muted-foreground font-semibold">{filtered.length}জন শিক্ষক পাওয়া গেছে</p>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-6">
               {filtered.map(renderCard)}
