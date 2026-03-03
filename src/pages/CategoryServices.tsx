@@ -1,11 +1,14 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { Phone, MapPin, Share2, MessageCircle, Star, GraduationCap, Building2, Briefcase, Clock, User, Award, Stethoscope, BadgeCheck, CalendarClock, Banknote, Filter, ChevronDown, Eye, Calendar, Search, X, Navigation, ImageIcon, BookOpen, Hash, Globe, Users, ShoppingBag, Tag, Facebook, ChevronLeft, ChevronRight, Package, Heart } from "lucide-react";
+import { Phone, MapPin, Share2, MessageCircle, Star, GraduationCap, Building2, Briefcase, Clock, User, Award, Stethoscope, BadgeCheck, CalendarClock, Banknote, Filter, ChevronDown, Eye, Calendar, Search, X, Navigation, ImageIcon, BookOpen, Hash, Globe, Users, ShoppingBag, Tag, Facebook, ChevronLeft, ChevronRight, Package, Heart, AlertCircle, HandHeart, Gift, Flame, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import PageHeader from "@/components/PageHeader";
 import SubmitFormDialog from "@/components/SubmitFormDialog";
 import PageAdBanner from "@/components/PageAdBanner";
 import BottomNav from "@/components/BottomNav";
+import { format, differenceInHours } from "date-fns";
+import { bn } from "date-fns/locale";
+import LostFoundPageComponent from "@/components/LostFoundPage";
 
 interface Service {
   id: string;
@@ -2159,12 +2162,7 @@ const CategoryServices = () => {
   };
 
   if (slug === "lost-found") {
-    return (
-      <div className="min-h-screen bg-background max-w-4xl mx-auto pb-20">
-        <PageHeader title="হারানো ও পাওয়া" />
-        <BottomNav />
-      </div>
-    );
+    return <LostFoundPageComponent />;
   }
 
   return (
