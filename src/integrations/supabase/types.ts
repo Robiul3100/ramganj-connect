@@ -535,38 +535,92 @@ export type Database = {
       }
       events: {
         Row: {
+          capacity: string | null
           category: string
           created_at: string
           description: string | null
+          end_date: string | null
           event_date: string | null
+          event_time: string | null
+          full_description: string | null
           icon_name: string | null
           id: string
+          image_url: string | null
           is_approved: boolean
+          is_free: boolean | null
+          is_verified: boolean | null
           location: string | null
+          map_link: string | null
+          organizer_image_url: string | null
+          organizer_location: string | null
+          organizer_name: string | null
+          phone: string | null
+          price: string | null
+          registration_link: string | null
+          registration_open: boolean | null
+          start_date: string | null
+          status: string
+          tagline: string | null
           title: string
           updated_at: string
         }
         Insert: {
+          capacity?: string | null
           category?: string
           created_at?: string
           description?: string | null
+          end_date?: string | null
           event_date?: string | null
+          event_time?: string | null
+          full_description?: string | null
           icon_name?: string | null
           id?: string
+          image_url?: string | null
           is_approved?: boolean
+          is_free?: boolean | null
+          is_verified?: boolean | null
           location?: string | null
+          map_link?: string | null
+          organizer_image_url?: string | null
+          organizer_location?: string | null
+          organizer_name?: string | null
+          phone?: string | null
+          price?: string | null
+          registration_link?: string | null
+          registration_open?: boolean | null
+          start_date?: string | null
+          status?: string
+          tagline?: string | null
           title: string
           updated_at?: string
         }
         Update: {
+          capacity?: string | null
           category?: string
           created_at?: string
           description?: string | null
+          end_date?: string | null
           event_date?: string | null
+          event_time?: string | null
+          full_description?: string | null
           icon_name?: string | null
           id?: string
+          image_url?: string | null
           is_approved?: boolean
+          is_free?: boolean | null
+          is_verified?: boolean | null
           location?: string | null
+          map_link?: string | null
+          organizer_image_url?: string | null
+          organizer_location?: string | null
+          organizer_name?: string | null
+          phone?: string | null
+          price?: string | null
+          registration_link?: string | null
+          registration_open?: boolean | null
+          start_date?: string | null
+          status?: string
+          tagline?: string | null
           title?: string
           updated_at?: string
         }

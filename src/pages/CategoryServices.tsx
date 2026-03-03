@@ -9,6 +9,7 @@ import BottomNav from "@/components/BottomNav";
 import { format, differenceInHours } from "date-fns";
 import { bn } from "date-fns/locale";
 import LostFoundPageComponent from "@/components/LostFoundPage";
+import EventsPageComponent from "@/components/EventsPage";
 
 interface Service {
   id: string;
@@ -2163,6 +2164,10 @@ const CategoryServices = () => {
 
   if (slug === "lost-found") {
     return <LostFoundPageComponent />;
+  }
+
+  if (slug === "events") {
+    return <EventsPageComponent />;
   }
 
   return (
