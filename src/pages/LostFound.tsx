@@ -157,10 +157,10 @@ const LostFound = () => {
           )}
         </div>
 
-        {/* Cards */}
+        {/* Cards - placeholder for new design */}
         {loading ? (
           <div className="space-y-4">
-            {Array.from({ length: 4 }).map((_, i) => <ItemCardSkeleton key={i} />)}
+            {Array.from({ length: 3 }).map((_, i) => <ItemCardSkeleton key={i} />)}
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -172,12 +172,7 @@ const LostFound = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {filtered.map((item) => (
-              <div key={item.id} className="rounded-2xl border border-border/40 bg-card p-4">
-                <p className="font-bold text-foreground">{item.item_name}</p>
-                <p className="text-sm text-muted-foreground">{item.type === "lost" ? "হারিয়েছে" : "পাওয়া গেছে"}</p>
-              </div>
-            ))}
+            {/* New card design will go here */}
           </div>
         )}
       </div>
