@@ -31,6 +31,7 @@ import AdminAdsManager from "@/components/admin/AdminAdsManager";
 import AdminAboutManager from "@/components/admin/AdminAboutManager";
 import SwipeUpEditor from "@/components/admin/SwipeUpEditor";
 import AdminDeveloperProfile from "@/components/admin/AdminDeveloperProfile";
+import AdminLostFoundManager from "@/components/admin/AdminLostFoundManager";
 
 // Legacy table configs for CRUD
 const legacyTableConfig: Record<string, { table: string; fields: { name: string; label: string; type?: string; options?: string[] }[]; nameKey: string }> = {
@@ -1044,6 +1045,7 @@ const AdminDashboard = () => {
       case "analytics": return <VisitorAnalytics />;
       case "service_grid": return <ServiceGridManager />;
       case "developer_profile": return <AdminDeveloperProfile logActivity={logActivity} />;
+      case "lost_found": return <AdminLostFoundManager logActivity={logActivity} />;
       default: return renderLegacy();
     }
   };

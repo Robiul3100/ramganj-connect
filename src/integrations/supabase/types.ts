@@ -657,36 +657,51 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          detail_description: string | null
           id: string
+          image_url: string | null
           is_approved: boolean
           item_date: string | null
           item_name: string
           location: string | null
+          person_image_url: string | null
+          person_name: string | null
           phone: string | null
+          reward: string | null
           type: string
           updated_at: string
         }
         Insert: {
           created_at?: string
           description?: string | null
+          detail_description?: string | null
           id?: string
+          image_url?: string | null
           is_approved?: boolean
           item_date?: string | null
           item_name: string
           location?: string | null
+          person_image_url?: string | null
+          person_name?: string | null
           phone?: string | null
+          reward?: string | null
           type?: string
           updated_at?: string
         }
         Update: {
           created_at?: string
           description?: string | null
+          detail_description?: string | null
           id?: string
+          image_url?: string | null
           is_approved?: boolean
           item_date?: string | null
           item_name?: string
           location?: string | null
+          person_image_url?: string | null
+          person_name?: string | null
           phone?: string | null
+          reward?: string | null
           type?: string
           updated_at?: string
         }
