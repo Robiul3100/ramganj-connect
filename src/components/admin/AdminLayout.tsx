@@ -251,7 +251,7 @@ const AdminLayout = ({ activeTab, onTabChange, currentUser, pendingCount, childr
         <div className="flex items-center justify-around px-1 py-1.5 max-w-lg mx-auto">
           {bottomNavItems.map((item, idx) => {
             const isHome = item.id === "home";
-            const serviceSubTabs: AdminTab[] = ["all_services", "services", "pending", "categories", "service_grid", "news", "slider", "advertisements", "about", "timeline", "emergency", "blood", "donations", "offices", "announcements", "events", "police"];
+            const serviceSubTabs: AdminTab[] = ["all_services", "services", "pending", "categories", "service_grid", "news", "slider", "advertisements", "about", "timeline", "emergency", "blood", "donations", "offices", "announcements", "events", "police", "videos"];
             const settingsSubTabs: AdminTab[] = ["all_settings", "site_settings", "app_settings", "notifications", "users", "activity", "developer_profile"];
             
             const isActive = isHome
