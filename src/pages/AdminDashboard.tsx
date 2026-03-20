@@ -35,6 +35,7 @@ import AdminLostFoundManager from "@/components/admin/AdminLostFoundManager";
 import AdminEventsManager from "@/components/admin/AdminEventsManager";
 import AdminPoliceManager from "@/components/admin/AdminPoliceManager";
 import AdminServicesByCategory from "@/components/admin/AdminServicesByCategory";
+import AdminVideoManager from "@/components/admin/AdminVideoManager";
 
 // Legacy table configs for CRUD
 const legacyTableConfig: Record<string, { table: string; fields: { name: string; label: string; type?: string; options?: string[] }[]; nameKey: string }> = {
