@@ -53,6 +53,7 @@ const tabGroups = [
       { id: "lost_found" as AdminTab, label: "হারানো ও পাওয়া", icon: Globe },
       { id: "events" as AdminTab, label: "ইভেন্ট", icon: Globe },
       { id: "police" as AdminTab, label: "পুলিশ", icon: Shield },
+      { id: "videos" as AdminTab, label: "ভিডিও", icon: Globe },
     ],
   },
   {
