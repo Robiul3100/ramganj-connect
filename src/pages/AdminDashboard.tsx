@@ -1056,6 +1056,7 @@ const AdminDashboard = () => {
       case "lost_found": return <AdminLostFoundManager logActivity={logActivity} />;
       case "events": return <AdminEventsManager logActivity={logActivity} />;
       case "police": return <AdminPoliceManager logActivity={logActivity} />;
+      case "videos": return <AdminVideoManager logActivity={logActivity} />;
       default: return renderLegacy();
     }
   };
