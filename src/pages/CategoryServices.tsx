@@ -11,6 +11,7 @@ import { bn } from "date-fns/locale";
 import LostFoundPageComponent from "@/components/LostFoundPage";
 import EventsPageComponent from "@/components/EventsPage";
 import PolicePageComponent from "@/components/PolicePage";
+import VideoPageComponent from "@/components/VideoPage";
 
 interface Service {
   id: string;
@@ -2173,6 +2174,10 @@ const CategoryServices = () => {
 
   if (slug === "police") {
     return <PolicePageComponent />;
+  }
+
+  if (slug === "video") {
+    return <VideoPageComponent />;
   }
 
   return (

@@ -35,6 +35,7 @@ import AdminLostFoundManager from "@/components/admin/AdminLostFoundManager";
 import AdminEventsManager from "@/components/admin/AdminEventsManager";
 import AdminPoliceManager from "@/components/admin/AdminPoliceManager";
 import AdminServicesByCategory from "@/components/admin/AdminServicesByCategory";
+import AdminVideoManager from "@/components/admin/AdminVideoManager";
 
 // Legacy table configs for CRUD
 const legacyTableConfig: Record<string, { table: string; fields: { name: string; label: string; type?: string; options?: string[] }[]; nameKey: string }> = {
@@ -923,6 +924,7 @@ const AdminDashboard = () => {
     { id: "announcements" as AdminTab, label: "ঘোষণা", desc: "মার্কি ঘোষণা ম্যানেজ", icon: Megaphone, gradient: "from-orange-500 to-red-500" },
     { id: "events" as AdminTab, label: "ইভেন্ট", desc: "ইভেন্ট ম্যানেজ করুন", icon: CalendarHeart, gradient: "from-fuchsia-500 to-pink-500" },
     { id: "police" as AdminTab, label: "পুলিশ", desc: "পুলিশ থানা ও কর্মকর্তা", icon: ShieldAlert, gradient: "from-slate-600 to-blue-600" },
+    { id: "videos" as AdminTab, label: "ভিডিও", desc: "YouTube ভিডিও ম্যানেজ", icon: Video, gradient: "from-red-600 to-rose-600" },
   ];
 
   const filteredHubSections = serviceHubSections.filter(s =>
@@ -1054,6 +1056,7 @@ const AdminDashboard = () => {
       case "lost_found": return <AdminLostFoundManager logActivity={logActivity} />;
       case "events": return <AdminEventsManager logActivity={logActivity} />;
       case "police": return <AdminPoliceManager logActivity={logActivity} />;
+      case "videos": return <AdminVideoManager logActivity={logActivity} />;
       default: return renderLegacy();
     }
   };
