@@ -924,6 +924,7 @@ const AdminDashboard = () => {
     { id: "announcements" as AdminTab, label: "ঘোষণা", desc: "মার্কি ঘোষণা ম্যানেজ", icon: Megaphone, gradient: "from-orange-500 to-red-500" },
     { id: "events" as AdminTab, label: "ইভেন্ট", desc: "ইভেন্ট ম্যানেজ করুন", icon: CalendarHeart, gradient: "from-fuchsia-500 to-pink-500" },
     { id: "police" as AdminTab, label: "পুলিশ", desc: "পুলিশ থানা ও কর্মকর্তা", icon: ShieldAlert, gradient: "from-slate-600 to-blue-600" },
+    { id: "videos" as AdminTab, label: "ভিডিও", desc: "YouTube ভিডিও ম্যানেজ", icon: Video, gradient: "from-red-600 to-rose-600" },
   ];
 
   const filteredHubSections = serviceHubSections.filter(s =>
