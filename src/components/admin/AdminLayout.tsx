@@ -216,9 +216,7 @@ const AdminLayout = ({ activeTab, onTabChange, currentUser, pendingCount, childr
             <aside className="absolute left-0 top-0 bottom-0 w-[280px] bg-card border-r border-border flex flex-col animate-slide-in-left">
               <div className="flex items-center justify-between p-4 border-b border-border/60">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm">
-                    <Shield className="w-4 h-4 text-primary-foreground" />
-                  </div>
+                  <img src={ramganjCityLogo} alt="রামগঞ্জ সিটি" className="h-8 w-auto object-contain" />
                   <span className="text-sm font-bold text-foreground">অ্যাডমিন প্যানেল</span>
                 </div>
                 <button onClick={() => setSidebarOpen(false)} className="w-8 h-8 rounded-xl bg-muted/80 hover:bg-muted flex items-center justify-center transition-colors">
