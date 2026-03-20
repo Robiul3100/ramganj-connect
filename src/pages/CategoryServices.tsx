@@ -2175,6 +2175,10 @@ const CategoryServices = () => {
     return <PolicePageComponent />;
   }
 
+  if (slug === "video") {
+    return <VideoPageComponent />;
+  }
+
   return (
     <div className="min-h-screen bg-background max-w-4xl mx-auto pb-20">
       <PageHeader title={category?.name || "সেবাসমূহ"} color={colors.gradient} onAdd={() => setShowForm(true)} />
