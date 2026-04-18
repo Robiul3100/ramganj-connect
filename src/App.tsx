@@ -35,6 +35,8 @@ import InstallApp from "./pages/InstallApp";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Disclaimer from "./pages/Disclaimer";
 import LostFound from "./pages/LostFound";
+import Quiz from "./pages/Quiz";
+import QuizPlay from "./pages/QuizPlay";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +78,8 @@ const App = () => {
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/disclaimer" element={<Disclaimer />} />
                 <Route path="/lost-found" element={<LostFound />} />
+                <Route path="/quiz" element={<Quiz />} />
+                <Route path="/quiz/:id" element={<QuizPlay />} />
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="*" element={<NotFound />} />
