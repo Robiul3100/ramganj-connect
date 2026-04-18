@@ -119,11 +119,38 @@ const MenuIcon = ({ active }: { active: boolean }) => (
   </svg>
 );
 
+/* ── Quiz Icon (multicolor 3D) ── */
+const QuizIcon = ({ active }: { active: boolean }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <defs>
+      <linearGradient id="quiz-bg" x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#a855f7" />
+        <stop offset="0.5" stopColor="#ec4899" />
+        <stop offset="1" stopColor="#f97316" />
+      </linearGradient>
+      <radialGradient id="quiz-shine" cx="9" cy="7" r="7" gradientUnits="userSpaceOnUse">
+        <stop stopColor="white" stopOpacity="0.5" />
+        <stop offset="1" stopColor="white" stopOpacity="0" />
+      </radialGradient>
+    </defs>
+    {/* Brain/lightbulb shape */}
+    <path d="M12 3a6 6 0 00-4 10.5V16a2 2 0 002 2h4a2 2 0 002-2v-2.5A6 6 0 0012 3z"
+      fill="url(#quiz-bg)" opacity={active ? 1 : 0.78} />
+    <path d="M12 3a6 6 0 00-4 10.5V16a2 2 0 002 2h4a2 2 0 002-2v-2.5A6 6 0 0012 3z"
+      fill="url(#quiz-shine)" />
+    {/* Question mark */}
+    <text x="12" y="13" textAnchor="middle" fontSize="8" fontWeight="900" fill="white" opacity="0.95">?</text>
+    {/* Base */}
+    <rect x="9.5" y="19" width="5" height="1.5" rx="0.75" fill="#64748b" opacity="0.7" />
+    <rect x="10.5" y="20.8" width="3" height="1" rx="0.5" fill="#475569" opacity="0.6" />
+  </svg>
+);
+
 /* ── Nav config ── */
 const navItems = [
   { SvgIcon: HomeIcon, label: "হোম", route: "/", type: "route" as const, glow: "rgba(59,130,246,0.45)" },
   { SvgIcon: ServicesIcon, label: "সেবা", route: "/services", type: "route" as const, glow: "rgba(139,92,246,0.45)" },
-  { SvgIcon: DonationIcon, label: "অনুদান", route: "/donation", type: "route" as const, glow: "rgba(244,63,94,0.45)" },
+  { SvgIcon: QuizIcon, label: "কুইজ", route: "/quiz", type: "route" as const, glow: "rgba(168,85,247,0.5)" },
   { SvgIcon: BellIcon, label: "নোটিশ", route: "/notifications", type: "route" as const, glow: "rgba(245,158,11,0.45)" },
   { SvgIcon: MenuIcon, label: "মেন্যু", route: "", type: "menu" as const, glow: "rgba(16,185,129,0.45)" },
 ];
