@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import ramganjCityLogo from "@/assets/ramganj-city-logo.png";
 
-export type AdminTab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications" | "app_settings" | "service_grid" | "all_services" | "all_settings" | "developer_profile" | "lost_found" | "events" | "police" | "videos";
+export type AdminTab = "dashboard" | "services" | "categories" | "pending" | "users" | "activity" | "emergency" | "blood" | "donations" | "announcements" | "slider" | "about" | "timeline" | "news" | "site_settings" | "advertisements" | "offices" | "analytics" | "notifications" | "app_settings" | "service_grid" | "all_services" | "all_settings" | "developer_profile" | "lost_found" | "events" | "police" | "videos" | "quizzes";
 
 // Bottom nav pages (4 main pages)
 const bottomNavItems: { id: AdminTab | "home"; label: string; icon: typeof LayoutDashboard }[] = [
@@ -54,6 +54,7 @@ const tabGroups = [
       { id: "events" as AdminTab, label: "ইভেন্ট", icon: Globe },
       { id: "police" as AdminTab, label: "পুলিশ", icon: Shield },
       { id: "videos" as AdminTab, label: "ভিডিও", icon: Globe },
+      { id: "quizzes" as AdminTab, label: "কুইজ", icon: Zap },
     ],
   },
   {
