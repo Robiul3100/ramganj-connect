@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X, Send } from "lucide-react";
+import { toast } from "sonner";
 
 interface FieldConfig {
   name: string;
@@ -31,7 +32,7 @@ const SubmitFormDialog = ({ open, onClose, title, subtitle, fields, onSubmit, he
 
   const handleSubmit = async () => {
     if (parseInt(captchaAnswer) !== captchaA + captchaB) {
-      alert("নিরাপত্তা প্রশ্নের উত্তর সঠিক নয়!");
+      toast.error("নিরাপত্তা প্রশ্নের উত্তর সঠিক নয়!");
       return;
     }
     setLoading(true);
@@ -41,7 +42,7 @@ const SubmitFormDialog = ({ open, onClose, title, subtitle, fields, onSubmit, he
       setCaptchaAnswer("");
       onClose();
     } catch { 
-      alert("সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+      toast.error("সমস্যা হয়েছে, আবার চেষ্টা করুন।");
     }
     setLoading(false);
   };
@@ -117,3 +118,4 @@ const SubmitFormDialog = ({ open, onClose, title, subtitle, fields, onSubmit, he
 };
 
 export default SubmitFormDialog;
+
