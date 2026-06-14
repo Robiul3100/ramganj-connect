@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /admin
+Disallow: /admin-login
 
-Sitemap: https://www.robiul.ami.bd/sitemap.xml
+# Canonical site URL - update here and in sitemap.xml together.
+Sitemap: https://ramganj-city.vercel.app/sitemap.xml
