@@ -1,73 +1,158 @@
-# Welcome to your Lovable project
+# রামগঞ্জ সিটি — Ramganj Connect
 
-## Project info
+> রামগঞ্জের সকল সেবা, খবর ও জরুরি তথ্য একটি অ্যাপে। PWA, বাংলা-প্রথম, অফলাইন-ফ্রেন্ডলি।
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+**Live:** [ramganj-city.vercel.app](https://ramganj-city.vercel.app)
+**Owner:** [Robiul3100](https://github.com/Robiul3100)
+**Stack:** React 18 + TypeScript + Vite + Supabase + Firebase FCM + Vercel
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## ফিচার সমূহ
 
-**Use Lovable**
+- **সেবা ক্যাটালগ** — ২৫+ রাউট, ইমার্জেন্সি, ব্লাড ব্যাংক, অফিস, টিউশন মিডিয়া
+- **প্রশাসন প্যানেল** — সেবা, নিউজ, স্লাইডার, বিজ্ঞাপন, কুইজ, ইভেন্ট ম্যানেজমেন্ট
+- **PWA** — ইনস্টলযোগ্য, অফলাইনে ব্যবহারযোগ্য
+- **পুশ নোটিফিকেশন** — Firebase Cloud Messaging
+- **রিয়েল-টাইম** — Supabase Realtime (সাইট সেটিংস, নোটিফিকেশন, স্লাইডার)
+- **নামাজের সময়সূচি** — অটো-কম্পিউটেড (adhan lib) + বাংলা ক্যালেন্ডার
+- **কুইজ সিস্টেম** — লিডারবোর্ড, অ্যাটেম্প্ট ট্র্যাকিং
+- **লস্ট অ্যান্ড ফাউন্ড** — পাবলিক সাবমিশন + অ্যাডমিন অ্যাপ্রুভাল
+- **রক্তদাতা** — অনুমোদিত ডোনার ডিরেক্টরি
+- **ডার্ক/লাইট থিম** — অ্যাপল-স্টাইল ওয়াটারড্রপ ট্রানজিশন
+- **মেইনটেন্যান্স মোড** — অ্যাডমিন-নিয়ন্ত্রিত সাইট-ওয়াইড টগল
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## টেকনোলজি
 
-**Use your preferred IDE**
+| ক্যাটাগরি | টেক |
+|---|---|
+| ফ্রন্টএন্ড | React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui |
+| রাউটিং | React Router 6 |
+| স্টেট/ডেটা | TanStack Query |
+| ব্যাকএন্ড | Supabase (Postgres + Auth + Realtime + Storage + Edge Functions) |
+| পুশ | Firebase Cloud Messaging (FCM) |
+| PWA | vite-plugin-pwa (Workbox) |
+| ডিপ্লয় | Vercel (SPA rewrite) |
+| প্যাকেজ ম্যানেজার | Bun (recommended) or npm |
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## লোকাল ডেভেলপমেন্ট সেটআপ
 
-Follow these steps:
+### প্রিরিকোয়াইজিট
+- Node.js 20+
+- (ঐচ্ছিক) Bun — [install](https://bun.sh)
+- (ঐচ্ছিক) Supabase CLI — [install](https://supabase.com/docs/guides/cli)
+
+### ধাপসমূহ
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# 1. ক্লোন
+git clone https://github.com/Robiul3100/ramganj-connect.git
+cd ramganj-connect
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# 2. ডিপেন্ডেন্সি ইনস্টল
+bun install
+# অথবা: npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 3. এনভায়রনমেন্ট ভেরিয়েবল
+cp .env.example .env
+# .env ফাইলে Supabase ও Firebase এর আসল মান বসান
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+# 4. ডেভ সার্ভার চালু
+bun run dev
+# অথবা: npm run dev
+# → http://localhost:8080
+
+# 5. প্রোডাকশন বিল্ড
+bun run build
+
+# 6. প্রিভিউ বিল্ড
+bun run preview
 ```
 
-**Edit a file directly in GitHub**
+### স্ক্রিপ্টসমূহ
+- `dev` — Vite dev server (HMR, port 8080, host 127.0.0.1)
+- `build` — প্রোডাকশন বিল্ড → `dist/`
+- `build:dev` — ডেভেলপমেন্ট mode-এ বিল্ড
+- `lint` — ESLint চেক
+- `test` / `test:watch` — Vitest
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## Supabase সেটআপ
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. [supabase.com](https://supabase.com) এ নতুন প্রজেক্ট তৈরি করুন
+2. `supabase/migrations/` ফোল্ডারের সব SQL ফাইল ক্রমে চালান (ড্যাশবোর্ডের SQL Editor দিয়ে)
+3. `Authentication → Providers` এ ইমেইল পাসওয়ার্ড চালু আছে কিনা দেখুন
+4. `Settings → API` থেকে URL, anon key, project id কপি করে `.env`-এ বসান
+5. **প্রথম অ্যাডমিন তৈরি:**
+   - `SETUP_ADMIN_SECRET` সেট করুন Supabase Edge Function secrets-এ
+   - `ADMIN_OWNER_EMAIL` সেট করুন
+   - `setup-admin` edge function deploy করুন
+   - `curl` বা `AdminLogin?setup=1` UI দিয়ে প্রথম admin invite করুন
+   - সফল হলে `setup-admin` function ডিলিট/আন-ডিপ্লয় করুন
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## Firebase FCM সেটআপ
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. [Firebase Console](https://console.firebase.google.com) এ প্রজেক্ট তৈরি
+2. Project Settings → Cloud Messaging → Web Push certificates → Generate key pair
+3. Web app যোগ করুন, config মানগুলো `.env`-এ বসান
+4. Supabase Edge Function secrets-এ যোগ করুন:
+   - `FIREBASE_PROJECT_ID`
+   - `FIREBASE_CLIENT_EMAIL`
+   - `FIREBASE_PRIVATE_KEY` (নিউলাইন escape সহ)
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## ডিপ্লয় (Vercel)
 
-## Can I connect a custom domain to my Lovable project?
+1. [vercel.com](https://vercel.com) এ GitHub রিপো কানেক্ট করুন
+2. Build command: `bun run build` (অথবা `npm run build`)
+3. Output dir: `dist`
+4. Environment variables সেট করুন (উপরে দেখুন)
+5. `vercel.json` এ SPA rewrite আছে — কোনো অতিরিক্ত কনফিগার লাগবে না
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## অ্যাডমিন অ্যাকাউন্ট তৈরি
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+প্রথম অ্যাডমিন (ওনার) তৈরি করতে `/admin-login?setup=1` URL-এ যান।
+পরবর্তী অ্যাডমিনরা: Supabase Dashboard → Authentication → Users → Add user → SQL এ `user_roles` insert।
+
+⚠️ **গুরুত্বপূর্ণ:** `setup-admin` Edge Function ডিপ্লয় করার সময় অবশ্যই `SETUP_ADMIN_SECRET` ও `ADMIN_OWNER_EMAIL` env var সেট করুন। প্রথম admin তৈরির পর function আন-ডিপ্লয়/ডিলিট করুন।
+
+---
+
+## সিকিউরিটি নোটস
+
+- `user_roles` টেবিলে RLS enable আছে; admin role `has_role()` SQL function দিয়ে চেক হয়
+- ব্লাড ডোনার, লস্ট-ফাউন্ড-এর ফোন নম্বর পাবলিক-রিডেবল (intentional — যাতে যোগাযোগ করা যায়)
+- কুইজ অ্যাটেম্প্টে নাম/ফোন PII থেকে রক্ষায় `public_quiz_leaderboard` view ব্যবহার করুন (শুধু স্কোর + সময়)
+- Supabase anon key client-side-এ exposed — এটা design, কিন্তু production deployment-এ প্রজেক্ট ID ও row-level policy সঠিকভাবে configure করুন
+
+---
+
+## কন্ট্রিবিউটিং
+
+1. Fork করুন
+2. Feature branch: `git checkout -b feat/your-feature`
+3. Commit: `git commit -m "feat: add your feature"`
+4. Push: `git push origin feat/your-feature`
+5. Pull Request খুলুন
+
+ESLint + TypeScript strict mode ব্যবহার করুন। নতুন query-তে `any` avoid করুন, schema type ব্যবহার করুন।
+
+---
+
+## লাইসেন্স
+
+© 2026 Ramganj City Organisation. সকল অধিকার সংরক্ষিত।
+
+---
+
+**তৈরি করেছে** [রবিউল ইসলাম ইদরিস](https://github.com/Robiul3100) (RSF ROBIUL)
