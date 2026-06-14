@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.robiul.ami.bd/</loc><priority>1.0</priority><changefreq>daily</changefreq></url>
-  <url><loc>https://www.robiul.ami.bd/services</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://www.robiul.ami.bd/news</loc><priority>0.8</priority><changefreq>daily</changefreq></url>
-  <url><loc>https://www.robiul.ami.bd/about</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://www.robiul.ami.bd/contact</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://www.robiul.ami.bd/emergency</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://www.robiul.ami.bd/blood-bank</loc><priority>0.7</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://www.robiul.ami.bd/donation</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/</loc><priority>1.0</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/services</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/service/tuition</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/news</loc><priority>0.8</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/about-ramganj</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/contact</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/emergency-calls</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/blood-bank</loc><priority>0.7</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/donation</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/lost-found</loc><priority>0.6</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/quiz</loc><priority>0.6</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/offices</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/notifications</loc><priority>0.5</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/privacy-policy</loc><priority>0.3</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/disclaimer</loc><priority>0.3</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://ramganj-city.vercel.app/install</loc><priority>0.4</priority><changefreq>monthly</changefreq></url>
 </urlset>
