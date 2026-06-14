@@ -1,32 +1,32 @@
 /**
  * Firebase Cloud Messaging integration.
- * 
+ *
  * HOW TO SET UP:
  * 1. Create a Firebase project at https://console.firebase.google.com
  * 2. Enable Cloud Messaging
- * 3. Get your web app config and paste values below
- * 4. Get your Server Key from Project Settings > Cloud Messaging
- * 5. Add FCM_SERVER_KEY as a secret in Lovable Cloud
- * 
+ * 3. Get your web app config and paste values into your .env file
+ *    (see .env.example for variable names)
+ * 4. Get your VAPID key from Project Settings > Cloud Messaging > Web Push certificates
+ * 5. Add FCM_SERVER_KEY as a secret in Supabase Edge Function secrets
+ *
  * All keys below are PUBLISHABLE client-side keys (safe to commit).
  * The Server Key is stored securely in backend secrets.
  */
 
-// ============================================================
-// REPLACE THESE VALUES WITH YOUR FIREBASE PROJECT CONFIG
-// ============================================================
+const env = import.meta.env;
+
 export const firebaseConfig = {
-  apiKey: "AIzaSyD7u0j2ZAw8scYtQrIwIcACqDuzLdObtx4",
-  authDomain: "ramganj-city.firebaseapp.com",
-  projectId: "ramganj-city",
-  storageBucket: "ramganj-city.firebasestorage.app",
-  messagingSenderId: "59033055734",
-  appId: "1:59033055734:web:1c927f31afd7409cc857d7",
+  apiKey: env.VITE_FIREBASE_API_KEY || "",
+  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || "",
+  projectId: env.VITE_FIREBASE_PROJECT_ID || "",
+  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET || "",
+  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID || "",
+  appId: env.VITE_FIREBASE_APP_ID || "",
 };
 
-// Your VAPID key from Firebase Console > Project Settings > Cloud Messaging > Web Push certificates
-// You need to generate this from Firebase Console > Project Settings > Cloud Messaging > Web Push certificates
-export const VAPID_KEY = "BDP4IFyAIHRBbLetujtvT-BV3EYUysSFXNim5Qzm8bCAN-3k3x0PXAa-pHphoX0X_Ymphcy6H-FTZSigSqydu0A";
+// VAPID key is read at runtime from environment variables.
+// Generate yours at: Firebase Console > Project Settings > Cloud Messaging > Web Push certificates
+export const VAPID_KEY: string = env.VITE_FIREBASE_VAPID_KEY || "";
 
 /**
  * Check if Firebase is configured
