@@ -10,6 +10,27 @@ import { toast } from "sonner";
  * and shows browser Notification when enabled.
  * Also auto-subscribes to FCM and handles foreground messages.
  */
+
+// Use a small wrapper around storage so dedup works across multiple tabs.
+// Falls back to in-memory if storage is unavailable (private mode).
+const DEDUP_KEY_PREFIX = "notif_dedup_";
+const DEDUP_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+const markSeen = (id: string): boolean => {
+  try {
+    const raw = localStorage.getItem(DEDUP_KEY_PREFIX + id);
+    if (raw) {
+      const ts = Number(raw);
+      if (Number.isFinite(ts) && Date.now() - ts < DEDUP_TTL_MS) return true;
+    }
+    localStorage.setItem(DEDUP_KEY_PREFIX + id, String(Date.now()));
+    return false;
+  } catch {
+    // Storage unavailable - allow notification (no dedup)
+    return false;
+  }
+};
+
 const NotificationListener = () => {
   const { prefs } = useUserPreferences();
   const enabledRef = useRef(prefs.notificationsEnabled);
@@ -26,7 +47,7 @@ const NotificationListener = () => {
     }
   }, [prefs.notificationsEnabled, isSubscribed, subscribe]);
 
-  // Listen for FCM foreground messages → show in-app toast
+  // Listen for FCM foreground messages - show in-app toast
   useEffect(() => {
     if (!isFirebaseConfigured()) return;
 
@@ -50,13 +71,9 @@ const NotificationListener = () => {
           const title = payload.notification?.title || "নতুন নোটিফিকেশন";
           const body = payload.notification?.body || "";
 
-          // Dedup with realtime channel
+          // Dedup across tabs via localStorage
           const notifId = payload.data?.notification_id;
-          if (notifId) {
-            const key = `notif_${notifId}`;
-            if (sessionStorage.getItem(key)) return;
-            sessionStorage.setItem(key, "1");
-          }
+          if (notifId && markSeen(notifId)) return;
 
           toast(title, {
             description: body,
@@ -78,7 +95,7 @@ const NotificationListener = () => {
     return () => { unsubscribe?.(); };
   }, []);
 
-  // Realtime fallback → in-app toast + browser notification
+  // Realtime fallback - in-app toast + browser notification
   useEffect(() => {
     const channel = supabase
       .channel("user_notifications")
@@ -87,14 +104,11 @@ const NotificationListener = () => {
         { event: "INSERT", schema: "public", table: "admin_notifications" },
         (payload: any) => {
           if (!enabledRef.current) return;
-          const { title, body, is_draft } = payload.new || {};
+          const { title, body, is_draft, id } = payload.new || {};
           if (!title || is_draft) return;
+          if (!id || markSeen(id)) return;
 
-          const key = `notif_${payload.new.id}`;
-          if (sessionStorage.getItem(key)) return;
-          sessionStorage.setItem(key, "1");
-
-          // In-app toast — clicking "দেখুন" goes to notifications page
+          // In-app toast - clicking "দেখুন" goes to notifications page
           toast(title, {
             description: body || "",
             duration: 6000,

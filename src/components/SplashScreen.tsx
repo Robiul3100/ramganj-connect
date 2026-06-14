@@ -5,12 +5,37 @@ interface SplashScreenProps {
   onFinish: () => void;
 }
 
+const SKIP_IF_INSTALLED_KEY = "splash_dismissed";
+const DEFAULT_DURATION_MS = 4000;
+
 const SplashScreen = ({ onFinish }: SplashScreenProps) => {
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    const fadeTimer = setTimeout(() => setFadeOut(true), 3500);
-    const finishTimer = setTimeout(() => onFinish(), 4000);
+    // Skip splash on subsequent loads within the same day for installed PWAs
+    // or fast connections (already-cached).
+    let duration = DEFAULT_DURATION_MS;
+    try {
+      const last = localStorage.getItem(SKIP_IF_INSTALLED_KEY);
+      if (last) {
+        const ageMs = Date.now() - Number(last);
+        if (Number.isFinite(ageMs) && ageMs < 6 * 60 * 60 * 1000) {
+          duration = 800; // quick re-show
+        }
+      }
+    } catch {
+      // localStorage unavailable - use default duration
+    }
+
+    // Mark as dismissed so subsequent loads are quicker
+    try {
+      localStorage.setItem(SKIP_IF_INSTALLED_KEY, String(Date.now()));
+    } catch {
+      // Ignore storage errors
+    }
+
+    const fadeTimer = setTimeout(() => setFadeOut(true), duration - 500);
+    const finishTimer = setTimeout(() => onFinish(), duration);
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(finishTimer);
