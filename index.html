@@ -1,37 +1,41 @@
 <!doctype html>
-<html lang="en">
+<html lang="bn">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>রামগঞ্জ সিটি</title>
-    <meta name="description" content="আধুনিকতার ছোঁয়ায় রামগঞ্জ">
-    <meta name="author" content="Lovable" />
-
-    <!-- PWA Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
     <meta name="theme-color" content="#2680EB" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="রামগঞ্জ সিটি" />
     <link rel="apple-touch-icon" href="/pwa-icons/icon-192.png" />
+
+    <!-- Default meta values; useDynamicMeta hook may override at runtime. -->
+    <title>রামগঞ্জ সিটি</title>
+    <meta name="description" content="আধুনিকতার ছোঁয়ায় রামগঞ্জ - সকল সেবা, খবর ও জরুরি তথ্য এক অ্যাপে" />
+    <link rel="canonical" href="https://ramganj-city.vercel.app/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ramganj-city.vercel.app/" />
+    <meta property="og:title" content="রামগঞ্জ সিটি" />
+    <meta property="og:description" content="আধুনিকতার ছোঁয়ায় রামগঞ্জ - সকল সেবা, খবর ও জরুরি তথ্য এক অ্যাপে" />
+    <meta property="og:image" content="https://ramganj-city.vercel.app/pwa-icons/icon-512.png" />
+    <meta property="og:locale" content="bn_BD" />
+    <meta property="og:site_name" content="রামগঞ্জ সিটি" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="রামগঞ্জ সিটি" />
+    <meta name="twitter:description" content="আধুনিকতার ছোঁয়ায় রামগঞ্জ - সকল সেবা, খবর ও জরুরি তথ্য এক অ্যাপে" />
+    <meta name="twitter:image" content="https://ramganj-city.vercel.app/pwa-icons/icon-512.png" />
+
+    <!-- Fonts (preconnect for faster load) -->
+    <link rel="preconnect" href="https://banglawebfonts.pages.dev" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="https://banglawebfonts.pages.dev/fonts/bensen-handwriting/bensen-handwriting-regular.woff2" crossorigin="anonymous">
     <link href="https://banglawebfonts.pages.dev/css/bensen-handwriting.css" rel="stylesheet">
     <link rel="preload" as="font" type="font/woff2" href="https://banglawebfonts.pages.dev/fonts/solaiman-lipi/solaiman-lipi-regular.woff2" crossorigin="anonymous">
     <link href="https://banglawebfonts.pages.dev/css/solaiman-lipi.css" rel="stylesheet">
-
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/lAuk0Gbz8lWnbhqSWUe7FycUx9m2/social-images/social-1771296886434-FB_IMG_1771035815018.webp">
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
-    <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/lAuk0Gbz8lWnbhqSWUe7FycUx9m2/social-images/social-1771296886434-FB_IMG_1771035815018.webp">
-    
-    
-    
-    
-    <meta property="og:title" content="রামগঞ্জ সিটি">
-  <meta name="twitter:title" content="রামগঞ্জ সিটি">
-  <meta property="og:description" content="আধুনিকতার ছোঁয়ায় রামগঞ্জ">
-  <meta name="twitter:description" content="আধুনিকতার ছোঁয়ায় রামগঞ্জ">
-</head>
+  </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
